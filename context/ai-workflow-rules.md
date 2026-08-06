@@ -1,0 +1,37 @@
+# AI Workflow Rules
+
+> Rules governing how AI agents work **on** this project, and separately, how AI behaves **inside** the product.
+
+---
+
+## Part 1 — Rules for agents building this project
+
+### Currently in force
+
+**We are in planning. Do not write application code, components, schemas, APIs, pages, or UI.** This holds until the Tier 1 questions in `docs/open-questions.md` are answered and a build plan is approved. (Bible §2, §57)
+
+### Always in force
+
+1. **Never invent a requirement.** Ambiguity goes to `docs/open-questions.md`. Silent assumption is the single most damaging failure mode on this project.
+2. **Never implement an undefined system.** (Bible §56-09) If a spec is missing, the answer is a spec, not a guess.
+3. **Record decisions that affect architecture** in `docs/decisions/decision-register.md`, including what was rejected and what it costs.
+4. **Challenge conflicts with the philosophy** rather than complying quietly. (Bible, final directive)
+5. **Break down requirements that are too broad.** Breadth is this project's principal risk.
+6. **Do not add a feature because ERP software usually has it.** Apply the Bible §5 test: does it improve control, decision quality, financial performance, manufacturing performance, inventory efficiency, user speed, or data trust?
+7. **Update documentation in the same change as the decision it reflects.** Stale context files are worse than none.
+8. **One implementation unit, one objective, explicit acceptance criteria.** (Bible §49)
+9. **Do not generate fake factory data** and present it as real, in any artefact, at any stage. (Bible §47)
+
+---
+
+## Part 2 — Rules for AI inside the product
+
+Bible §35 is unambiguous: AI is not a chatbot bolted on. It exists inside the operational system. These rules constrain it:
+
+1. **AI may only assert what system data supports.** (§35) An answer that outruns its evidence is a defect, not a limitation.
+2. **AI output carries the provenance envelope** like any other derived value. (D-002)
+3. **AI may not manufacture confidence.** If the data is insufficient, it says so, in the same designed `INSUFFICIENT_DATA` state everything else uses.
+4. **AI-produced recommendations follow the D-003 lifecycle** and are subject to the same realisation discipline as any other. No exemption for being AI-generated.
+5. **AI explanations must be traceable to evidence** the user can open and inspect. (§36)
+6. **AI arrives after the data is trustworthy, not before.** (§56-03, §50) Provenance infrastructure is built from day one; AI *features* come last.
+7. `UNRESOLVED` (P-11) — which AI capabilities are safe to introduce, and whether AI may ever take an action rather than propose one. **The default until decided: propose only, never act.**
