@@ -30,19 +30,34 @@ What is happening? · Why is it happening? · What matters? · What should I do?
 | Documentation model | Six-file context system + domain docs + decision register + open questions | Bible §52 |
 | Planning discipline | Ambiguity is recorded as an open question, never silently invented | Bible §2 |
 | Domain model | First draft complete | `docs/domain/01-factory-operating-model.md` |
+| **Primary user** | **Inventory / warehouse manager** | D-007 |
+| **First release scope** | **Inventory + procurement + cost.** No production, BoMs, MRP, maintenance, full quality | D-007 |
+| **Manufacturing type** | **Mixed** — process and discrete, per-item behaviour | D-009 |
+| **Deployment** | **Single site**, records still site-scoped | D-004 |
+| **Valuation** | **Finance owns it.** This system owns quantity truth | D-008 |
+| Build plan | Draft 1 written | `context/specs/00-build-plan.md` |
 
-Proposed but **not yet accepted**: append-only stock ledger, provenance envelope, recommendation lifecycle, site-scoping, per-item costing, vertical-slice build order. See `docs/decisions/decision-register.md`.
+Proposed but **not yet accepted**: append-only stock ledger, provenance envelope, recommendation lifecycle, vertical-slice build order, consumption-based planning. See `docs/decisions/decision-register.md`.
+
+---
+
+## What the product is, in one line
+
+> **A system that makes stock true, and turns that truth into better buying decisions with visible financial consequence.**
+
+Scope detail and its consequences: `docs/domain/02-first-release-scope.md`.
 
 ---
 
 ## Not yet decided
 
-`UNRESOLVED` — **Primary user** of first release (B-01)
-`UNRESOLVED` — **MVP boundary** (B-02)
-`UNRESOLVED` — **Manufacturing type**: discrete / process / mixed (B-03)
-`UNRESOLVED` — **Deployment scope**: single site / multi-site / multi-tenant (B-04)
-`UNRESOLVED` — **Pilot factory** and availability of real data (B-07)
-`UNRESOLVED` — **Goals, success metrics, scope, feature list** — all depend on the above
+`UNRESOLVED` — **Technology stack and deployment architecture** (A-19) — blocks all implementation
+`UNRESOLVED` — **Permission and role model** (A-20) — blocks anything protected
+`UNRESOLVED` — **Balance projection strategy**, sync or async (A-01) — blocks the ledger, the core unit
+`UNRESOLVED` — **Consumption capture granularity** (N-03) — very hard to backfill
+`UNRESOLVED` — **Catch-weight items** (N-04) — ledger-shaping
+`UNRESOLVED` — **Finance integration contract** (N-01) — blocks all financial-impact work
+`UNRESOLVED` — **Pilot factory and its consumption history** (B-07, N-06)
 
 Full register: `docs/open-questions.md`. These are business decisions, not engineering preferences, and they are not for the implementation agent to assume.
 

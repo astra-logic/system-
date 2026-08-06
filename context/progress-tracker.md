@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Domain modelling (Bible §57)
+**Current activity:** Scope settled; build plan drafted. Awaiting stack and the three critical-path answers.
 **Code written:** None. Correctly so.
 
 ---
@@ -12,9 +12,9 @@
 
 | Phase | Name | Status |
 |---|---|---|
-| 0 | Product architecture | **In progress** |
-| 1 | Context + specifications | Started — awaiting Tier 1 answers |
-| 2–21 | Factory model through advanced optimisation | Not started |
+| 0 | Product architecture | **Largely complete** — scope, domain model, build plan drafted |
+| 1 | Context + specifications | **In progress** — context files updated; unit specs not yet written |
+| 2–21 | Factory model through advanced optimisation | Not started. Sequence superseded for release 1 by `context/specs/00-build-plan.md` |
 
 ---
 
@@ -26,32 +26,45 @@
 
 **Open questions register** — `docs/open-questions.md`. 7 blocking, 20 architectural, 14 product questions. Bible §54's 25 questions absorbed and extended.
 
-**Decision register** — `docs/decisions/decision-register.md`. Six proposals recorded with rationale, rejected alternatives, and costs. **None yet accepted.**
+**Decision register** — `docs/decisions/decision-register.md`. Ten entries. **Four accepted** (D-007 scope, D-008 valuation ownership, D-009 mixed manufacturing, D-004 site scoping context), one superseded (D-005), five proposed.
+
+**Scoping decisions taken** — mixed manufacturing, inventory/warehouse manager as primary user, inventory + procurement + cost wedge, single site, finance owns valuation. Consequences worked through in `docs/domain/02-first-release-scope.md`.
+
+**First release scope** — `docs/domain/02-first-release-scope.md`. In/out by domain, plus the four consequences that reshape the product: finance owning valuation, procurement without production, mixed-mode inventory foundations, and warehouse-first navigation. Six new open questions raised.
+
+**Build plan draft 1** — `context/specs/00-build-plan.md`. Twenty units across five stages, three milestones, each with objective, boundary, dependencies and acceptance criteria per §49.
 
 ---
 
 ## Blocked
 
-Everything downstream of the Tier 1 questions in `docs/open-questions.md`. Specifically:
+Implementation cannot start. Critical path, in order of urgency:
 
-- Build plan — needs B-01 (primary user), B-02 (MVP boundary), B-03 (manufacturing type)
-- Architecture — needs B-04 (deployment scope), B-06 (valuation ownership), A-19 (stack)
-- Any specification work — needs the above
-- Any implementation — needs an approved build plan
+| Blocker | Blocks |
+|---|---|
+| A-19 stack and deployment | Everything |
+| A-20 permission model | U-02, and anything protected |
+| A-01 balance projection strategy | U-07, the core ledger unit |
+| N-03 consumption capture granularity | U-09 — very hard to backfill |
+| N-04 catch-weight | U-04 and U-07 — ledger-shaping |
+| N-01 finance integration contract | U-14, U-18 — all financial-impact work |
+| B-07 / N-06 pilot factory history | Whether planning returns real numbers at go-live |
 
 ---
 
 ## Next
 
-1. Human answers to Tier 1 questions.
-2. Domain model reviewed, challenged, revised to draft 2.
-3. Decision register entries accepted or rejected.
-4. Context files completed with real content.
-5. Build plan written (`context/specs/00-build-plan.md`).
-6. Only then: first specification, then implementation.
+1. Answer the six blockers above — the first three gate the critical path.
+2. Domain model and scope doc reviewed by someone who knows the actual factory. A domain model validated only by its author is a hypothesis.
+3. Remaining decision register proposals accepted or rejected — particularly D-001, the ledger.
+4. Build plan approved.
+5. Then: unit specifications, starting with U-01 and U-07.
+6. Then, and only then: implementation.
 
 ---
 
 ## Log
 
-**2026-08-06** — Project initialised. Product Bible received as the founding document. Factory Operating Model draft 1, open questions register, and decision register produced. No code written, per Bible §2 and §57.
+**2026-08-06** — Project initialised. Product Bible received as the founding document. Factory Operating Model draft 1, open questions register, and decision register produced.
+
+**2026-08-06** — Five of seven Tier 1 blocking questions answered: mixed manufacturing, inventory/warehouse manager as primary user, inventory + procurement + cost wedge, single site, finance owns valuation. D-005 superseded by D-008 — no costing engine is needed here, which is a significant scope reduction. First-release scope document and build plan draft 1 written. Six new scope-driven questions raised (N-01 … N-06). Still no code, per Bible §2 and §57.

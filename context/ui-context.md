@@ -48,9 +48,25 @@
 
 `UNRESOLVED` — **dark-only vs themed.** Bible §18 favours a dark technical workspace. Challenge D4 argues this should be validated against real shop-floor conditions and the accessibility bar in §46 before being locked in. Semantic tokens (already required by §18) keep the option open at no cost.
 
-`UNRESOLVED` — navigation. Bible §25 proposes ten top-level domains but requires validation against real user workflows first. **It must not be treated as settled.**
+`UNRESOLVED` — role-based complexity model, pending A-20.
 
-`UNRESOLVED` — role-based complexity model, pending A-20 and B-01.
+`UNRESOLVED` (N-05) — **handheld/tablet on the floor, or desk?** This changes the interaction model fundamentally and bears directly on the dark-only question: shop-floor lighting is where dark UI most often fails.
+
+---
+
+## Settled by the first-release scope
+
+**Primary user is the inventory / warehouse manager** (D-007). The interface is designed for the person accountable for stock being correct.
+
+**Navigation is warehouse-first, not the §25 module list.** Approximately: Today · Receiving · Stock · Movements · Counting · Purchasing · Items · Suppliers. Bible §25's ten domains remain a long-term hypothesis and **must not be built toward now**.
+
+**The Command Center (§40) is a warehouse command centre**, not an executive dashboard. Its question is *"what needs my attention in the warehouse today?"* — expected receipts, unresolved discrepancies, counts due, negative or blocked stock, items below reorder point, overdue POs.
+
+**The executive experience (§41) is deferred.** Building it over data that has not yet earned trust would produce exactly the "dashboard-first fake ERP" §47 prohibits.
+
+**Receiving and counting are the highest-stakes screens** for the three-second rule — used repeatedly, often standing, often with gloves.
+
+**Absent capability is stated, not disguised.** No MRP, no production visibility, no BoMs in this release. Where a user might reasonably expect them, the interface says they do not exist rather than implying they might.
 
 ---
 

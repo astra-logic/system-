@@ -12,17 +12,25 @@
 |---|---|---|
 | 1 | [`docs/00-product-bible.md`](docs/00-product-bible.md) | The founding document. Vision, philosophy, principles, prohibitions. **Source of authority.** |
 | 2 | [`docs/domain/01-factory-operating-model.md`](docs/domain/01-factory-operating-model.md) | The domain model. Nine foundations, fourteen domains, five challenges to the brief. |
-| 3 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
-| 4 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Architectural proposals with rationale, rejected alternatives, and costs. |
-| 5 | [`context/`](context/) | The six-file working context system (Bible §52). |
+| 3 | [`docs/domain/02-first-release-scope.md`](docs/domain/02-first-release-scope.md) | What the first release is, and the four consequences that reshape the product. |
+| 4 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Twenty units, five stages, three milestones, with acceptance criteria. |
+| 5 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
+| 6 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
+| 7 | [`context/`](context/) | The six-file working context system (Bible §52). |
 
 ---
 
+## What this release is
+
+> **A system that makes stock true, and turns that truth into better buying decisions with visible financial consequence.**
+
+Single site. Mixed manufacturing. Primary user is the **inventory / warehouse manager**. Covers inventory, procurement and cost consequence — **not** production, BoMs, MRP, maintenance or full quality. An external finance system owns valuation; this system owns quantity truth.
+
 ## Where the project actually is
 
-Phase 0 — product architecture. The Factory Operating Model exists in draft. **Seven blocking questions are unanswered**, and the build plan is deliberately empty until they are resolved.
+Phase 0 largely complete. Scope is settled, the domain model and build plan exist in draft, no code is written.
 
-The next move is not an engineering task. It is a set of business decisions: who the first user is, what the MVP boundary is, what kind of factory this serves, and whether this system owns inventory valuation.
+**Implementation is blocked on six answers**, three of them on the critical path: the technology stack, the permission model, and the balance-projection strategy for the ledger. See `docs/open-questions.md`.
 
 ## Why there is no code
 
@@ -39,7 +47,8 @@ docs/
 ├── 00-product-bible.md          Founding document — do not edit casually
 ├── open-questions.md            Register of everything unresolved
 ├── domain/
-│   └── 01-factory-operating-model.md
+│   ├── 01-factory-operating-model.md
+│   └── 02-first-release-scope.md
 └── decisions/
     └── decision-register.md
 
@@ -51,7 +60,7 @@ context/                         Bible §52 six-file system
 ├── ui-context.md
 ├── progress-tracker.md
 └── specs/
-    └── 00-build-plan.md         Intentionally empty
+    └── 00-build-plan.md         Draft 1 — approved plan required before any code
 ```
 
 ## Working rules
