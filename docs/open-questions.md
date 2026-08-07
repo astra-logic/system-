@@ -177,6 +177,8 @@ Remaining: factual questions (`F-01` … `F-10`, `REQUIRES_FACTORY_DATA`) and tw
 |---|---|
 | **Shipment consolidation** | Real economic effect — freight cost reduced by combining shipments. **Owned by no mechanism.** Mechanism 01 measures the *premium paid to compress time*; this measures *fixed-cost amortisation* — a different mechanism. **Not created** (D-032): gated by `F-01` anyway, materiality unmeasured. **Preserved, not deleted.** Revisit when `F-01` is answered |
 | **Logistics-cost domain** | D-030's boundary separates *price* from *quantity* and does so correctly. Shipment consolidation revealed a **third economic domain** the boundary was never written to address. Not a defect in D-030; recorded so it is not rediscovered as a bug |
+| **Disposal economics** | **New, from the Q-07 audit.** Recovery value and disposal cost — required by 4.3, owned by no mechanism, unavailable |
+| **Time value of deferred outlay** | **New, from the Q-07 audit.** 4.1's real financial benefit is the financing cost over the deferral period (`F-22`), not the principal. No mechanism claims it |
 
 ---
 
@@ -185,6 +187,36 @@ Remaining: factual questions (`F-01` … `F-10`, `REQUIRES_FACTORY_DATA`) and tw
 | Requirement | Status | Detail |
 |---|---|---|
 | **Orders & Supply Movement** | `TRACKED REQUIREMENT` — recorded 2026-08-07. **Not a saving mechanism**; classified `ENABLER`. No workshop, no model, no decisions, no build-plan unit. Not blocking anything | `docs/domain/06-orders-and-supply-movement-REQUIREMENT.md` |
+
+---
+
+## Q-07 audit — decision points awaiting review (2026-08-07)
+
+Full analysis in `docs/domain/10-Q07-saving-model-reconciliation.md`. **Nothing rewritten, nothing locked.**
+
+| ID | Decision | Status |
+|---|---|---|
+| **DP-10** | Is "working capital release" reported as a magnitude, and how labelled so a principal is not read as a benefit? | `OPEN` |
+| **DP-11** | Retire **4.2 slow-moving** as a saving category, keeping it as a detection signal? | `OPEN` |
+| **DP-12** | Reclassify **4.9 stockout avoidance** as `EXPOSURE / RISK`? | `OPEN` |
+| **DP-13** | Accept **backtested** safety stock as the re-expression of 4.7, replacing the modelled form? | `OPEN` |
+| **DP-14** | Which domain owns **4.1** — detected in inventory, acted on through purchasing? | `OPEN` |
+| **DP-15** | Is an **average** carrying rate acceptable for a **marginal** disposal decision (4.3)? | `OPEN` |
+
+### Category verdicts
+
+| Category | Verdict |
+|---|---|
+| 4.1 excess stock | Rewrite. **Capital release is a cash-flow timing effect, not a benefit of its principal** |
+| 4.2 slow-moving | **Retire as a category** — no independent intervention; detection signal only |
+| 4.3 dead stock | Rewrite. Exclusion principle survives; **average-rate-on-marginal-decision** problem |
+| 4.6 MOQ | Rewrite. Composes with M02 **in the opposite direction** |
+| 4.7 safety stock | Rewrite. **Backtested form is materially stronger than modelled** |
+| 4.9 stockout | **Reclassify** as `EXPOSURE / RISK` — conclusion survives, home changes |
+
+### New factory-data dependencies
+
+Disposal cost · recovery value · marginal vs average storage cost basis · requirement-at-order-time · price impact of MOQ reduction · `A-18` coverage policy (blocks 4.1 and 4.3).
 
 ---
 

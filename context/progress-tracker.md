@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** **Part 2.1 and Part 2.2 both LOCKED.** Part 2.3 not started, awaiting explicit instruction.
+**Current activity:** Parts 2.1 and 2.2 **LOCKED**. **Q-07 audit delivered** — nothing rewritten, six decision points awaiting review. Part 2.3 not started.
 **Code written:** None. Correctly so.
 
 ---
@@ -161,3 +161,15 @@ A consistency audit was run **before** locking rather than after, and found **si
 Verified clean: no uncertain Exposure/Risk can reach Potential Annual Saving; no probability, threshold, confidence constant or invented monetary value exists anywhere in mechanism 02; shipment consolidation remains a future-domain gap and has not become a mechanism; and every amended decision preserves its original text verbatim, quoted and labelled.
 
 `Q-07` is called out in the lock as **growing debt** — categories 4.1–4.7 still carry percentage-over-total formulas, and each new mechanism designed under D-027 widens the gap.
+
+**2026-08-07 — Q-07 audit.** Every remaining taxonomy category audited against D-027 and the two locked mechanisms. `docs/domain/10-Q07-saving-model-reconciliation.md`. **Nothing rewritten, nothing locked.**
+
+**No category passes as written.** 4.9 comes closest — its conclusion survives, its classification changes.
+
+Three findings go beyond the expected formula problem. **4.1's "working capital release" is a cash-flow timing effect, not a benefit of its principal**: you cannot un-buy stock, so the real intervention is deferring future purchase, and the actual value is the financing cost over the deferral period plus carrying avoided — not the 200,000 EGP headline. D-012 already keeps the principal out of Potential Annual Saving, but it is still displayed as a magnitude, and a magnitude reads as a benefit. **4.3 applies an average carrying rate to a marginal decision**: if the warehouse is not full, the marginal storage cost of dead stock may be near zero, and finance's average rate assumes an alternative use of space that may not exist. **4.7 has a materially stronger form available** — backtested rather than modelled safety stock, checkable against recorded history event by event, needing no service-level assumption and no distributional one.
+
+**4.2 is not a mechanism at all.** It has no independent intervention — the answer is always 4.1's or 4.3's — so left as a category it would either produce nothing or double-count. Recommended for retirement as a detection signal.
+
+D-029 and D-031 both earned their keep on categories they were not designed for: the 4.7-versus-mechanism-01 contradiction is the exact case predicted in Part 2.1 §8, and D-031 turns 4.7's advisory warning about hidden stockout risk into a structurally enforced disclosure.
+
+Orders & Supply Movement confirmed as a dependency of **every remaining category except 4.2** — and lead-time variability, 4.7's central input, *is* the order journey.
