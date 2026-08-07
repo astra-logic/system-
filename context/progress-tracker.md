@@ -65,7 +65,8 @@ Implementation cannot start. Critical path, in order of urgency:
 | ~~M-01 … M-08~~ | **CLOSED** by D-017 … D-024 |
 | **A-09 FX — now Tier 1** (D-024) | Every financial comparison across periods |
 | **F-01 … F-10 factory data** | Mechanism 01 cannot be quantified without them. `F-01` and `F-09` are the sharpest |
-| Q-03 / Q-04 / Q-05 modelling choices | Shared structure — confirm before Part 2.2 |
+| ~~Q-03 / Q-04~~ | **LOCKED** by D-025 / D-026 |
+| **Q-05 — F10 promotion** | **Sole remaining blocker before Part 2.2.** Reported for decision; must not be inferred |
 
 ---
 
@@ -95,3 +96,7 @@ Implementation cannot start. Critical path, in order of urgency:
 **2026-08-07** — Part 2.1 decision lock received and reconciled. Eight decisions recorded (D-017 … D-024), all eight Part 2 decision points closed. The largest change: numerical avoidability weights rejected — correctly, since they conflicted with already-locked rule 15 (confidence from evidence, never category constants). Quantification consequently moves from the category level to the intervention level: a testable counterfactual over identified events replaces a percentage over a total. Also new: `COST / EXPOSURE / RISK` as a first-class output that can never aggregate into Potential Annual Saving; the three-state evidence ladder; mechanism-level deduplication (amending D-012); and FX decomposition escalated to Tier 1.
 
 Three conflicts flagged rather than silently resolved: `EARLY REALIZATION EVIDENCE` vs the locked Core Mission §6 lifecycle (`Q-04`); `COST / EXPOSURE / RISK` as class vs status (`Q-03`); and saving-model categories 4.1–4.7, which predate D-017 and still describe weighted calculations (`Q-07`). Part 2.1 design is ready to lock; the mechanism is not buildable until `F-01` … `F-10` are answered. Still no code.
+
+**2026-08-07** — Q-03 and Q-04 locked as D-025 and D-026. `COST / EXPOSURE / RISK` becomes a distinct class rather than a status, so exposure cannot reach the North Star aggregation through a status change or a careless join. Evidence strength becomes an attribute alongside the lifecycle rather than a seventh state, preserving the Core Mission §6 vocabulary and keeping workflow state and belief strength orthogonal. D-027 elevates event-level counterfactual reasoning from a mechanism-01 correction to a standing design principle of the whole engine, which makes Q-07 mandatory rather than advisory.
+
+Q-05 (promote four-way financial change decomposition to foundation F10) is **reported for decision, not decided**. Part 2.2 not started.

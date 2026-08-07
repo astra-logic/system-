@@ -2,7 +2,7 @@
 
 > **Status:** Part 2.1 — reconciled against the decision lock of 2026-08-07. **No code, no formulas implemented, no schema, no UI.**
 > **Task source:** `docs/02-handoff-part1-locked.md`, Part 2.1 decision lock
-> **Governed by:** the 16 locked financial-trust rules (D-014) and decisions D-017 … D-024
+> **Governed by:** the 16 locked financial-trust rules (D-014) and decisions D-017 … D-027
 > **Labels:** `LOCKED` · `PROPOSED` (recommended, not accepted) · `UNKNOWN` · `REQUIRES_FACTORY_DATA` · `INSUFFICIENT_DATA`
 
 This is the first saving mechanism because it measures **money that was actually spent**. Its evidence is a document the factory already possesses, and its core case needs no assumed rate. If any mechanism can be made defensible, this is the one.
@@ -38,7 +38,7 @@ This is why the three-state ladder in §7 matters so much: it lets the system sa
 | Event count | Proposed a minimum count | No universal minimum; three-state ladder (D-019) |
 | Deduplication | One currency claim per PO line | At **economic-mechanism** level; genuinely independent effects may both be quantified (D-020) |
 | Customs | Flagged as a question | Valid candidate; uncontrollable cost becomes `COST / EXPOSURE / RISK`, not a saving (D-021) |
-| Realization | 6–12 months, `UNKNOWN` | 12 months default, with an early-evidence state (D-022) |
+| Realization | 6–12 months, `UNKNOWN` | 12 months default; evidence strength is an **attribute**, not a state (D-022, D-026) |
 | Carrying cost | Flagged dependency | Finance-owned; **no developer defaults**, ever (D-023) |
 | FX | Recommended normalisation | Tier 1, with four-way change decomposition (D-024) |
 
@@ -237,7 +237,7 @@ COST / EXPOSURE / RISK          not          SAVING OPPORTUNITY
 
 This is a genuine addition to the product's vocabulary and it is valuable. It lets the system be **useful about money it cannot claim**. A plant manager benefits from *"you spent 340,000 EGP on demurrage last year, 60% of it from port congestion we cannot control and 40% from documentation delays we can"* — the first half is exposure to manage, the second half is an opportunity.
 
-**Binding consequence:** `COST / EXPOSURE / RISK` amounts **never aggregate into Potential Annual Saving.** They are reported separately, and must be structurally incapable of leaking into the headline. See `Q-03` on whether this is a distinct object class rather than a status.
+**Binding consequence (D-025 `LOCKED`):** `COST / EXPOSURE / RISK` is a **distinct class**, not a status — `Opportunity ├── SAVING_OPPORTUNITY └── COST / EXPOSURE / RISK`. Only `SAVING_OPPORTUNITY` records are eligible for North Star aggregation. No transition or migration converts one into the other; a cost that later becomes defensibly avoidable raises a *new* saving opportunity with its own evidence.
 
 This generalises: it is the same posture already taken for stockout risk in `03-saving-opportunity-model.md` §4.9. The pattern is now consistent across the product.
 
@@ -379,11 +379,16 @@ Demand changes · volume changes · FX · freight-rate changes · supplier chang
 
 `UNKNOWN` — whether a genuine control group is achievable. **Probably not.** The honest position is that realization here is *evidence-supported attribution*, not proof, and the product must say exactly that.
 
-### One reconciliation issue to resolve
+### How this is modelled `LOCKED` (D-026)
 
-Core Mission §6 locks the opportunity lifecycle as `Potential → Approved → In Progress → Realized`, plus `Rejected` and `Expired`. **EARLY REALIZATION EVIDENCE must not silently become a seventh lifecycle state**, because that would extend a locked list.
+Evidence strength is a **separate attribute**, never a lifecycle state. Workflow state and evidence strength are orthogonal and are not mixed:
 
-`PROPOSED` — model it as an **evidence-strength attribute on `IN_PROGRESS`**, not a new state. The lifecycle stays locked; verification strength becomes a property of measurement. Flagged as `Q-04` for confirmation.
+```
+Lifecycle:         IN_PROGRESS          Lifecycle:         IN_PROGRESS
+Evidence strength: EARLY                Evidence strength: STRONG
+```
+
+The Core Mission §6 lifecycle is unchanged. `REALIZED` remains the state representing sufficiently verified financial realization.
 
 ---
 
@@ -476,9 +481,9 @@ Nothing in this section has been assumed anywhere else in this document.
 |---|---|
 | `Q-01` | Is *quality rejection* a distinct root-cause category, or does it belong under *Supplier delay*? |
 | `Q-02` | What test makes a counterfactual "defensible" for quantification? The lead-time gap illustration in §5 is a form, not a validated rule. |
-| `Q-03` | Is `COST / EXPOSURE / RISK` a distinct object class, or a status on the Saving Opportunity? **Recommend distinct class**, so it cannot leak into aggregation. |
-| `Q-04` | Is `EARLY REALIZATION EVIDENCE` an attribute on `IN_PROGRESS`, or a lifecycle state? **Recommend attribute**, to avoid extending the locked Core Mission §6 lifecycle. |
-| `Q-05` | Should four-way change decomposition become cross-cutting foundation **F10**? |
+| ~~`Q-03`~~ | **CLOSED → D-025.** Distinct class, not a status. |
+| ~~`Q-04`~~ | **CLOSED → D-026.** Evidence strength is an attribute; lifecycle unchanged. |
+| `Q-05` | Should four-way change decomposition become cross-cutting foundation **F10**? — **reported for decision, not yet decided** |
 | `Q-06` | If lead-time correction is applied, does an intervention that reduces expedites also change planning behaviour in ways that create *other* costs not yet modelled? |
 
 ---
@@ -503,10 +508,15 @@ Nothing in this section has been assumed anywhere else in this document.
 | 12 | Financial model is **net, not gross** |
 | 13 | Lead-time master-data correction is the special case that may require no additional inventory |
 | 14 | **FX normalisation is Tier 1**; decomposition is not fabricated when data is unavailable |
+| 15 | `COST / EXPOSURE / RISK` is a **distinct class**, not a status. Only `SAVING_OPPORTUNITY` is aggregable (D-025) |
+| 16 | Evidence strength is an **attribute**, never a lifecycle state. Core Mission §6 lifecycle unchanged (D-026) |
+| 17 | **Event-level counterfactual reasoning over category percentages** — a standing principle of the whole engine (D-027) |
 
 ### PROPOSED — recommended, awaiting acceptance
 
-Baseline precedence ladder (§13) · premium allocation to the driving PO line (§2) · the four quantification preconditions (§5) · confidence coverage inputs (§9) · `COST/EXPOSURE/RISK` as a distinct class (`Q-03`) · `EARLY_EVIDENCE` as an attribute (`Q-04`) · F10 promotion (`Q-05`) · adding *quality rejection* as a category (`Q-01`) · single large events never annualised (§7).
+Baseline precedence ladder (§13) · premium allocation to the driving PO line (§2) · the four quantification preconditions (§5) · confidence coverage inputs (§9) · F10 promotion (`Q-05`, reported for decision) · adding *quality rejection* as a category (`Q-01`) · single large events never annualised (§7).
+
+**Newly locked 2026-08-07:** `COST / EXPOSURE / RISK` as a distinct class (D-025) · evidence strength as an attribute (D-026) · event-level counterfactual reasoning as a standing design principle (D-027).
 
 ### REQUIRES_FACTORY_DATA
 
@@ -536,4 +546,4 @@ Baseline precedence ladder (§13) · premium allocation to the driving PO line (
 
 Every business-judgment decision raised in the Part 2 workshop is now answered. What remains is factual: `F-01` through `F-10` are questions about the factory that cannot be reasoned into existence. `F-01` in particular determines whether this mechanism produces currency or only counts — and until it is answered, no honest estimate of this mechanism's value is possible.
 
-`Q-03`, `Q-04` and `Q-05` are modelling choices that should be confirmed before Part 2.2, because all three affect shared structure rather than this mechanism alone.
+`Q-03` and `Q-04` are now locked (D-025, D-026). **`Q-05` remains open and is reported for decision** — it affects shared structure and an irreversible capture contract, so it should be settled before Part 2.2.

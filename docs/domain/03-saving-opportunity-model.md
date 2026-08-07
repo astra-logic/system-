@@ -71,9 +71,24 @@ OPPORTUNITY DETECTED  →  ANNUALIZATION ELIGIBLE  →  VERIFIED REALIZATION
 
 A single event may detect an opportunity while its annual saving remains `INSUFFICIENT_DATA`. This complements — does not replace — D-014 rule 11's 12-month preferred window: rule 11 sets the *time* bar, D-019 refuses to reduce *sufficiency* to a counted threshold.
 
-**2. `COST / EXPOSURE / RISK` is a first-class output (D-021).** Money the factory is spending or exposed to, where causality and avoidability are not defensible enough to claim a saving. It **never aggregates into Potential Annual Saving** and must be structurally incapable of doing so. This generalises what §4.9 already required for stockout risk, and it makes the product useful about money it cannot claim.
+**2. `COST / EXPOSURE / RISK` is a distinct class (D-021, D-025 `LOCKED`).** Money the factory is spending or exposed to, where causality and avoidability are not defensible enough to claim a saving.
 
-**3. Avoidability is categorical, never weighted (D-017).** No category in this taxonomy may compute a saving by applying a percentage to a total. Quantification requires a **specific intervention with a testable counterfactual over identified events**. This applies to every category below, not only to expedite premium.
+```
+Opportunity
+├── SAVING_OPPORTUNITY          ← the only class the North Star aggregation may consume
+└── COST / EXPOSURE / RISK      ← never aggregable, structurally
+```
+
+Not a status — a **class**. As a status it is one careless filter away from inflating the headline; as a class that is structurally impossible. **No transition, migration or aggregation path converts one into the other.** If an undefensible cost later becomes defensibly avoidable, a *new* `SAVING_OPPORTUNITY` is raised with its own evidence; the exposure record is not promoted.
+
+This generalises what §4.9 already required for stockout risk, and it makes the product useful about money it cannot claim.
+
+**3. Evidence-based, event-level counterfactual reasoning (D-017, elevated to a standing principle by D-027 `LOCKED`).** No category in this taxonomy may compute a saving by applying a percentage to a total.
+
+> Never *"60% of this cost is avoidable."*
+> Instead *"these specific events are attributable to this specific root cause, and this intervention would have prevented them under this stated counterfactual."*
+
+Financial quantification requires, where applicable: **stated intervention · testable counterfactual · reliable incremental-cost inputs · appropriate FX normalisation · sufficient evidence.** Never manufacture precision from weak evidence. This governs every category below and every mechanism not yet designed.
 
 **4. FX normalisation and change decomposition (D-024).** Every figure in §4 that compares across periods must be FX-normalised, and where the four-way decomposition (operational / price / FX / volume-mix) cannot be performed reliably, the conclusion is marked rather than presented with false precision.
 
@@ -93,7 +108,14 @@ POTENTIAL → APPROVED → IN_PROGRESS → REALIZED
 
 With one addition carried over from D-003, because it is the gate that makes the whole thing falsifiable:
 
-**Amended 2026-08-07 (D-022).** The default verification window is **12 months**, and verification strength is distinguished: `EARLY REALIZATION EVIDENCE` (visible improvement, not yet sufficient for a full annual claim) versus `STRONG / VERIFIED REALIZATION`. Per `Q-04` this is `PROPOSED` as an **evidence-strength attribute on `IN_PROGRESS`**, not a seventh lifecycle state — the Core Mission §6 lifecycle is locked and must not be silently extended.
+**Amended 2026-08-07 (D-022, D-026 `LOCKED`).** The default verification window is **12 months**. Verification strength is a **separate attribute**, never a lifecycle state — workflow state and evidence strength are orthogonal and must not be mixed:
+
+```
+Lifecycle:         IN_PROGRESS          Lifecycle:         IN_PROGRESS
+Evidence strength: EARLY                Evidence strength: STRONG
+```
+
+The Core Mission §6 lifecycle above stands unchanged. `REALIZED` remains the state representing sufficiently verified financial realization under the existing rules.
 
 **Between `IN_PROGRESS` and `REALIZED` sits measurement.** An opportunity may not enter `REALIZED` by assertion. It enters when an outcome is observed against a baseline captured *before* the action. An action taken whose measured outcome does not materialise resolves to `EXPIRED` or is re-opened — never silently to `REALIZED`.
 

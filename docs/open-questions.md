@@ -136,13 +136,13 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 |---|---|---|
 | Q-01 | Is *quality rejection* a distinct root-cause category, or does it belong under *Supplier delay*? | Add it — different owner, different action |
 | Q-02 | What test makes a counterfactual "defensible" for quantification? | The lead-time gap example is a *form*, not a validated rule. Needs real events |
-| Q-03 | Is `COST / EXPOSURE / RISK` a distinct object class, or a status on Saving Opportunity? | **Distinct class**, so aggregation cannot reach it |
-| Q-04 | Is `EARLY REALIZATION EVIDENCE` an attribute on `IN_PROGRESS`, or a lifecycle state? | **Attribute** — Core Mission §6 lifecycle is locked and must not be extended silently |
-| Q-05 | Promote four-way change decomposition to cross-cutting foundation **F10**? | **Yes** — it governs every financial trend, not one mechanism |
+| ~~Q-03~~ | `COST / EXPOSURE / RISK` — class or status? | **`LOCKED` → D-025.** Distinct class. Only `SAVING_OPPORTUNITY` is aggregable |
+| ~~Q-04~~ | `EARLY_REALIZATION_EVIDENCE` — attribute or state? | **`LOCKED` → D-026.** Attribute. Core Mission §6 lifecycle unchanged |
+| **Q-05** | **Promote four-way change decomposition to cross-cutting foundation F10?** | **`OPEN` — reported for decision 2026-08-07. Not to be inferred or defaulted.** Blocks Part 2.2 |
 | Q-06 | Does a lead-time correction create other costs not yet modelled? | Unknown; test during the vertical slice |
 | Q-07 | Categories 4.1–4.7 of the saving model predate D-017 and still describe weighted/threshold calculations | Re-express each as *intervention + counterfactual* before specification |
 
-**Q-03, Q-04 and Q-05 affect shared structure**, not mechanism 01 alone, and should be confirmed before Part 2.2 begins.
+**Q-03 and Q-04 are locked** (D-025, D-026). **Q-05 is the sole remaining blocker before Part 2.2** — it affects shared structure *and* an irreversible capture contract.
 
 ---
 

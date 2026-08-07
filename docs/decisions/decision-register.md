@@ -373,3 +373,92 @@ Observed financial change = operational effect + price/rate effect + FX effect +
 **Consequence.** `A-09` (multi-currency) is **escalated to Tier 1**.
 
 **Requires.** Finance to own FX policy, rate source and effective dating (`F-07`).
+
+---
+
+## D-025 — `COST / EXPOSURE / RISK` is a distinct class, not a lifecycle status
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F9, saving engine structure · **Closes:** `Q-03` · **Reinforces:** D-021, D-012
+
+**Decision.** Opportunity records are one of two **distinct classes**:
+
+```
+Opportunity
+├── SAVING_OPPORTUNITY
+└── COST / EXPOSURE / RISK
+```
+
+The North Star financial aggregation may consume **only `SAVING_OPPORTUNITY` records.**
+
+**Why — structural safety, not taxonomy tidiness.** As a status, a record could become a saving through a status change or an aggregation accident: one filter forgotten, one join widened, one `WHERE status IN (…)` extended by someone who did not know the rule. As a distinct class it is **structurally impossible** for exposure to enter Potential Annual Saving. The guarantee lives in the model rather than in every query written afterwards.
+
+This is the same reasoning as D-002: a rule enforced by structure survives, a rule enforced by discipline eventually does not.
+
+**Rejected.** A status on a single Opportunity type. Simpler model, one table, less duplication — and one careless aggregation away from inflating the number the whole product is judged on.
+
+**Cost.** Two classes to model and present, with some shared fields. Reporting that spans both must join deliberately rather than filter casually — which is the intent.
+
+**Binding consequence.** No status transition, migration, reclassification or aggregation path may convert a `COST / EXPOSURE / RISK` record into a `SAVING_OPPORTUNITY`. If a previously undefensible cost later becomes defensibly avoidable, a **new** `SAVING_OPPORTUNITY` is raised with its own evidence — the exposure record is not promoted.
+
+---
+
+## D-026 — Evidence strength is an attribute, never a lifecycle state
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F9 · **Closes:** `Q-04` · **Amends:** D-022 · **Preserves:** Core Mission §6
+
+**Decision.** The lifecycle stays exactly as Core Mission §6 locks it:
+
+```
+POTENTIAL → APPROVED → IN_PROGRESS → REALIZED    (+ REJECTED, EXPIRED)
+```
+
+`EARLY_REALIZATION_EVIDENCE` is **not** a lifecycle state. Evidence strength is a **separate attribute** carried alongside the state:
+
+```
+Lifecycle:         IN_PROGRESS
+Evidence strength: EARLY
+```
+```
+Lifecycle:         IN_PROGRESS
+Evidence strength: STRONG
+```
+
+`REALIZED` remains the lifecycle state representing **sufficiently verified financial realization** under the existing Core Mission rules.
+
+**Why.** Workflow state and evidence strength are orthogonal concerns that answer different questions — *where is this in the process?* versus *how well do we believe it?* Collapsing them into one enum means every future refinement of either concept multiplies the states of both, and the locked §6 vocabulary erodes by accretion. Keeping them separate also lets evidence strength apply wherever it is meaningful without inventing a parallel state machine.
+
+**Rejected.** A seventh lifecycle state. Fewer concepts on the surface; extends a locked list, conflates two dimensions, and makes the lifecycle unstable over time.
+
+**Cost.** Two fields to reason about instead of one. UI must present them together without implying one is a sub-state of the other.
+
+---
+
+## D-027 — Evidence-based, event-level counterfactual reasoning is a core design principle
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F9, whole saving engine · **Generalises:** D-017 · **Scope:** every mechanism, present and future
+
+**Decision.** Elevated from a mechanism-01 correction to a **standing design principle of the Saving Intelligence engine**:
+
+> **Prefer evidence-based, event-level counterfactual reasoning over arbitrary category percentages.**
+
+Never:
+> ~~"60% of this cost is avoidable."~~
+
+Instead:
+> *"These specific events are attributable to this specific root cause, and this intervention would have prevented them under this stated counterfactual."*
+
+Any financial quantification requires, where applicable:
+
+1. **Stated intervention** — specific enough to be tested, not "improve planning"
+2. **Testable counterfactual** — assessed event by event against recorded evidence
+3. **Reliable incremental-cost inputs** — per D-023, no invented defaults
+4. **Appropriate FX normalisation** — per D-024
+5. **Sufficient evidence** — per D-019's ladder
+
+**Never manufacture precision from weak evidence.**
+
+**Why it is elevated.** The failure it prevents is not specific to expedite premium. Every category in the taxonomy invites the same shortcut — a plausible percentage applied to a total produces a large, confident, indefensible number faster than any honest method. As a principle it also governs mechanisms not yet designed, so the error cannot re-enter through a category nobody has written yet.
+
+**Cost.** Fewer quantified opportunities, and each requires more evidence. Categories that cannot meet the bar report `OPPORTUNITY DETECTED` with `INSUFFICIENT_DATA` for the figure — which is the honest outcome, not a degraded one.
+
+**Consequence.** `Q-07` becomes mandatory rather than advisory: saving-model categories 4.1–4.7 predate this principle and must each be re-expressed as intervention plus counterfactual before specification.

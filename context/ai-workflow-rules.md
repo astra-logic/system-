@@ -22,6 +22,7 @@
 7. **Update documentation in the same change as the decision it reflects.** Stale context files are worse than none.
 8. **One implementation unit, one objective, explicit acceptance criteria.** (Bible §49)
 9. **Do not generate fake factory data** and present it as real, in any artefact, at any stage. (Bible §47)
+9-0. **Prefer evidence-based, event-level counterfactual reasoning over category percentages.** (D-027) Never *"60% of this cost is avoidable"*; instead *"these specific events trace to this root cause, and this intervention would have prevented them under this stated counterfactual."* Quantification requires stated intervention · testable counterfactual · reliable incremental-cost inputs · FX normalisation · sufficient evidence.
 9a. **Never invent a constant to make a calculation complete.** Avoidability weights, carrying-cost defaults, minimum event counts — all were explicitly rejected (D-017, D-019, D-023). A missing input produces `INSUFFICIENT_DATA`, not a plausible-looking number.
 9b. **Never silently resolve a conflict between locked decisions.** Flag it and say which needs revisiting.
 10. **Never present a potential saving as realised**, and never produce the headline Potential Annual Saving figure as a single confident point. D-012's rules — range, weakest basis, deduplication, one-time separated from recurring — are binding. This is the number the whole product is judged on.
