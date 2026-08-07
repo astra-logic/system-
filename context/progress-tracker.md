@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Part 2.1 complete and ready for final lock. All decision points and shared-structure questions closed. Awaiting factory data.
+**Current activity:** Part 2.1 **LOCKED**. Part 2.2 workshop drafted for mechanism 02 (purchase price variance); awaiting review.
 **Code written:** None. Correctly so.
 
 ---
@@ -103,3 +103,9 @@ Q-05 (promote four-way financial change decomposition to foundation F10) is **re
 **2026-08-07** — Q-05 accepted as A′ and locked as D-028. **F10 — Financial Change Decomposition Capture Contract** added as a tenth cross-cutting foundation, deliberately scoped to capture only. The split follows the asymmetry that capture is irreversible while computation is reversible: dimensions not preserved at event time cannot be reconstructed, but an algorithm fixed from a single mechanism is premature abstraction. The universal decomposition calculation, formula and UI are deferred as `Q-08` pending a second mechanism. D-024 and D-012 reconciled; F10 added to the factory operating model, the build plan (new U-01b in Stage 0), and the finance integration contract (`N-01` must now carry the raw dimensions). Terminology is deliberate — it is a *capture contract*, never described as an engine.
 
 Part 2.1 is ready for final lock. Part 2.2 not started. Still no code.
+
+**2026-08-07** — Part 2.1 approved and locked by the product owner. Q-07, Q-08 and F-01 … F-10 retained as tracked non-blocking items.
+
+**2026-08-07** — Part 2.2 workshop opened. Mechanism 02 identified from the approved taxonomy as **§4.4 purchase price variance** — specified, not invented, and confirmed by the U-18 sequencing line in the build plan. Workshop draft written to `docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md`; **not a lock document**, and DP-01 … DP-08 are deliberately unanswered.
+
+Three findings worth carrying into review: §4.4's existing formula `(current price − best comparable price) × annual volume` violates D-027 and must be replaced with an event-level counterfactual (W-01); the mechanism name conflates accounting PPV, which D-008 gives to finance, with procurement price opportunity, which is ours (DP-01); and unlike mechanism 01, whose evidence exists by necessity, this mechanism's evidence is the alternative that was *not* chosen — which exists only if someone recorded it (F-12, F-13). Eleven new factory-evidence requirements recorded (F-11 … F-21).

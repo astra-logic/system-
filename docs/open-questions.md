@@ -129,6 +129,17 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | F-08 | Finance's authoritative carrying-cost rate — exists? owner? provenance? | Any intervention requiring more stock (= `N-10`) |
 | F-09 | Master-data lead-time quality, and whether actual receipt timing is recorded well enough to compare | **The first slice (D-015) depends entirely on this** |
 | F-10 | Volume and purchase history sufficient to normalise verification against demand changes | Confounder handling in realization |
+| F-11 | Who sets and approves material prices? (mechanism 02) | Ownership of the opportunity |
+| F-12 | **Are quotations recorded, with dates and terms — including declined ones?** | **Gates mechanism 02.** Without them there is no counterfactual |
+| F-13 | **Do purchase contracts / price agreements exist in structured form?** | The strongest evidence tier for mechanism 02 |
+| F-14 | Is invoice price captured separately from PO price? | Price actually paid |
+| F-15 | Are incoterms recorded per PO? | Price comparability |
+| F-16 | Are payment terms recorded per PO? | Price comparability in a high-interest environment |
+| F-17 | Are historical supplier price lists retained? | Baseline evidence |
+| F-18 | Does finance already compute accounting PPV, and against what standard? | Overlap with D-008 |
+| F-19 | Are duty and clearing costs attributable to a PO line? | Landed-cost comparability |
+| F-20 | Is there an approved-supplier list; are single-source items identified? | Whether an alternative was permissible |
+| F-21 | Is specification / grade recorded well enough to establish equivalence? | Equivalence is the hard part |
 
 ### Modelling questions raised by the lock — need confirmation before Part 2.2
 
