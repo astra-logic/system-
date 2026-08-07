@@ -310,6 +310,8 @@ Decisions D-017 … D-024 were locked by the product owner in response to the ei
 
 **New requirement.** Attribution must be **explainable**, not a silent filter.
 
+**Cross-reference added 2026-08-07 by D-029 (not an amendment — D-020's substance is unchanged).** This decision governs **double counting** — attribution of a shared economic benefit. It does **not** cover **contradiction** — opposed interventions on an intersecting subject. Those are separate controls with different tests and different failure modes. See D-029.
+
 **⚠ Terminology conflict raised 2026-08-07, not yet resolved.** This decision's text uses **"PPV"** for the mechanism from which emergency-purchase lines are excluded. Under the preliminary DP-01 decision, "PPV" now unambiguously means **Finance's accounting purchase price variance**, which is not ours under D-008 — so the sentence currently reads as though we exclude lines from Finance's metric. **D-020's wording requires amendment to "Procurement Price Opportunity"** when Part 2.2 is locked. Flagged rather than silently edited, because D-020 is a locked decision.
 
 ---
@@ -521,3 +523,49 @@ The four-way model (`operational + price/rate + FX + volume/mix`) remains the **
 ## D-012 — amendment note (2026-08-07)
 
 Cross-mechanism aggregation depends on **consistent capture** under F10. Inconsistent capture would reintroduce the basis-laundering D-012 forbids — aggregating figures whose FX and price treatment differ, producing a total that looks precise and is not. F10's capture contract is therefore a precondition of D-012's weakest-basis rule holding across mechanisms, not merely a convenience.
+
+
+---
+
+## D-029 — Contradiction control is a cross-cutting saving-model rule
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F9 / saving model · **Closes:** `W-16`, `W-25` · **Cross-references:** D-020 (unchanged)
+
+**Decision.** Universal rule:
+
+> **Every Opportunity must expose an intervention signature sufficient to determine whether it conflicts with another Opportunity.**
+
+Minimum signature: **typed subject · affected dimensions · direction per dimension · effect window.** The originating mechanism populates it.
+
+**Double counting and contradiction are separate controls.** D-020 governs attribution of shared benefit; D-029 governs executability of opposed actions.
+
+**Explicitly not a new F-series foundation.** The distinguishing principle: **F-series foundations govern what must be captured from reality; the saving model governs what may be asserted about it.** Contradiction control imposes no capture obligation on operational events — it is a property of derived findings.
+
+**Why architecture C.** Mechanism-specific control is not merely weaker but **structurally impossible** — a mechanism cannot detect a conflict with another mechanism because it never sees the other side. A wholly universal rule is under-specified, since only the originating mechanism knows what its intervention does to quantity, stock or supplier share; it would have to guess, which is inventing.
+
+**Placement.** Invariant, signature vocabulary, detection test and allowed resolutions → Saving Opportunity Model. Enforcement rule → code standards. Cross-reference → F9 and D-020.
+
+**Cost.** Every Opportunity gains required structure. A mechanism that cannot declare a signature cannot be integrated — which is the enforcement, and it is structural rather than procedural.
+
+---
+
+## D-030 — The mechanism boundary is the counterfactual's effect on quantity
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** saving taxonomy · **Closes:** `DP-09`
+
+**Decision.** Mechanism boundaries are determined by **whether the counterfactual changes the quantity purchased over the relevant defined window** — never by supplier terminology such as "price break".
+
+| Case | Mechanism |
+|---|---|
+| Same quantity + better defensible price | **Mechanism 02** |
+| Changed quantity | Quantity / inventory economics |
+| Contract or price condition not applied at unchanged quantity | **Mechanism 02** |
+| Quantity-driven price advantage | May **compose** across both, with the two economic effects kept distinguishable |
+
+**Also locked:** **"Boundary determines mechanism; gates determine quantifiability."** The boundary answers *which mechanism*; the evidence and comparability gates answer *whether anything may be quantified*. They compose — the boundary alone never licenses a claim.
+
+**Quantity is interpreted over the relevant defined window**, not a single order. Volume rebates and annual-volume agreements aggregate across a period.
+
+**Why.** Validated against twelve adversarial cases; all twelve classify. Keying on the counterfactual — the object D-027 made central — rather than on a supplier term is what makes it robust.
+
+**Open, deliberately unresolved:** `W-35` (consolidation taxonomy) and `W-36` (commitment risk).

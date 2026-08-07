@@ -28,6 +28,9 @@
 10f-1. **Do not build a decomposition engine.** F10 is a capture contract; the calculation is deferred (`Q-08`).
 10f. **No cross-period financial comparison without FX normalisation.** Where the operational/price/FX/volume-mix decomposition cannot be performed reliably, mark it — never fabricate it. (D-024)
 10g. **Deduplication is at the economic-mechanism level**, and attribution must be explainable — never a silent filter. (D-020)
+10g-1. **Every Opportunity declares an intervention signature** — typed subject, affected dimensions, direction per dimension, effect window. An Opportunity without one **cannot be presented**. (D-029)
+10g-2. **Contradiction control is separate from deduplication.** Opposed directions on intersecting subject, dimension and window must resolve — net, suspend, supersede or adjudicate — before presentation. (D-029)
+10g-3. **Mechanism boundaries follow the counterfactual's effect on quantity over the relevant window**, never supplier terminology. Boundary determines mechanism; gates determine quantifiability. (D-030)
 10h. **A single event may detect an opportunity but not support an annual figure.** OPPORTUNITY DETECTED · ANNUALIZATION ELIGIBLE · VERIFIED REALIZATION are distinct. (D-019)
 11. **Every event carries effective time and recorded time.** (F5)
 12. **Quality hold stock is excluded from Available.** (F3)

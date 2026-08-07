@@ -47,6 +47,10 @@ Constraints the eventual stack must satisfy, derived from the domain model rathe
 | D-026 | Evidence strength is an attribute, not a lifecycle state | Workflow state and belief strength are orthogonal |
 | D-027 | Event-level counterfactual reasoning over category percentages | Prevents plausible-percentage inflation across every mechanism |
 | D-028 | **F10 capture contract** — capture now, calculation engine later | Capture is irreversible; computation is reversible |
+| D-029 | Contradiction control as a cross-cutting saving-model rule | A mechanism structurally cannot see the other side of a cross-mechanism contradiction |
+| D-030 | Mechanism boundary = counterfactual's effect on quantity over a window | Keys on the counterfactual, not on supplier terminology |
+
+**Placement principle (D-029).** *F-series foundations govern what must be **captured from reality**; the saving model governs what may be **asserted about it**.* Contradiction control imposes no capture obligation, so it is not an F-foundation.
 
 ## Cross-cutting foundations
 

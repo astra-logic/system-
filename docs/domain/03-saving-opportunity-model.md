@@ -98,6 +98,24 @@ The universal decomposition **calculation** (`operational + price/rate + FX + vo
 
 **5. Deduplication is at the economic-mechanism level (D-020).** Not per transaction. Genuinely independent effects may both be quantified; attribution must be explainable.
 
+**6. Contradiction control is separate from deduplication (D-029 `LOCKED`).**
+
+> Every Opportunity must expose an **intervention signature** sufficient to determine whether it conflicts with another Opportunity.
+
+Minimum: **typed subject · affected dimensions · direction per dimension · effect window.** The originating mechanism populates it.
+
+**Detection:** two open opportunities conflict when their subjects intersect, their affected dimensions intersect, their directions oppose, **and** their effect windows overlap. All four must hold — so *"reduce safety stock"* and *"get a better price"* on one item correctly coexist.
+
+**Allowed resolutions:** net · suspend · supersede · adjudicate.
+
+| | Double counting (D-020) | Contradiction (D-029) |
+|---|---|---|
+| Question | Same money twice? | Can both actions be taken? |
+| Failure | Headline inflates | Recommendations unexecutable |
+| Visibility | **Invisible unless audited** | **Immediately visible** |
+
+**7. Mechanism boundaries follow the counterfactual (D-030 `LOCKED`).** Boundaries are set by whether the counterfactual changes the **quantity purchased over the relevant defined window** — never by supplier terminology. And: **boundary determines mechanism; gates determine quantifiability.**
+
 ---
 
 ## 3. Lifecycle

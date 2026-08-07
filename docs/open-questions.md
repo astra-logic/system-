@@ -147,6 +147,10 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | F-26 | **Are supplier price-break structures recorded**, with thresholds and effective dates? | Capture is irreversible (D-028 reasoning); the consuming mechanism does not exist yet |
 | F-27 | Are substitute / alternate items identified in master data? | Without it, cross-item contradiction is **undetectable in release 1** and must be stated as a limit |
 | F-28 | Are **volume rebates and annual-volume agreements** recorded, with thresholds and achievement to date? | Cases 2–3 of the DP-09 boundary test cannot be classified without it |
+| F-29 | Can the factory distinguish a **crystallised** cost from an **open** exposure in its own records? | W-33 option D |
+| F-30 | Do volume agreements carry **penalty or shortfall clauses**, and are those terms recorded? | W-36 |
+| F-31 | Is **ordering cost** known, and does Finance own it? | W-35, temporal consolidation |
+| F-32 | Are shipments recorded such that multiple POs on one shipment are identifiable? | W-35, shipment consolidation |
 
 ### Modelling questions raised by the lock — need confirmation before Part 2.2
 

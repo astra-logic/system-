@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Part 2.1 **LOCKED**. Part 2.2 final reconciliation delivered (W-25, W-26, DP-09); awaiting decision before the lock document.
+**Current activity:** Part 2.1 **LOCKED**. W-25 and DP-09 locked as D-029/D-030. Formal decision report delivered for W-33, W-36, W-35 — **D-025 unchanged**, awaiting decision.
 **Code written:** None. Correctly so.
 
 ---
@@ -127,3 +127,11 @@ Five investigations returned. **Price breaks:** the boundary is drawn at the wro
 **W-26:** recommend splitting into Observed Cost (historical, `ACTUAL`, no lifecycle) and Exposure/Risk (forward-looking, `FORECAST`/`ESTIMATED`, may carry mitigation). The decisive argument is a provenance defect rather than taxonomy preference: one class mixing actual past spend with forecast future risk makes any aggregate `FORECAST` under D-002's weakest-basis rule, understating the certainty of the historical half invisibly. **This touches D-025 and is not being done** — recorded as `W-33` requiring explicit amendment.
 
 **DP-09:** adversarial test across all twelve cases — boundary survives 12/12, and surfaced four refinements. Quantity must be scoped to a *window* not an order, or volume rebates and annual agreements are ambiguous. The boundary classifies which mechanism; the comparability gates still decide whether anything is quantifiable — they compose rather than compete. Taxonomy §4.5 "consolidation" is ambiguous, spanning supplier consolidation (mechanism 02) and temporal consolidation (quantity mechanism), and needs splitting. And annual-volume agreements create **commitment risk** — neither price nor inventory, owned by no mechanism.
+
+**2026-08-07** — W-25 locked as **D-029** (contradiction control as a cross-cutting saving-model rule, not an F-foundation; D-020 gains a cross-reference, substance unchanged) and DP-09 locked as **D-030** (mechanism boundary is the counterfactual's effect on quantity over the relevant window; boundary determines mechanism, gates determine quantifiability).
+
+Formal decision report written for W-33, W-36 and W-35. **No locked decision amended — D-025 stands exactly as locked.**
+
+The report's central finding: **W-33's alternatives B and C are not competing options but orthogonal axes.** B asks where these objects sit relative to `Opportunity`; C asks whether Cost and Exposure are one thing or two. Each fixes a different defect — B fixes lifecycle inheritance, C fixes meaningless aggregation — so only their composition (option D) closes both. Alternative A fails by D-025's own principle: avoiding a meaningless aggregate under A requires a discipline, and D-025 exists precisely because discipline eventually fails. Option D is a **hardening** of D-025 rather than a relaxation, since exposure moves further from Potential Annual Saving.
+
+W-36 resolves to Exposure/Risk with no new mechanism, and produced a clarification of D-014 rule 6's scope: certain incremental costs are netted, uncertain future obligations are disclosed as linked exposure — netting a probability against a certainty would require inventing a probability. W-35 found a **third** meaning of "consolidation" — shipment consolidation, whose economic effect is freight cost and which sits adjacent to mechanism 01. Both W-36 and W-35 surfaced the same pattern (`W-45`): an Opportunity may create an Exposure that must be disclosed rather than netted.
