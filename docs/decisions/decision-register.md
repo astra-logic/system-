@@ -169,7 +169,7 @@ Operational management is reclassified as `ENABLER`. The saving engine is `CORE`
 
 **Amended 2026-08-07 by D-020.** The original deduplication rule — *"key = (item, PO line, period); any PO line contributes to at most one currency claim"* — is **withdrawn as too blunt.** Deduplication happens at the **economic-mechanism** level: genuinely independent effects on the same transaction may both be quantified, and attribution must be explainable. All other provisions of D-012 stand unchanged.
 
-**Amended 2026-08-07 by D-021.** `COST / EXPOSURE / RISK` amounts never enter this aggregate and must be structurally incapable of doing so.
+**Amended 2026-08-07 by D-021, and again by the D-025 amendment.** **Non-`OPPORTUNITY` findings** — `OBSERVED COST`, `EXPOSURE / RISK`, and `EVIDENCE GAP` (which sits outside the Finding hierarchy entirely) — never enter this aggregate and must be structurally incapable of doing so.
 
 **Why.** This is the number the entire product is judged on, and it is the easiest to inflate invisibly — through double counting, one-time/recurring conflation, thin-history annualisation, or basis laundering by aggregation. It will be audited by a finance manager, and it must survive that.
 
@@ -380,19 +380,58 @@ Observed financial change = operational effect + price/rate effect + FX effect +
 
 ---
 
-## D-025 — `COST / EXPOSURE / RISK` is a distinct class, not a lifecycle status
+## D-025 — Findings are separated by class; only Opportunity is saving-eligible
 
-**Status:** `LOCKED` 2026-08-07 · **Area:** F9, saving engine structure · **Closes:** `Q-03` · **Reinforces:** D-021, D-012
+**Status:** `LOCKED` 2026-08-07 · **AMENDED 2026-08-07** by W-33 / W-46 · **Area:** F9, saving engine structure · **Closes:** `Q-03`, `W-26`, `W-33`, `W-46` · **Reinforces:** D-021, D-012, D-002
 
-**Decision.** Opportunity records are one of two **distinct classes**:
+### As originally locked — preserved verbatim, not rewritten
+
+> **Decision.** Opportunity records are one of two **distinct classes**:
+>
+> ```
+> Opportunity
+> ├── SAVING_OPPORTUNITY
+> └── COST / EXPOSURE / RISK
+> ```
+>
+> The North Star financial aggregation may consume **only `SAVING_OPPORTUNITY` records.**
+
+**The original intent is preserved in full:** exposure must be structurally incapable of entering Potential Annual Saving. The amendment **hardens** that guarantee; it does not relax it.
+
+### As amended
 
 ```
-Opportunity
-├── SAVING_OPPORTUNITY
-└── COST / EXPOSURE / RISK
+FINDING
+├── OPPORTUNITY          ← the only class eligible to contribute to Potential
+│                          Annual Saving. Carries the D-011 lifecycle:
+│                          POTENTIAL → APPROVED → IN_PROGRESS → REALIZED
+│
+├── OBSERVED COST        ← historical ACTUAL financial fact.
+│                          No lifecycle. Observation state only.
+│                          No mitigation — it already happened.
+│
+└── EXPOSURE / RISK      ← forward-looking FORECAST / ESTIMATED condition.
+                           No lifecycle. May carry mitigation.
+
+EVIDENCE GAP             ← OUTSIDE the Finding hierarchy entirely (W-46).
+                           A statement about the quality and completeness of
+                           our own data and evidence — not a claim about the
+                           factory's money.
 ```
 
-The North Star financial aggregation may consume **only `SAVING_OPPORTUNITY` records.**
+The North Star financial aggregation may consume **only `OPPORTUNITY` records.**
+
+**Binding principles.**
+
+1. `EXPOSURE / RISK` is **never approved** as an Opportunity.
+2. `EXPOSURE / RISK` is **never realized** as an Opportunity.
+3. A **mitigation that creates a defensible counterfactual becomes a new Opportunity**. The exposure itself is neither approved nor realized.
+4. A direction change **supersedes** the previous exposure. Historical truth is never mutated.
+5. When an exposure materialises, the exposure record is **preserved as historical evidence** and a **linked `OBSERVED COST` is created**. The object does not transform.
+6. Uncertain `EXPOSURE / RISK` is **never netted** against Potential Annual Saving.
+7. `ACTUAL` historical cost and `FORECAST` / `ESTIMATED` exposure are **never mixed in a financial aggregate**.
+
+**`EVIDENCE GAP` (W-46).** Outside the Finding hierarchy, because it is a claim about whether the system has sufficient evidence to make a financial claim — not a claim about money. It must never contribute to Potential Annual Saving, be treated as an Opportunity, enter financial aggregation, inherit Opportunity lifecycle semantics, or carry opportunity value. It **may** carry observed spend exposure strictly as an `ACTUAL` fact where supported — **and that spend is not itself an Evidence Gap value.**
 
 **Why — structural safety, not taxonomy tidiness.** As a status, a record could become a saving through a status change or an aggregation accident: one filter forgotten, one join widened, one `WHERE status IN (…)` extended by someone who did not know the rule. As a distinct class it is **structurally impossible** for exposure to enter Potential Annual Saving. The guarantee lives in the model rather than in every query written afterwards.
 
@@ -402,7 +441,16 @@ This is the same reasoning as D-002: a rule enforced by structure survives, a ru
 
 **Cost.** Two classes to model and present, with some shared fields. Reporting that spans both must join deliberately rather than filter casually — which is the intent.
 
-**Binding consequence.** No status transition, migration, reclassification or aggregation path may convert a `COST / EXPOSURE / RISK` record into a `SAVING_OPPORTUNITY`. If a previously undefensible cost later becomes defensibly avoidable, a **new** `SAVING_OPPORTUNITY` is raised with its own evidence — the exposure record is not promoted.
+**Amendment rationale (W-33, W-46).** The original decision was correct about aggregation safety and **silent about lifecycle**. Two independent defects surfaced later:
+
+- **Lifecycle inheritance** — placing the class under `Opportunity` made *"realized exposure"* expressible, implying exposure had become a saving.
+- **Meaningless aggregation** — one class holding `ACTUAL` past spend and `FORECAST` future risk permits a sum that is meaningless however it is labelled. Avoiding it required a convention, and D-025 exists precisely because a rule enforced by discipline eventually is not.
+
+**Mitigation is the decisive behavioural evidence for the split**: impossible for cost, which already happened, and the entire point of exposure. One class cannot coherently define an attribute impossible for half its members.
+
+**Binding consequence — as amended.** No status transition, migration, reclassification or aggregation path may convert any non-`OPPORTUNITY` finding into an `OPPORTUNITY`. If a previously undefensible cost or exposure later becomes defensibly avoidable, a **new** `OPPORTUNITY` is raised with its own evidence — the original record is **preserved, never promoted**. The same applies to exposure materialisation: a linked `OBSERVED COST` is created; the exposure is not converted.
+
+> *Original binding consequence, preserved:* "No status transition, migration, reclassification or aggregation path may convert a `COST / EXPOSURE / RISK` record into a `SAVING_OPPORTUNITY`. If a previously undefensible cost later becomes defensibly avoidable, a **new** `SAVING_OPPORTUNITY` is raised with its own evidence — the exposure record is not promoted." 
 
 ---
 
@@ -569,3 +617,54 @@ Minimum signature: **typed subject · affected dimensions · direction per dimen
 **Why.** Validated against twelve adversarial cases; all twelve classify. Keying on the counterfactual — the object D-027 made central — rather than on a supplier term is what makes it robust.
 
 **Open, deliberately unresolved:** `W-35` (consolidation taxonomy) and `W-36` (commitment risk).
+
+
+---
+
+## D-031 — An Opportunity may create or deepen a linked Exposure / Risk
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** saving model · **Closes:** `W-45` · **Clarifies:** D-014 rule 6
+
+**Decision.** A **saving-model rule establishing a linked-finding relationship**:
+
+```
+OPPORTUNITY  ──may create 0..n──▶  EXPOSURE / RISK
+EXPOSURE / RISK  ──has 0..1 originating──▶  OPPORTUNITY
+```
+
+**Disclosure, never netting.** D-014 rule 6 nets **certain incremental costs**. An uncertain future obligation is **disclosed alongside the Opportunity, never subtracted from it** — netting a probability against a certainty would require inventing a probability, which D-017 and D-023 forbid.
+
+**No probability scores, thresholds, or risk-value calculations.**
+
+**Validated across five instances:** supplier concentration · commitment risk · logistics disruption · inventory risk · FX exposure.
+
+Two results shaped the rule:
+
+- **Inventory risk shows netting and disclosure coexist.** A price-break intervention produces both a *certain* carrying cost (netted under rule 6) and an *uncertain* obsolescence risk (disclosed). Not alternatives — one intervention, two rules side by side.
+- **FX shows the link is optional on the exposure side.** FX exposure exists whether or not any Opportunity created it.
+
+**`EXPOSURE / RISK` carries no intervention signature.** This follows from D-025's amended principle 3: a mitigation with a defensible counterfactual **becomes an Opportunity**, and that Opportunity carries the signature. Two confirming cases — two Exposures cannot contradict, being observations rather than recommendations; and an Opportunity that *worsens* an existing Exposure is a **disclosure relationship, not a contradiction**.
+
+> **D-029 governs opposed actions. D-031 governs an action that creates or deepens a risk.** Distinct and complementary.
+
+**Placement.** Saving Opportunity Model, per D-029's principle — *F-series foundations govern what must be captured from reality; the saving model governs what may be asserted about it.*
+
+---
+
+## D-032 — Taxonomy §4.5 "consolidation" is retired and redistributed
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** saving taxonomy · **Closes:** `W-35` · **Applies:** D-030
+
+**Decision.** §4.5 held three distinct economic mechanisms under one name. It is **retired and redistributed** — **no new mechanism is created.**
+
+| Case | Destination |
+|---|---|
+| **Supplier consolidation** — same total quantity over the relevant window, volume concentrated among fewer suppliers | **Mechanism 02.** A counterfactual shape, **not** a new mechanism. **Landed-cost comparability required.** May create a supplier-concentration `EXPOSURE / RISK` (D-031) |
+| **Temporal / order consolidation** — order quantity and frequency change | **Future quantity / inventory mechanism** |
+| **Shipment consolidation** — same purchase quantity, shipments combined to reduce freight | **Real economic effect, acknowledged. Currently unowned. NOT a mechanism in current scope.** Retained as a **future-domain gap**, not deleted. Not built, not quantified |
+
+**Why no shipment mechanism now.** The effect is genuinely unowned — mechanism 01 measures the *premium paid to compress time*, this measures *fixed-cost amortisation*. But it is **gated by `F-01`** (the same separable-freight question), and its materiality is unmeasured. Creating a mechanism for an effect of unknown size is the breadth risk of challenge D1.
+
+**Note on D-030.** This case revealed that D-030's boundary does not classify **logistics cost**. That is **not a defect** — D-030 was locked to separate price from quantity and does so correctly. Shipment consolidation sits in a third economic domain the boundary was never written to address.
+
+**Also recorded:** *ordering cost* (`F-31`) is an unknown of the same class as the carrying-cost rate — **finance-owned, no invented default**, by analogy with D-023.

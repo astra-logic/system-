@@ -171,6 +171,15 @@ Remaining: factual questions (`F-01` … `F-10`, `REQUIRES_FACTORY_DATA`) and tw
 
 ---
 
+## Future-domain gaps — acknowledged, unowned, deliberately not built
+
+| Gap | Status |
+|---|---|
+| **Shipment consolidation** | Real economic effect — freight cost reduced by combining shipments. **Owned by no mechanism.** Mechanism 01 measures the *premium paid to compress time*; this measures *fixed-cost amortisation* — a different mechanism. **Not created** (D-032): gated by `F-01` anyway, materiality unmeasured. **Preserved, not deleted.** Revisit when `F-01` is answered |
+| **Logistics-cost domain** | D-030's boundary separates *price* from *quantity* and does so correctly. Shipment consolidation revealed a **third economic domain** the boundary was never written to address. Not a defect in D-030; recorded so it is not rediscovered as a bug |
+
+---
+
 ## Tracked cross-cutting requirements — not designed, not blocking
 
 | Requirement | Status | Detail |

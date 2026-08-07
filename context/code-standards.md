@@ -22,7 +22,10 @@
 10b. **Aggregates carry the weakest basis among their inputs**, including `STALE_DATA`. (D-002 as amended)
 10c. **No numerical avoidability weights**, anywhere, in any form. Avoidability is categorical. Quantification requires a specific intervention and a testable counterfactual over identified events. (D-017)
 10d. **No default carrying-cost rate.** Not 15%, not 20%, not any value. Finance owns it; absent it, the dependent output is `INSUFFICIENT_DATA`. (D-023)
-10e. **`COST / EXPOSURE / RISK` is a distinct class, not a status.** Only `SAVING_OPPORTUNITY` records are eligible for North Star aggregation. No transition, migration or aggregation path converts one class into the other. (D-021, D-025)
+10e. **Findings are separated by class.** `FINDING → OPPORTUNITY | OBSERVED COST | EXPOSURE / RISK`, with `EVIDENCE GAP` **outside** the hierarchy. Only `OPPORTUNITY` is eligible for North Star aggregation. No transition, migration or aggregation path converts a non-Opportunity finding into an Opportunity. (D-021, D-025 as amended)
+10e-1. **`ACTUAL` historical cost and `FORECAST`/`ESTIMATED` exposure are never mixed in a financial aggregate.** (D-025 as amended)
+10e-2. **Exposure is never approved and never realized.** A mitigation with a defensible counterfactual becomes a new Opportunity. Direction changes supersede; materialisation preserves the exposure and creates a linked `OBSERVED COST`. (D-025 as amended)
+10e-3. **An Opportunity may create a linked Exposure, disclosed and never netted.** No probability scores, thresholds or risk-value calculations. Exposure carries **no** intervention signature. (D-031)
 10e2. **Evidence strength is an attribute, never a lifecycle state.** Workflow state and evidence strength are orthogonal; the Core Mission §6 lifecycle is not extended. (D-026)
 10f-0. **Preserve the F10 capture dimensions on financial events** — original amount, currency, FX rate and date, quantity, unit basis, UoM, period — **as applicable to that event. Never invent a field the event does not have.** (D-028)
 10f-1. **Do not build a decomposition engine.** F10 is a capture contract; the calculation is deferred (`Q-08`).

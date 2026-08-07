@@ -233,12 +233,15 @@ Root cause is classified, for example: customs delay · documentation delay · s
 Where causality and avoidability are **not** sufficiently defensible — port congestion, external events — the amount is presented as:
 
 ```
-COST / EXPOSURE / RISK          not          SAVING OPPORTUNITY
+OBSERVED COST  (already incurred)     not     SAVING OPPORTUNITY
+EXPOSURE / RISK (forward-looking)     not     SAVING OPPORTUNITY
 ```
+
+**Two destinations, not one (D-025 as amended, D-021).** Demurrage **already paid** is a historical `ACTUAL` fact → `OBSERVED COST`. **Forward** port-congestion risk is a `FORECAST` condition → `EXPOSURE / RISK`. The two are never mixed in an aggregate — one is a bill the factory has settled, the other a condition it carries.
 
 This is a genuine addition to the product's vocabulary and it is valuable. It lets the system be **useful about money it cannot claim**. A plant manager benefits from *"you spent 340,000 EGP on demurrage last year, 60% of it from port congestion we cannot control and 40% from documentation delays we can"* — the first half is exposure to manage, the second half is an opportunity.
 
-**Binding consequence (D-025 `LOCKED`):** `COST / EXPOSURE / RISK` is a **distinct class**, not a status — `Opportunity ├── SAVING_OPPORTUNITY └── COST / EXPOSURE / RISK`. Only `SAVING_OPPORTUNITY` records are eligible for North Star aggregation. No transition or migration converts one into the other; a cost that later becomes defensibly avoidable raises a *new* saving opportunity with its own evidence.
+**Binding consequence (D-025 as amended):** findings are separated by class — `FINDING ├── OPPORTUNITY ├── OBSERVED COST └── EXPOSURE / RISK`, with `EVIDENCE GAP` outside the hierarchy entirely. Only `OPPORTUNITY` records are eligible for North Star aggregation. No transition or migration converts a non-Opportunity finding into an Opportunity; a cost that later becomes defensibly avoidable raises a *new* Opportunity with its own evidence, and the original is preserved.
 
 This generalises: it is the same posture already taken for stockout risk in `03-saving-opportunity-model.md` §4.9. The pattern is now consistent across the product.
 
@@ -514,14 +517,14 @@ Nothing in this section has been assumed anywhere else in this document.
 | 5 | **No universal minimum event count.** Three states: OPPORTUNITY DETECTED · ANNUALIZATION ELIGIBLE · VERIFIED REALIZATION |
 | 6 | One event → opportunity detected, annual saving `INSUFFICIENT_DATA` |
 | 7 | Deduplication at **economic-mechanism** level; genuinely independent effects may both be quantified; attribution must be explainable |
-| 8 | Customs demurrage is a valid candidate; uncontrollable cost → `COST / EXPOSURE / RISK`, **never** aggregated into Potential Annual Saving |
+| 8 | Customs demurrage is a valid candidate; uncontrollable cost → **`OBSERVED COST`** if already incurred or **`EXPOSURE / RISK`** if forward-looking, **never** aggregated into Potential Annual Saving |
 | 9 | Realization window **12 months** default, with EARLY vs STRONG/VERIFIED evidence distinguished; confounders must be considered |
 | 10 | A premium reduction is **evidence of improvement, not proof of causation** |
 | 11 | Carrying-cost rate is **finance-owned**. **No hidden developer defaults.** Dependency on an assumed rate must be visibly disclosed |
 | 12 | Financial model is **net, not gross** |
 | 13 | Lead-time master-data correction is the special case that may require no additional inventory |
 | 14 | **FX normalisation is Tier 1**; decomposition is not fabricated when data is unavailable |
-| 15 | `COST / EXPOSURE / RISK` is a **distinct class**, not a status. Only `SAVING_OPPORTUNITY` is aggregable (D-025) |
+| 15 | Findings are separated by class; only `OPPORTUNITY` is aggregable. `OBSERVED COST` and `EXPOSURE / RISK` are distinct; `EVIDENCE GAP` sits outside the hierarchy (D-025 as amended) |
 | 16 | Evidence strength is an **attribute**, never a lifecycle state. Core Mission §6 lifecycle unchanged (D-026) |
 | 17 | **Event-level counterfactual reasoning over category percentages** — a standing principle of the whole engine (D-027) |
 | 18 | **F10 capture contract** — raw financial dimensions preserved at event time, without inventing fields the event lacks (D-028) |
@@ -550,7 +553,7 @@ Baseline precedence ladder (§13) · premium allocation to the driving PO line (
 - **No numerical avoidability weights**, in any form, anywhere.
 - No default carrying-cost rate — not 15%, not 20%, not any value.
 - No annualisation below the evidence bar in §7.
-- No aggregation of `COST / EXPOSURE / RISK` into Potential Annual Saving.
+- No aggregation of any non-`OPPORTUNITY` finding into Potential Annual Saving, and **no mixing of `ACTUAL` cost with `FORECAST` exposure** in any aggregate.
 - No cross-period financial comparison without FX normalisation.
 - No verified-realization claim before the §11 evidence bar is met.
 - **No universal decomposition algorithm, formula, or decomposition UI** — deferred by D-028 (`Q-08`). F10 is a capture contract only, and must not be described or built as an engine.

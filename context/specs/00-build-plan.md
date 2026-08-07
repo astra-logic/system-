@@ -153,7 +153,7 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 **Acceptance.** Every planning output shows inputs, logic, assumptions, output, confidence and limitations (§30). A run is a reproducible stored snapshot — same inputs, same result, forever.
 
 ### U-17 · Saving Opportunity object and lifecycle `CORE`
-**Classes.** Per D-025, two distinct classes — `SAVING_OPPORTUNITY` and `COST / EXPOSURE / RISK`. Only the former is aggregable. Per D-026, evidence strength is an attribute, not a lifecycle state.
+**Classes.** Per D-025 as amended — `FINDING → OPPORTUNITY | OBSERVED COST | EXPOSURE / RISK`, with `EVIDENCE GAP` outside the hierarchy. Only `OPPORTUNITY` is aggregable, and only `OPPORTUNITY` carries the lifecycle. Per D-026, evidence strength is an attribute, not a lifecycle state. Per D-029, every Opportunity declares an intervention signature; exposure does not. Per D-031, an Opportunity may create a linked exposure, disclosed and never netted.
 **Objective.** D-011 — the eighteen-field object and the `POTENTIAL → APPROVED → IN_PROGRESS → REALIZED` lifecycle, with `REJECTED` and `EXPIRED`.
 **Depends on.** U-01. **Open:** A-03 (confidence rule), N-12 (ownership and approval).
 **Acceptance.**

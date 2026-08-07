@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Part 2.1 **LOCKED**. Proposed D-025 amendment written with full before/after and impact inventory — **not applied**. W-35 and W-45 analysed. Awaiting decision.
+**Current activity:** Part 2.1 **LOCKED**. **D-025 amendment applied.** D-031 and D-032 locked. One decision point remains (W-49 `DEEPENS`) before the Part 2.2 lock.
 **Code written:** None. Correctly so.
 
 ---
@@ -143,3 +143,13 @@ One thing blocks the amendment and was surfaced rather than assumed: the accepte
 **W-35** produced a correction to my own earlier recommendation. "Split §4.5 into three" was wrong phrasing — the analysis shows **two homes and one gap**. Supplier consolidation is a counterfactual shape inside mechanism 02, not a new mechanism; temporal consolidation belongs to the future quantity mechanism and is currently the least quantifiable of the three, depending on two unresolved finance-owned inputs; shipment consolidation is genuinely unowned but **not yet justified as a mechanism**, being gated by `F-01` anyway and of unmeasured materiality. It also revealed that D-030's boundary does not classify logistics cost — not a defect, since D-030 was locked to separate price from quantity and does that correctly.
 
 **W-45** tested 5/5 valid across supplier concentration, commitment, inventory, logistics disruption and FX. Two instructive results: a price-break intervention produces both a *nettable* certain cost and a *disclosable* uncertain risk, so netting and disclosure coexist rather than competing; and FX exposure exists independently of any opportunity, proving the link is optional on the exposure side. Recommended as a saving-model rule establishing a linked-finding relationship. Exposure carries **no** intervention signature — which follows from the already-accepted principle that a mitigation with a defensible counterfactual *becomes* an Opportunity.
+
+**2026-08-07** — W-46 resolved as option (ii): `EVIDENCE GAP` sits **outside** the Finding hierarchy, because it is a claim about whether the system has sufficient evidence to make a financial claim rather than a claim about the factory's money.
+
+**D-025 amendment applied.** The original decision block and binding consequence are **preserved verbatim inside the entry**, quoted and labelled, with the amendment stated explicitly alongside — history is not rewritten. Propagated to D-021 (customs now has two destinations: demurrage already paid is a bill settled, forward congestion risk is a condition carried), D-012, the saving model, mechanism 01, code standards, the build plan and architecture.
+
+**D-031** locks the Opportunity → Exposure linked-finding relationship with `CREATES` cardinality, disclosure never netting, and no probability scores. **D-032** retires and redistributes taxonomy §4.5 without creating a new mechanism; shipment consolidation is preserved as a **future-domain gap** rather than deleted, and the logistics-cost domain is recorded so it is not later rediscovered as a defect in D-030.
+
+W-47 and W-48 resolved. W-47: the Exposure record is **never created until the intervention is actioned** — before that the prospective consequence is an attribute of the Opportunity's disclosure, which avoids orphans and avoids deletion, and preserves the useful history that a recommendation was declined partly because of the risk it would create. W-48: each Opportunity creates its **own** record and *current exposure* is a derived view, exactly as balances are projections of the ledger — merging would destroy which action caused what.
+
+**W-49 remains open and is the only outstanding decision.** Recommended as a distinct `DEEPENS` relationship type, mandatory. It **extends** the accepted cardinality — an exposure gains 0..n deepening Opportunities alongside 0..1 creating — so it was flagged rather than applied. D-031 carries `CREATES` only.

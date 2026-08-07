@@ -43,7 +43,9 @@ Constraints the eventual stack must satisfy, derived from the domain model rathe
 | D-008 | We own quantity truth; finance owns valuation | Removes the largest, riskiest piece of scope; keeps the financial intelligence |
 | D-009 | Mixed manufacturing: item behaviour is per item | Ledger numeric model is the hardest thing to change later |
 | D-010 | Demand is observed consumption; planning is reorder-point, not MRP | MRP needs BoMs, which need production |
-| D-025 | `COST / EXPOSURE / RISK` is a distinct class, not a status | Exposure structurally cannot enter the North Star aggregation |
+| D-025 *(amended)* | Findings separated by class; only `OPPORTUNITY` is saving-eligible; `EVIDENCE GAP` outside the hierarchy | Exposure structurally cannot enter the aggregation, and `ACTUAL` cost is never mixed with `FORECAST` risk |
+| D-031 | An Opportunity may create a linked Exposure — disclosed, never netted | Netting a probability against a certainty would require inventing one |
+| D-032 | §4.5 "consolidation" retired and redistributed; no new mechanism | Shipment consolidation preserved as a future-domain gap |
 | D-026 | Evidence strength is an attribute, not a lifecycle state | Workflow state and belief strength are orthogonal |
 | D-027 | Event-level counterfactual reasoning over category percentages | Prevents plausible-percentage inflation across every mechanism |
 | D-028 | **F10 capture contract** — capture now, calculation engine later | Capture is irreversible; computation is reversible |

@@ -333,3 +333,111 @@ So the mitigation — the only thing an Exposure could act through — **is an O
 | W-45 | Recommendation: saving-model rule + linked relationship. Exposure carries no signature |
 | Part 2.2 lock | **Not created** |
 | Part 2.3 | **Not started** |
+
+
+---
+---
+
+# 4. W-47 / W-48 / W-49 — investigation
+
+> Requested before locking the W-45 relationship. **No new questions raised** beyond one flagged extension.
+
+## W-47 — Does an Exposure created by an Opportunity remain linked if the Opportunity is rejected?
+
+**Alternatives**
+
+| | Option |
+|---|---|
+| A | Exposure is deleted on rejection |
+| B | Exposure persists, unlinked |
+| C | **Exposure is never created until the intervention is actioned** |
+| D | Created at `APPROVED`, closed on rejection |
+
+**Recommendation: C.**
+
+**Reasoning.** The exposure is a consequence of **the action**, not of the recommendation. If we never consolidate to supplier B, we never acquire the concentration risk. But the *prospective* consequence is decision-relevant — a reviewer must see *"this would create X exposure"* to decide honestly.
+
+Those are two different objects:
+
+```
+Prospective consequence  →  an attribute of the Opportunity's disclosure
+Actual Exposure record   →  created when the intervention reaches IN_PROGRESS
+```
+
+**Consequences.** No orphan exposures. No deletion — which would violate the supersede-never-mutate principle. Rejection history is preserved and useful: *"we declined this partly because of the concentration risk"* remains readable.
+
+*Edge case:* an actioned intervention later reversed produces a **supersede**, not a delete — consistent with D-025 principle 4.
+
+**Relationship to cardinality.** Unchanged. It clarifies **when** the link comes into being, not how many.
+
+**Changes the locked W-45 principle?** **No.**
+
+---
+
+## W-48 — Can multiple Opportunities create or link to the same Exposure?
+
+**Alternatives**
+
+| | Option |
+|---|---|
+| A | One Exposure, many originating Opportunities (would make the exposure side 0..n) |
+| B | **Each Opportunity creates its own Exposure record; current exposure is a derived view** |
+| C | Each creates its own, merged into a stored aggregate |
+
+**Recommendation: B.**
+
+**Reasoning.** Three consolidation opportunities all moving volume to supplier B each deepen concentration on B. Merging them into one mutable record would **destroy which action caused what** — exactly what an audit trail needs, and a mutation the ledger philosophy forbids.
+
+The intuition behind A is still served: *"current concentration on supplier B"* is a **derived view over the records**, precisely as balances are projections of the ledger (D-001), and consistent with DP-04's accepted *aggregate by cause* discipline.
+
+**Consequences.** Exposure records accumulate; the presentation layer aggregates by subject. No stored merged object, so no mutation.
+
+**Relationship to cardinality.** **Confirms 0..1 exactly.** Each exposure has exactly one originating Opportunity — or none, in the standalone case.
+
+**Changes the locked W-45 principle?** **No — it confirms it.**
+
+---
+
+## W-49 — Must an Opportunity disclose an existing Exposure it deepens but did not create?
+
+**Alternatives**
+
+| | Option |
+|---|---|
+| A | Yes, mandatory, same relationship as created |
+| B | No — only created exposures are disclosed |
+| C | **Yes, mandatory, as a distinct relationship type** |
+
+**Recommendation: C.**
+
+**Reasoning.** The case is real and detectable without inventing anything. FX exposure already exists because the factory imports; an Opportunity to switch to a cheaper foreign supplier **increases foreign-denominated spend and therefore deepens it.** The system can see this from the intervention signature plus existing exposure records — **qualitatively, with no probability and no scoring.** *How much* it deepens may be unquantifiable; *that* it deepens is a factual statement.
+
+**B is rejected** because an Opportunity that silently worsens a known risk is exactly the hidden cost this discipline exists to prevent. Deepening is the same failure as creating, in a different shape.
+
+**A is rejected** because *creates* and *deepens* differ materially — one brings a risk into existence, the other adds to an existing one. Different remediation, different ownership. Conflating them would also corrupt W-48's aggregation, since a *deepens* link could be miscounted as a new exposure.
+
+**Consequences.** The linked-finding relationship gains a **type**: `CREATES` | `DEEPENS`.
+
+### ⚠ Relationship to cardinality — this extends what was accepted
+
+The accepted statement was: *"an Exposure may have 0..1 originating Opportunity."* That remains true **for `CREATES`**. Adding `DEEPENS` means:
+
+```
+OPPORTUNITY  ──creates 0..n──▶  EXPOSURE / RISK
+OPPORTUNITY  ──deepens 0..n──▶  EXPOSURE / RISK
+
+EXPOSURE / RISK  ──has 0..1 creating Opportunity──▶
+EXPOSURE / RISK  ──has 0..n deepening Opportunities──▶
+```
+
+**Changes the locked W-45 principle?** **It extends it.** Not a contradiction — origination stays 0..1 — but an exposure becomes linkable to more Opportunities than one, through a second relationship type.
+
+**This is more than what was accepted, so it is flagged rather than applied.** D-031 has been locked with the accepted `CREATES` cardinality only. **`DEEPENS` awaits your decision.**
+
+---
+
+## Remaining decision point
+
+| | |
+|---|---|
+| **W-49 `DEEPENS` relationship type** | Recommended. Extends the accepted cardinality on the exposure side. **Not applied.** D-031 currently carries `CREATES` only |

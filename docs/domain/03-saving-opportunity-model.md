@@ -71,15 +71,23 @@ OPPORTUNITY DETECTED  →  ANNUALIZATION ELIGIBLE  →  VERIFIED REALIZATION
 
 A single event may detect an opportunity while its annual saving remains `INSUFFICIENT_DATA`. This complements — does not replace — D-014 rule 11's 12-month preferred window: rule 11 sets the *time* bar, D-019 refuses to reduce *sufficiency* to a counted threshold.
 
-**2. `COST / EXPOSURE / RISK` is a distinct class (D-021, D-025 `LOCKED`).** Money the factory is spending or exposed to, where causality and avoidability are not defensible enough to claim a saving.
+**2. Findings are separated by class (D-025 as amended 2026-08-07).**
 
 ```
-Opportunity
-├── SAVING_OPPORTUNITY          ← the only class the North Star aggregation may consume
-└── COST / EXPOSURE / RISK      ← never aggregable, structurally
+FINDING
+├── OPPORTUNITY          ← the only class the North Star aggregation may consume.
+│                          Carries the §3 lifecycle.
+├── OBSERVED COST        ← historical ACTUAL fact. No lifecycle. No mitigation.
+└── EXPOSURE / RISK      ← forward-looking FORECAST/ESTIMATED. No lifecycle.
+                           May carry mitigation.
+
+EVIDENCE GAP             ← OUTSIDE the Finding hierarchy (W-46). A statement about
+                           our data, never about the factory's money.
 ```
 
-Not a status — a **class**. As a status it is one careless filter away from inflating the headline; as a class that is structurally impossible. **No transition, migration or aggregation path converts one into the other.** If an undefensible cost later becomes defensibly avoidable, a *new* `SAVING_OPPORTUNITY` is raised with its own evidence; the exposure record is not promoted.
+Classes, not statuses. As statuses they would be one careless filter away from inflating the headline; as classes that is structurally impossible.
+
+**Binding:** exposure is never approved and never realized · a mitigation with a defensible counterfactual **becomes a new Opportunity** · direction changes **supersede**, never mutate · a materialised exposure is **preserved** and creates a **linked `OBSERVED COST`** · uncertain exposure is **never netted** against Potential Annual Saving · `ACTUAL` cost and `FORECAST` exposure are **never mixed in an aggregate**.
 
 This generalises what §4.9 already required for stockout risk, and it makes the product useful about money it cannot claim.
 
@@ -113,6 +121,19 @@ Minimum: **typed subject · affected dimensions · direction per dimension · ef
 | Question | Same money twice? | Can both actions be taken? |
 | Failure | Headline inflates | Recommendations unexecutable |
 | Visibility | **Invisible unless audited** | **Immediately visible** |
+
+**6a. An Opportunity may create or deepen a linked Exposure/Risk (D-031 `LOCKED`).**
+
+```
+OPPORTUNITY  ──may create 0..n──▶  EXPOSURE / RISK
+EXPOSURE / RISK  ──has 0..1 originating──▶  OPPORTUNITY
+```
+
+**Disclosed alongside the Opportunity, never subtracted from it.** Rule 6 nets *certain* incremental costs; an *uncertain* future obligation is disclosed — netting a probability against a certainty would require inventing one. **No probability scores, thresholds or risk-value calculations.**
+
+Validated across supplier concentration · commitment risk · logistics disruption · inventory risk · FX exposure. Note that **netting and disclosure coexist**: a price break produces both a certain carrying cost (netted) and an uncertain obsolescence risk (disclosed).
+
+`EXPOSURE / RISK` **carries no intervention signature** — a mitigation with a defensible counterfactual becomes an Opportunity, and that carries it. **D-029 governs opposed actions; D-031 governs an action that creates or deepens a risk.**
 
 **7. Mechanism boundaries follow the counterfactual (D-030 `LOCKED`).** Boundaries are set by whether the counterfactual changes the **quantity purchased over the relevant defined window** — never by supplier terminology. And: **boundary determines mechanism; gates determine quantifiability.**
 
@@ -174,7 +195,17 @@ Each category below states its inputs, its impact type, and — critically — *
 **Calculation:** `(current price − best comparable price) × annual volume`
 **Refuses when:** below `A-12` delivery sample · prices not genuinely comparable (differing MOQ, quality, terms, incoterms). **Comparability is the hard part, and a price difference that ignores it is not a saving.**
 
-### 4.5 Order consolidation
+### 4.5 Order consolidation — **RETIRED AND REDISTRIBUTED** (D-032)
+
+> This category held **three** distinct economic mechanisms under one name. Retired 2026-08-07. **No new mechanism was created.**
+>
+> - **Supplier consolidation** → **Mechanism 02**. Same total quantity over the window; **landed-cost comparability required**; may create a supplier-concentration exposure (D-031)
+> - **Temporal / order consolidation** → **future quantity / inventory mechanism**. Changes ordering quantity and frequency economics
+> - **Shipment consolidation** → **future-domain gap.** Real effect, currently unowned, **not a mechanism in current scope**, gated by `F-01`, materiality unmeasured. Preserved, not deleted
+>
+> The original text below is retained for history. Its formula is separately invalid under D-027 (`Q-07`).
+
+#### Original entry (superseded)
 **Impact:** recurring
 **Calculation:** `(orders avoided × ordering cost) − additional carrying cost incurred`
 **Refuses when:** ordering cost is unknown
@@ -217,7 +248,7 @@ A single headline figure — *"Potential Annual Saving: €487,000"* — is the 
 
 **3. Annualising from thin history.** Two months of consumption multiplied by six is not an annual figure — it is a guess wearing a precise number's clothing. **Rule:** annualisation requires a minimum history window (`NEW-08`); below it, the opportunity returns `INSUFFICIENT_DATA`.
 
-**0. Exposure leaking into saving.** `COST / EXPOSURE / RISK` amounts (D-021) are not opportunities and must be structurally incapable of entering this aggregate — not merely filtered out by convention.
+**0. Non-Opportunity findings leaking into saving.** `OBSERVED COST` and `EXPOSURE / RISK` (D-021, D-025 as amended), and `EVIDENCE GAP` (outside the hierarchy entirely), must be structurally incapable of entering this aggregate — not merely filtered out by convention. **`ACTUAL` cost and `FORECAST` exposure are never mixed**, in this aggregate or any other.
 
 **4. Basis laundering by aggregation.** Summing an `ACTUAL`-based opportunity with an `ASSUMED`-based one yields a total that looks precise and is not. **Rule:** per D-002's contagion rule, an aggregate carries the *weakest* basis among its components. A total containing any `ASSUMED` input is `ASSUMED`. A total containing any stale cost is `STALE_DATA`.
 
