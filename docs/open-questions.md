@@ -196,12 +196,16 @@ Full analysis in `docs/domain/10-Q07-saving-model-reconciliation.md`. **Nothing 
 
 | ID | Decision | Status |
 |---|---|---|
-| **DP-10** | Is "working capital release" reported as a magnitude, and how labelled so a principal is not read as a benefit? | `OPEN` |
-| **DP-11** | Retire **4.2 slow-moving** as a saving category, keeping it as a detection signal? | `OPEN` |
-| **DP-12** | Reclassify **4.9 stockout avoidance** as `EXPOSURE / RISK`? | `OPEN` |
-| **DP-13** | Accept **backtested** safety stock as the re-expression of 4.7, replacing the modelled form? | `OPEN` |
-| **DP-14** | Which domain owns **4.1** — detected in inventory, acted on through purchasing? | `OPEN` |
-| **DP-15** | Is an **average** carrying rate acceptable for a **marginal** disposal decision (4.3)? | `OPEN` |
+**Adversarially tested 2026-08-07** → `docs/domain/11-DP10-DP15-adversarial-decision-report.md`. **Nothing locked.**
+
+| ID | Decision | Verdict |
+|---|---|---|
+| **DP-10** | Capital release | **Structure ready to lock.** Outflow is *delayed, never avoided* for excess; benefit is **one-time, not recurring**; principal is a **position, not a release**. Values need `F-22`/`F-08` |
+| **DP-11** | Retire 4.2 | **Ready to lock.** Four attempts to find an independent mechanism; three failed. The fourth — **slow relative to shelf life** — is a genuine `EXPOSURE / RISK`, not a saving |
+| **DP-12** | Reclassify 4.9 | **Ready to lock.** Two findings recorded: historical stockout events are **operational data, not findings**; and D-031 lacks a **`MITIGATES`** type |
+| **DP-13** | Backtested safety stock | **Approach survives; the claim does not.** Supports *"no recorded intervention explains the floor"* — absence of evidence of insufficiency, **not** evidence of sufficiency. **Gated by `F-01`** |
+| **DP-14** | Ownership | **Structure ready.** Three roles — finding · action · data. ⚠ **D-011's single `Owner` field must split** |
+| **DP-15** | Carrying cost | **Principle ready.** The marginal-vs-average framing is wrong — the question is **which components apply**. ⚠ **Disposal does not free capital**, so 4.3 may be far smaller than it appears |
 
 ### Category verdicts
 
@@ -217,6 +221,16 @@ Full analysis in `docs/domain/10-Q07-saving-model-reconciliation.md`. **Nothing 
 ### New factory-data dependencies
 
 Disposal cost · recovery value · marginal vs average storage cost basis · requirement-at-order-time · price impact of MOQ reduction · `A-18` coverage policy (blocks 4.1 and 4.3).
+
+**Added by the adversarial report:** **is warehouse space constrained?** · what purpose was finance's carrying rate built for? · are shelf lives recorded? · are supplier escalations recorded in any form? · manual override history · who owns data quality?
+
+### Candidate cross-cutting rules raised (not locked)
+
+| Candidate | Note |
+|---|---|
+| **A financial rate must be fit for the decision it is used in** | Extends D-023 beyond *never invent* to *never misapply*. A finance-owned average can be authoritative and still be the wrong instrument |
+| **Asymmetric valuation must be presented, not hidden** | A quantified benefit beside an unvaluable risk biases the decision structurally. Affects 4.7, 4.1 and any future mechanism trading certainty against risk |
+| **`MITIGATES`** relationship type | An Opportunity that *reduces* an exposure currently cannot say so. Would extend D-031 a second time |
 
 ---
 

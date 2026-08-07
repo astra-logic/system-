@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Parts 2.1 and 2.2 **LOCKED**. **Q-07 audit delivered** — nothing rewritten, six decision points awaiting review. Part 2.3 not started.
+**Current activity:** Parts 2.1 and 2.2 **LOCKED**. DP-10 … DP-15 adversarially tested — **nothing locked**, awaiting review. Part 2.3 not started.
 **Code written:** None. Correctly so.
 
 ---
@@ -173,3 +173,15 @@ Three findings go beyond the expected formula problem. **4.1's "working capital 
 D-029 and D-031 both earned their keep on categories they were not designed for: the 4.7-versus-mechanism-01 contradiction is the exact case predicted in Part 2.1 §8, and D-031 turns 4.7's advisory warning about hidden stockout risk into a structurally enforced disclosure.
 
 Orders & Supply Movement confirmed as a dependency of **every remaining category except 4.2** — and lead-time variability, 4.7's central input, *is* the order journey.
+
+**2026-08-07 — DP-10 … DP-15 adversarial decision report.** `docs/domain/11-DP10-DP15-adversarial-decision-report.md`. Nothing locked, no rate or threshold invented.
+
+**DP-13 was the important one, and the naive backtest did not survive.** *"Stock never fell below L"* proves nothing on its own — the floor may have been propped up by expedites, escalations, manual overrides, production rescheduling, substitutions, or demand suppression. Several of those are wholly unobservable in release 1: production is out of scope, and **there is no record of an order never placed**. The honest claim is therefore *"no stockout occurred and no recorded intervention explains the floor"* — absence of evidence of insufficiency, not evidence of sufficiency. It also exposed a dependency: **4.7's backtest is worthless without Mechanism 01's expedite capture**, so `F-01` gates both.
+
+**DP-10 corrected my own framing twice.** For excess stock the outflow is **delayed, never avoided** — permanent cancellation only applies to stock that will never be consumed, which is dead stock, not excess. And the benefit is **one-time, not recurring**: you can only reduce the same excess once. Recurring benefit belongs to fixing the policy that created it, which is 4.7. That resolves the 4.1/4.7 relationship, which was flagged as double counting but is really a temporal distinction — one-time correction versus recurring prevention.
+
+**DP-15 showed the marginal-versus-average framing was wrong.** Carrying cost is not one thing; the question is which *components* apply to a given decision. And **disposing of dead stock does not free capital** — the money was spent when it was bought, and if the stock is worthless the capital is gone rather than tied up. Since capital is usually the largest component of any carrying rate, **4.3 may be a far smaller opportunity than it appears.**
+
+Three candidate cross-cutting rules surfaced: a financial rate must be *fit for the decision*, extending D-023 from "never invent" to "never misapply"; asymmetric valuation must be presented rather than hidden, since a quantified gain beside an unvaluable risk biases the decision structurally; and D-031 may need a `MITIGATES` type, since an Opportunity that reduces an exposure currently has no way to say so.
+
+⚠ **D-011's single `Owner` field is demonstrably insufficient** — finding, action and data ownership are three distinct accountabilities. Flagged, not changed.
