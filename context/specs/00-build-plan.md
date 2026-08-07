@@ -2,7 +2,7 @@
 
 > **Status:** Draft 1, 2026-08-06. Written after the Tier 1 scoping questions were answered.
 > **Scope:** `docs/domain/02-first-release-scope.md` — inventory + procurement + cost, single site, warehouse-first, mixed manufacturing, finance owns valuation.
-> **North Star:** `docs/01-core-mission.md` — Potential Annual Saving. Saving model: `docs/domain/03-saving-opportunity-model.md`.
+> **North Star:** `docs/01-core-mission.md` — Potential Annual Saving. Saving model: `docs/domain/03-saving-opportunity-model.md`. Mechanism 01: `docs/domain/04-mechanism-01-expedite-premium.md` (Part 2.1 locked).
 > **Still planning.** This is a sequence, not a licence to start coding. Implementation begins when this plan is approved *and* the stack question (A-19) is answered.
 
 ---
@@ -41,6 +41,16 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 **Depends on.** Stack decision (A-19).
 **Acceptance.** A value computed from a `FORECAST` input cannot be represented as `ACTUAL`. `INSUFFICIENT_DATA` propagates rather than defaulting to zero. Degradation rules are property-tested.
 **Note.** First for a reason. Retrofitting provenance means auditing every number in the system.
+
+### U-01b · F10 financial change decomposition capture contract `ENABLER`
+**Objective.** D-028 — preserve the raw dimensions that permit later decomposition of financial change.
+**Boundary.** **The capture contract only.** Original amount · currency · FX rate · rate date · quantity · unit basis · UoM · period boundary · source/provenance · reference event — *as applicable to each event*. **No decomposition algorithm, no formula, no UI** — deferred by `Q-08`.
+**Depends on.** U-01 (provenance), U-03 (time), U-04 (UoM). **Open:** `F-07` (FX source and policy).
+**Acceptance.**
+- A financial event that genuinely carries a dimension preserves it; **a dimension the event does not have is not invented** — no empty FX fields on domestic transactions.
+- Captured dimensions are sufficient to reconstruct a financial change later without recourse to the original document.
+- Nothing in this unit computes a decomposition.
+**Note.** Placed in Stage 0 because capture is irreversible. Imposes obligations on U-07, U-12, U-13 and U-14.
 
 ### U-02 · Identity, roles, permissions `ENABLER`
 **Objective.** Authentication and the permission model.
@@ -86,6 +96,7 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 - Balances always equal the projection of full history — verified by independent recomputation.
 - No movement can be edited or deleted. Corrections are reversing entries.
 - No movement exists without a source document and reason code.
+- Cost-bearing movements carry the F10 capture dimensions (U-01b).
 - On hand, reserved, available, incoming, projected are each computed per F3's definitions and never conflated.
 - Backdated movements produce correct balances at both effective and recorded time.
 
@@ -129,7 +140,7 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 
 ### U-14 · Cost reference import `ENABLER`
 **Objective.** D-008 — import item costs from finance.
-**Depends on.** N-01 (**blocks this unit entirely**).
+**Depends on.** N-01 (**blocks this unit entirely**). Per D-028, the import contract must carry the F10 raw dimensions or derived figures cannot be decomposed later.
 **Acceptance.** Imported costs carry basis `USER_DEFINED` with an `as_of` date. **Staleness is visible wherever a derived financial figure is shown** — not buried in a settings page.
 
 ### U-15 · Consumption history and projected availability `ENABLER`
@@ -142,6 +153,7 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 **Acceptance.** Every planning output shows inputs, logic, assumptions, output, confidence and limitations (§30). A run is a reproducible stored snapshot — same inputs, same result, forever.
 
 ### U-17 · Saving Opportunity object and lifecycle `CORE`
+**Classes.** Per D-025, two distinct classes — `SAVING_OPPORTUNITY` and `COST / EXPOSURE / RISK`. Only the former is aggregable. Per D-026, evidence strength is an attribute, not a lifecycle state.
 **Objective.** D-011 — the eighteen-field object and the `POTENTIAL → APPROVED → IN_PROGRESS → REALIZED` lifecycle, with `REJECTED` and `EXPIRED`.
 **Depends on.** U-01. **Open:** A-03 (confidence rule), N-12 (ownership and approval).
 **Acceptance.**

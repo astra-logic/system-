@@ -76,7 +76,7 @@ Full context in `docs/domain/02-first-release-scope.md`.
 
 | ID | Question | Blocks | Status |
 |---|---|---|---|
-| N-01 | Finance integration contract — which system, cost granularity, refresh cadence, direction | All financial-impact work | `OPEN` |
+| N-01 | Finance integration contract — which system, cost granularity, refresh cadence, direction, **plus the F10 raw dimensions** (D-028) | All financial-impact work, and later decomposability | `OPEN` |
 | N-02 | Is the outbound movement feed to finance in release 1, or are we read-only initially? | Integration scope | `OPEN` |
 | N-03 | Is consumption captured against a cost centre / line, or item only? | Ledger capture design — **very hard to backfill** | `OPEN` |
 | N-04 | Are catch-weight items required? | Ledger and UoM design — must be decided before the ledger is built | `OPEN` |
@@ -138,11 +138,14 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | Q-02 | What test makes a counterfactual "defensible" for quantification? | The lead-time gap example is a *form*, not a validated rule. Needs real events |
 | ~~Q-03~~ | `COST / EXPOSURE / RISK` — class or status? | **`LOCKED` → D-025.** Distinct class. Only `SAVING_OPPORTUNITY` is aggregable |
 | ~~Q-04~~ | `EARLY_REALIZATION_EVIDENCE` — attribute or state? | **`LOCKED` → D-026.** Attribute. Core Mission §6 lifecycle unchanged |
-| **Q-05** | **Promote four-way change decomposition to cross-cutting foundation F10?** | **`OPEN` — reported for decision 2026-08-07. Not to be inferred or defaulted.** Blocks Part 2.2 |
+| ~~Q-05~~ | Promote four-way change decomposition to foundation F10? | **`LOCKED` → D-028 (accepted as A′).** F10 is a **capture contract**, not an engine. Capture locked now; calculation deferred |
+| **Q-08** | **When does the F10 capture contract become a decomposition *engine*?** | **`DEFERRED` by D-028.** Requires at least a second mechanism to validate the abstraction. Not a blocker |
 | Q-06 | Does a lead-time correction create other costs not yet modelled? | Unknown; test during the vertical slice |
 | Q-07 | Categories 4.1–4.7 of the saving model predate D-017 and still describe weighted/threshold calculations | Re-express each as *intervention + counterfactual* before specification |
 
-**Q-03 and Q-04 are locked** (D-025, D-026). **Q-05 is the sole remaining blocker before Part 2.2** — it affects shared structure *and* an irreversible capture contract.
+**All shared-structure questions are now locked** — Q-03 → D-025, Q-04 → D-026, Q-05 → D-028. **Nothing in the design blocks Part 2.2.**
+
+Remaining: factual questions (`F-01` … `F-10`, `REQUIRES_FACTORY_DATA`) and two deliberate deferrals — `Q-07` (re-express saving-model categories 4.1–4.7 under D-027) and `Q-08` (the decomposition engine, awaiting a second mechanism).
 
 ---
 

@@ -43,10 +43,14 @@ Constraints the eventual stack must satisfy, derived from the domain model rathe
 | D-008 | We own quantity truth; finance owns valuation | Removes the largest, riskiest piece of scope; keeps the financial intelligence |
 | D-009 | Mixed manufacturing: item behaviour is per item | Ledger numeric model is the hardest thing to change later |
 | D-010 | Demand is observed consumption; planning is reorder-point, not MRP | MRP needs BoMs, which need production |
+| D-025 | `COST / EXPOSURE / RISK` is a distinct class, not a status | Exposure structurally cannot enter the North Star aggregation |
+| D-026 | Evidence strength is an attribute, not a lifecycle state | Workflow state and belief strength are orthogonal |
+| D-027 | Event-level counterfactual reasoning over category percentages | Prevents plausible-percentage inflation across every mechanism |
+| D-028 | **F10 capture contract** — capture now, calculation engine later | Capture is irreversible; computation is reversible |
 
 ## Cross-cutting foundations
 
-F1 tenancy · F2 stock ledger · F3 quantity semantics · F4 provenance · F5 time · F6 units of measure · F7 lot/serial · F8 costing · F9 recommendations and realised impact.
+F1 tenancy · F2 stock ledger · F3 quantity semantics · F4 provenance · F5 time · F6 units of measure · F7 lot/serial · F8 costing · F9 recommendations and realised impact · **F10 financial change decomposition capture contract** (added 2026-08-07, D-028).
 
 Detail in `docs/domain/01-factory-operating-model.md` Part B. F8 is now largely resolved by D-008 — this system holds a **cost reference**, not a costing engine. **F2 and F4 remain the load-bearing foundations** and are the first two units in the build plan.
 
@@ -54,7 +58,7 @@ Detail in `docs/domain/01-factory-operating-model.md` Part B. F8 is now largely 
 
 An external finance system is the system of record for inventory valuation. This system:
 
-- **imports** item costs (basis `USER_DEFINED`, with `as_of`) — `N-01` defines the contract
+- **imports** item costs (basis `USER_DEFINED`, with `as_of`) — `N-01` defines the contract, and per D-028 **must carry the F10 raw dimensions** (original amount, currency, FX rate and date, unit basis) or figures derived from it cannot be decomposed later
 - **emits** a movement feed for finance to value — `N-02` decides whether this is in release 1
 - **never** posts journal entries or computes inventory value
 - **surfaces** price variances as decision signals, not accounting entries

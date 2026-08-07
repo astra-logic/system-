@@ -2,7 +2,7 @@
 
 > **Status:** Part 2.1 — reconciled against the decision lock of 2026-08-07. **No code, no formulas implemented, no schema, no UI.**
 > **Task source:** `docs/02-handoff-part1-locked.md`, Part 2.1 decision lock
-> **Governed by:** the 16 locked financial-trust rules (D-014) and decisions D-017 … D-027
+> **Governed by:** the 16 locked financial-trust rules (D-014) and decisions D-017 … D-028
 > **Labels:** `LOCKED` · `PROPOSED` (recommended, not accepted) · `UNKNOWN` · `REQUIRES_FACTORY_DATA` · `INSUFFICIENT_DATA`
 
 This is the first saving mechanism because it measures **money that was actually spent**. Its evidence is a document the factory already possesses, and its core case needs no assumed rate. If any mechanism can be made defensible, this is the one.
@@ -40,7 +40,7 @@ This is why the three-state ladder in §7 matters so much: it lets the system sa
 | Customs | Flagged as a question | Valid candidate; uncontrollable cost becomes `COST / EXPOSURE / RISK`, not a saving (D-021) |
 | Realization | 6–12 months, `UNKNOWN` | 12 months default; evidence strength is an **attribute**, not a state (D-022, D-026) |
 | Carrying cost | Flagged dependency | Finance-owned; **no developer defaults**, ever (D-023) |
-| FX | Recommended normalisation | Tier 1, with four-way change decomposition (D-024) |
+| FX | Recommended normalisation | Tier 1 (D-024). Raw dimensions **captured** under F10; the decomposition **calculation** is deferred (D-028) |
 
 ---
 
@@ -105,7 +105,8 @@ DID THE SAVING ACTUALLY HAPPEN?
 | Standard lead time in master data, and observed actual | The comparison that drives the strongest case |
 | Expedite authorisation — who, when | |
 | **Root cause category** | See §3. Captured in workflow, not reconstructed. |
-| Currency of each cost component, and rate date | Required for D-024 |
+| Currency of each cost component, rate and rate date | **F10 capture contract** (D-028), as applicable — not invented where absent |
+| Quantity, unit basis, period boundary | **F10 capture contract** (D-028) |
 
 ### The gating question
 
@@ -410,11 +411,22 @@ Observed financial change
 
 **Do not pretend to calculate this decomposition when the required data is unavailable.** Where FX normalisation cannot be performed reliably, the conclusion is marked `INSUFFICIENT_DATA` / `ASSUMED` / `LIMITED_CONFIDENCE` — never presented with false precision.
 
-### This is bigger than one mechanism
+### This is bigger than one mechanism — now foundation **F10** `LOCKED` (D-028)
 
 The decomposition applies to **every financial trend the product will ever show** — price variance, carrying cost, excess stock value, the headline figure itself. It is cross-cutting infrastructure, not a feature of mechanism 01.
 
-`PROPOSED` — promote it to a cross-cutting foundation alongside F1–F9 in `01-factory-operating-model.md`, as **F10 — Financial change decomposition**. Flagged as `Q-05`.
+Promoted to **F10 — Financial Change Decomposition Capture Contract** in `01-factory-operating-model.md`, scoped deliberately:
+
+| | Status |
+|---|---|
+| FX normalisation is Tier 1 | `LOCKED` |
+| **Capture** of the raw dimensions that permit later decomposition | `LOCKED` — the F10 contract |
+| The universal decomposition **calculation** | **`DEFERRED`** (`Q-08`) — pending a second mechanism |
+| Never fabricate a decomposition where data is unavailable | `LOCKED` |
+
+**Capture is irreversible; computation is reversible.** Dimensions not preserved at event time cannot be reconstructed later, so capture is standardised now. Fixing a universal algorithm from one mechanism would be premature abstraction.
+
+**What this means for mechanism 01 concretely:** every expedite event preserves original amount, currency, FX rate, rate date, quantity, unit basis and period — *as applicable to that event*. **Fields the source event does not actually have are not invented**; an empty FX field on a domestic transaction records nothing while implying something. The mechanism does **not** implement a four-way decomposition; it preserves what one would later need.
 
 `REQUIRES_FACTORY_DATA` — FX rate history, source, and finance's policy on which rate applies at which date (`F-07`).
 
@@ -483,7 +495,8 @@ Nothing in this section has been assumed anywhere else in this document.
 | `Q-02` | What test makes a counterfactual "defensible" for quantification? The lead-time gap illustration in §5 is a form, not a validated rule. |
 | ~~`Q-03`~~ | **CLOSED → D-025.** Distinct class, not a status. |
 | ~~`Q-04`~~ | **CLOSED → D-026.** Evidence strength is an attribute; lifecycle unchanged. |
-| `Q-05` | Should four-way change decomposition become cross-cutting foundation **F10**? — **reported for decision, not yet decided** |
+| ~~`Q-05`~~ | **CLOSED → D-028.** F10 is a *capture contract*; the calculation engine is deferred as `Q-08`. |
+| `Q-08` | **DEFERRED** — when does the F10 capture contract become a decomposition *engine*? Requires a second mechanism to validate the abstraction. |
 | `Q-06` | If lead-time correction is applied, does an intervention that reduces expedites also change planning behaviour in ways that create *other* costs not yet modelled? |
 
 ---
@@ -511,12 +524,13 @@ Nothing in this section has been assumed anywhere else in this document.
 | 15 | `COST / EXPOSURE / RISK` is a **distinct class**, not a status. Only `SAVING_OPPORTUNITY` is aggregable (D-025) |
 | 16 | Evidence strength is an **attribute**, never a lifecycle state. Core Mission §6 lifecycle unchanged (D-026) |
 | 17 | **Event-level counterfactual reasoning over category percentages** — a standing principle of the whole engine (D-027) |
+| 18 | **F10 capture contract** — raw financial dimensions preserved at event time, without inventing fields the event lacks (D-028) |
 
 ### PROPOSED — recommended, awaiting acceptance
 
-Baseline precedence ladder (§13) · premium allocation to the driving PO line (§2) · the four quantification preconditions (§5) · confidence coverage inputs (§9) · F10 promotion (`Q-05`, reported for decision) · adding *quality rejection* as a category (`Q-01`) · single large events never annualised (§7).
+Baseline precedence ladder (§13) · premium allocation to the driving PO line (§2) · the four quantification preconditions (§5) · confidence coverage inputs (§9) · adding *quality rejection* as a category (`Q-01`) · single large events never annualised (§7).
 
-**Newly locked 2026-08-07:** `COST / EXPOSURE / RISK` as a distinct class (D-025) · evidence strength as an attribute (D-026) · event-level counterfactual reasoning as a standing design principle (D-027).
+**Newly locked 2026-08-07:** `COST / EXPOSURE / RISK` as a distinct class (D-025) · evidence strength as an attribute (D-026) · event-level counterfactual reasoning as a standing design principle (D-027) · **F10 financial change decomposition capture contract (D-028)**.
 
 ### REQUIRES_FACTORY_DATA
 
@@ -539,6 +553,7 @@ Baseline precedence ladder (§13) · premium allocation to the driving PO line (
 - No aggregation of `COST / EXPOSURE / RISK` into Potential Annual Saving.
 - No cross-period financial comparison without FX normalisation.
 - No verified-realization claim before the §11 evidence bar is met.
+- **No universal decomposition algorithm, formula, or decomposition UI** — deferred by D-028 (`Q-08`). F10 is a capture contract only, and must not be described or built as an engine.
 
 ### Is Part 2.1 ready for final lock?
 
@@ -546,4 +561,6 @@ Baseline precedence ladder (§13) · premium allocation to the driving PO line (
 
 Every business-judgment decision raised in the Part 2 workshop is now answered. What remains is factual: `F-01` through `F-10` are questions about the factory that cannot be reasoned into existence. `F-01` in particular determines whether this mechanism produces currency or only counts — and until it is answered, no honest estimate of this mechanism's value is possible.
 
-`Q-03` and `Q-04` are now locked (D-025, D-026). **`Q-05` remains open and is reported for decision** — it affects shared structure and an irreversible capture contract, so it should be settled before Part 2.2.
+**All shared-structure questions raised by this mechanism are now locked** — `Q-03` → D-025, `Q-04` → D-026, `Q-05` → D-028. Nothing in the design blocks Part 2.2.
+
+What remains is factual (`F-01` … `F-10`) and two deliberate deferrals (`Q-07` re-expressing saving-model categories 4.1–4.7 under D-027; `Q-08` the decomposition engine, awaiting a second mechanism).

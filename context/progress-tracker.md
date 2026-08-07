@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Part 2.1 reconciled against the decision lock. All eight mechanism decision points closed. Awaiting factory data.
+**Current activity:** Part 2.1 complete and ready for final lock. All decision points and shared-structure questions closed. Awaiting factory data.
 **Code written:** None. Correctly so.
 
 ---
@@ -65,8 +65,7 @@ Implementation cannot start. Critical path, in order of urgency:
 | ~~M-01 … M-08~~ | **CLOSED** by D-017 … D-024 |
 | **A-09 FX — now Tier 1** (D-024) | Every financial comparison across periods |
 | **F-01 … F-10 factory data** | Mechanism 01 cannot be quantified without them. `F-01` and `F-09` are the sharpest |
-| ~~Q-03 / Q-04~~ | **LOCKED** by D-025 / D-026 |
-| **Q-05 — F10 promotion** | **Sole remaining blocker before Part 2.2.** Reported for decision; must not be inferred |
+| ~~Q-03 / Q-04 / Q-05~~ | **ALL LOCKED** by D-025 / D-026 / D-028. Nothing in the design blocks Part 2.2 |
 
 ---
 
@@ -100,3 +99,7 @@ Three conflicts flagged rather than silently resolved: `EARLY REALIZATION EVIDEN
 **2026-08-07** — Q-03 and Q-04 locked as D-025 and D-026. `COST / EXPOSURE / RISK` becomes a distinct class rather than a status, so exposure cannot reach the North Star aggregation through a status change or a careless join. Evidence strength becomes an attribute alongside the lifecycle rather than a seventh state, preserving the Core Mission §6 vocabulary and keeping workflow state and belief strength orthogonal. D-027 elevates event-level counterfactual reasoning from a mechanism-01 correction to a standing design principle of the whole engine, which makes Q-07 mandatory rather than advisory.
 
 Q-05 (promote four-way financial change decomposition to foundation F10) is **reported for decision, not decided**. Part 2.2 not started.
+
+**2026-08-07** — Q-05 accepted as A′ and locked as D-028. **F10 — Financial Change Decomposition Capture Contract** added as a tenth cross-cutting foundation, deliberately scoped to capture only. The split follows the asymmetry that capture is irreversible while computation is reversible: dimensions not preserved at event time cannot be reconstructed, but an algorithm fixed from a single mechanism is premature abstraction. The universal decomposition calculation, formula and UI are deferred as `Q-08` pending a second mechanism. D-024 and D-012 reconciled; F10 added to the factory operating model, the build plan (new U-01b in Stage 0), and the finance integration contract (`N-01` must now carry the raw dimensions). Terminology is deliberate — it is a *capture contract*, never described as an engine.
+
+Part 2.1 is ready for final lock. Part 2.2 not started. Still no code.

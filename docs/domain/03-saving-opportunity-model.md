@@ -1,6 +1,6 @@
 # 03 — Saving Opportunity Model
 
-> **Status:** Draft 1, reconciled 2026-08-07 against the Part 2.1 decision lock (D-017 … D-024). Planning only.
+> **Status:** Draft 1, reconciled 2026-08-07 against the Part 2.1 decision lock (D-017 … D-028). Planning only.
 > **Source of authority:** `docs/01-core-mission.md` (North Star), `docs/00-product-bible.md` (§36, §37, §38).
 > **Supersedes:** the recommendation structure in D-003, which is now under-specified.
 
@@ -90,7 +90,11 @@ This generalises what §4.9 already required for stockout risk, and it makes the
 
 Financial quantification requires, where applicable: **stated intervention · testable counterfactual · reliable incremental-cost inputs · appropriate FX normalisation · sufficient evidence.** Never manufacture precision from weak evidence. This governs every category below and every mechanism not yet designed.
 
-**4. FX normalisation and change decomposition (D-024).** Every figure in §4 that compares across periods must be FX-normalised, and where the four-way decomposition (operational / price / FX / volume-mix) cannot be performed reliably, the conclusion is marked rather than presented with false precision.
+**4. FX normalisation, and the F10 capture contract (D-024, D-028 `LOCKED`).** Every figure in §4 that compares across periods must be FX-normalised. Raw dimensions permitting later decomposition — original amount, currency, FX rate and rate date, quantity, unit basis, period — are **captured now** under **F10 — Financial Change Decomposition Capture Contract**, *as applicable to each event and never invented where absent*.
+
+The universal decomposition **calculation** (`operational + price/rate + FX + volume/mix`) is **deferred** until a second mechanism validates the abstraction (`Q-08`). Capture is irreversible; computation is reversible. Where a decomposition cannot be performed reliably, the conclusion is marked rather than presented with false precision — it is never fabricated.
+
+**Consistent capture across mechanisms is a precondition of §5's aggregation rules.** Inconsistent capture would reintroduce basis laundering: aggregating figures whose FX and price treatment differ produces a total that looks precise and is not.
 
 **5. Deduplication is at the economic-mechanism level (D-020).** Not per transaction. Genuinely independent effects may both be quantified; attribution must be explainable.
 

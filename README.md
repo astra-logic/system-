@@ -84,3 +84,4 @@ context/                         Bible §52 six-file system
 5. The system never fakes certainty. If it does not know, it says so.
 6. Potential is never presented as realised, and the headline saving figure is never a single confident point.
 7. No constant is invented to make a calculation complete — no avoidability weights, no default carrying-cost rate, no minimum event count. A missing input yields `INSUFFICIENT_DATA`.
+8. Capture is irreversible, computation is reversible — so raw financial dimensions are preserved at event time, while calculation methods are deferred until the abstraction is validated.

@@ -462,3 +462,60 @@ Any financial quantification requires, where applicable:
 **Cost.** Fewer quantified opportunities, and each requires more evidence. Categories that cannot meet the bar report `OPPORTUNITY DETECTED` with `INSUFFICIENT_DATA` for the figure — which is the honest outcome, not a degraded one.
 
 **Consequence.** `Q-07` becomes mandatory rather than advisory: saving-model categories 4.1–4.7 predate this principle and must each be re-expressed as intervention plus counterfactual before specification.
+
+---
+
+## D-028 — F10 is a Financial Change Decomposition **Capture Contract**, not an engine
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** new cross-cutting foundation · **Closes:** `Q-05` · **Reconciles:** D-024, D-012, D-002 · **Accepted as option A′**
+
+**Decision.** Promote financial change decomposition to a cross-cutting foundation, **F10**, scoped for now to the **capture contract only**.
+
+> **F10 — Financial Change Decomposition Capture Contract**
+
+It is **not** a universal decomposition calculation engine, and must not be called one. It may later evolve into *F10 — Financial Change Decomposition Engine*, but **only after multiple mechanisms validate the abstraction.**
+
+**Why the split.** Capture and computation have opposite risk profiles:
+
+```
+CAPTURE      = irreversible
+COMPUTATION  = reversible
+```
+
+Dimensions not preserved at event time cannot reliably be reconstructed later — a record holding only `freight cost = 45,000 EGP` is permanently undecomposable, whatever algorithm arrives afterwards. Capture must therefore be standardised now. Conversely, fixing a universal algorithm after a single mechanism is premature abstraction, and an abstraction chosen from `N=1` is the kind everything afterwards has to fight.
+
+**Locked now — the capture contract.** Where relevant to a financial event or value, preserve, *as applicable to that event*: original amount · currency · FX rate · FX rate date / effective date · quantity · unit basis · unit of measure · time period / period boundary · source / provenance · reference transaction or event · any other raw dimension required to reconstruct the change.
+
+**The constraint that keeps this honest.** *Do not invent fields the source event does not actually have.* This sits in real tension with "capture everything because it is irreversible," and resolves one way: **preserve what the event genuinely carries; never manufacture placeholders.** A domestic single-currency transaction has no FX dimension, and an empty FX field on it records nothing while implying something.
+
+**Deferred explicitly.** The universal decomposition algorithm · the universal formula · any decomposition UI · mechanism-specific decomposition behaviour beyond what current evidence requires. Recorded as `Q-08`.
+
+**Rejected.** *Full foundation now* — would force an engine designed from one mechanism. *Per-mechanism rules* — divergent capture across mechanisms, requiring a migration touching every cost-bearing record. *Extend F4 instead* — F4 describes what a value **is**; F10 preserves what a value was **made of** so a change between two values can be explained. Perfect provenance on both endpoints still cannot say how much of a change was FX. *Defer entirely* — loses capture irreversibly.
+
+**Cost.** Expands the movement record (F2) and the finance import contract (`N-01`). Adds a Stage 0 obligation to the build plan. Some captured dimensions may prove unnecessary once the engine is designed — an acceptable price for an irreversible risk.
+
+**Consequences.**
+- `N-01` (finance integration contract) now must specify that imported cost arrives carrying these dimensions; otherwise figures derived from it cannot be decomposed.
+- Build plan gains **U-01b**, and U-07 / U-12 / U-13 / U-14 acquire capture obligations.
+- D-024's FX Tier-1 status is unchanged; its decomposition requirement is now split into *captured* and *deferred* halves.
+
+---
+
+## D-024 — amendment note (2026-08-07)
+
+Following D-028, D-024 is read in two parts:
+
+| Part | Status |
+|---|---|
+| FX normalisation is Tier 1 for multi-currency financial comparison | `LOCKED` — unchanged |
+| Raw dimensions preserved to permit later decomposition | `LOCKED` — now the F10 capture contract (D-028) |
+| The universal four-way decomposition **calculation** | **`DEFERRED`** — `Q-08`, pending a second mechanism |
+| Never fabricate a decomposition where data is unavailable | `LOCKED` — unchanged |
+
+The four-way model (`operational + price/rate + FX + volume/mix`) remains the **target shape**, not an implemented method.
+
+---
+
+## D-012 — amendment note (2026-08-07)
+
+Cross-mechanism aggregation depends on **consistent capture** under F10. Inconsistent capture would reintroduce the basis-laundering D-012 forbids — aggregating figures whose FX and price treatment differ, producing a total that looks precise and is not. F10's capture contract is therefore a precondition of D-012's weakest-basis rule holding across mechanisms, not merely a convenience.

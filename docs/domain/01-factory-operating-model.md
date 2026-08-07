@@ -27,7 +27,7 @@ For each domain the Bible asks eight questions. Every domain section below answe
 
 ## Part B — Cross-cutting foundations
 
-These are not modules. They are the physics of the system. Every domain in Part C sits on top of them. **If these are wrong, nothing above them can be trusted, and the entire "decision intelligence" and "financial impact" ambition collapses.** They are therefore the first things that must be settled.
+These are not modules. They are the physics of the system. **F10 was added 2026-08-07** by D-028. Every domain in Part C sits on top of them. **If these are wrong, nothing above them can be trusted, and the entire "decision intelligence" and "financial impact" ambition collapses.** They are therefore the first things that must be settled.
 
 ---
 
@@ -200,6 +200,8 @@ The binding rule: **a movement's cost is fixed when it is recorded.** Later pric
 
 §36 and §37 are the product's differentiators, and also its largest credibility risk. A recommendation engine that claims savings it never proves is precisely the "fake savings calculations" §47 forbids.
 
+> **Superseded in part.** F9's recommendation object and lifecycle below are superseded by D-011 (Saving Opportunity), D-025 (`COST / EXPOSURE / RISK` as a distinct class) and D-026 (evidence strength as an attribute, not a lifecycle state). See `docs/domain/03-saving-opportunity-model.md` for the current model. The principles below — baselines captured before action, only measured outcomes reported as realised, dismissals are data — all stand.
+
 `PROPOSED` A **Recommendation** is a stored, first-class object with §36's structure — what, why, evidence, calculation, assumptions, expected impact, confidence, action — plus a lifecycle:
 
 ```
@@ -221,6 +223,72 @@ Two rules that make this real rather than cosmetic:
 
 1. **Baselines are captured before the action, not reconstructed after it.** Reconstructed baselines are unfalsifiable.
 2. **Dismissals are data.** A recommendation type that is dismissed 90% of the time is a broken recommendation type, and the system should be able to see that about itself.
+
+---
+
+### F10 — Financial change decomposition **capture contract**
+
+> **Status:** `LOCKED` 2026-08-07 (D-028). **This is a capture contract, not a calculation engine.**
+> The universal decomposition algorithm is **deferred** until at least a second mechanism validates the abstraction.
+
+The reason this is a foundation rather than a mechanism feature rests on one asymmetry:
+
+```
+CAPTURE      = irreversible
+COMPUTATION  = reversible
+```
+
+If the underlying dimensions of a financial event are not preserved **at event time**, the missing dimensions cannot reliably be reconstructed later. A record storing only `freight cost = 45,000 EGP` can never be decomposed by any algorithm invented afterwards — the information is simply gone. Capture must therefore be standardised now.
+
+The calculation is the opposite case. Designing a universal decomposition algorithm from a single mechanism would be premature abstraction, and abstraction chosen from `N=1` is the kind everything afterwards has to fight.
+
+**So: capture now, calculation engine later.**
+
+#### What the contract must preserve
+
+Where relevant to a financial event or value, preserve the raw dimensions needed to reconstruct a financial change later, **as applicable to that event**:
+
+| Dimension | Note |
+|---|---|
+| Original amount | As transacted, before any conversion |
+| Currency | Of the original amount |
+| FX rate | The rate applied |
+| FX rate date / effective date | Which rate, as of when |
+| Quantity | |
+| Unit basis | Price per what |
+| Unit of measure | Per F6 |
+| Time period / period boundary | Per F5 |
+| Source / provenance | Per F4 |
+| Reference transaction / event | What this attaches to |
+| Other raw dimensions required to reconstruct the change | Judged per source event |
+
+#### The constraint that keeps this honest
+
+**Do not invent fields the source event does not actually have.**
+
+This sits in genuine tension with "capture everything now because it is irreversible," and the tension resolves one way: **preserve what the event genuinely carries; never manufacture placeholders.** A domestic single-currency transaction has no FX dimension, and adding an empty FX field to it records nothing while implying something. The purpose is to avoid losing information that exists — not to build a universal schema in advance of knowing what is needed.
+
+#### What this enables later, and does not do now
+
+Sufficient information to decompose an observed financial change into — **where applicable, and only where data supports it** —
+
+```
+operational effect  +  price / rate effect  +  FX effect  +  volume / mix effect
+```
+
+**Deferred:** the universal decomposition algorithm · the universal formula · any decomposition UI · mechanism-specific decomposition behaviour beyond what current evidence requires.
+
+#### Relationship to the other foundations
+
+| Foundation | Relationship |
+|---|---|
+| **F4 provenance** | Complementary, not overlapping. F4 describes *what a value is* (basis, source, confidence). F10 preserves *what a value was made of* so a **change between two values** can later be explained. Perfect provenance on both endpoints still does not tell you how much of a change was FX. |
+| **F2 ledger** | Cost-bearing movements carry these dimensions. Expands the movement record. |
+| **F3 / F5 / F6** | Supply the quantity, period and UoM dimensions. |
+| **F8 / D-008** | Cost imported from finance must arrive carrying these dimensions, or figures derived from it cannot be decomposed. **Adds a requirement to the finance integration contract (`N-01`).** |
+| **F9 / D-012** | Cross-mechanism aggregation depends on consistent capture; inconsistent capture reintroduces the basis-laundering D-012 forbids. |
+
+`REQUIRES_FACTORY_DATA` — FX rate history, source and finance's effective-dating policy (`F-07`).
 
 ---
 

@@ -24,6 +24,8 @@
 10d. **No default carrying-cost rate.** Not 15%, not 20%, not any value. Finance owns it; absent it, the dependent output is `INSUFFICIENT_DATA`. (D-023)
 10e. **`COST / EXPOSURE / RISK` is a distinct class, not a status.** Only `SAVING_OPPORTUNITY` records are eligible for North Star aggregation. No transition, migration or aggregation path converts one class into the other. (D-021, D-025)
 10e2. **Evidence strength is an attribute, never a lifecycle state.** Workflow state and evidence strength are orthogonal; the Core Mission §6 lifecycle is not extended. (D-026)
+10f-0. **Preserve the F10 capture dimensions on financial events** — original amount, currency, FX rate and date, quantity, unit basis, UoM, period — **as applicable to that event. Never invent a field the event does not have.** (D-028)
+10f-1. **Do not build a decomposition engine.** F10 is a capture contract; the calculation is deferred (`Q-08`).
 10f. **No cross-period financial comparison without FX normalisation.** Where the operational/price/FX/volume-mix decomposition cannot be performed reliably, mark it — never fabricate it. (D-024)
 10g. **Deduplication is at the economic-mechanism level**, and attribution must be explainable — never a silent filter. (D-020)
 10h. **A single event may detect an opportunity but not support an annual figure.** OPPORTUNITY DETECTED · ANNUALIZATION ELIGIBLE · VERIFIED REALIZATION are distinct. (D-019)
