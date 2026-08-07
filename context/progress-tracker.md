@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Parts 2.1 and 2.2 **LOCKED**. DP-10 … DP-15 adversarially tested — **nothing locked**, awaiting review. Part 2.3 not started.
+**Current activity:** Parts 2.1 and 2.2 **LOCKED**. Final reconciliation on monetary boundaries delivered — **nothing locked**, four architectural amendments pending. Part 2.3 not started.
 **Code written:** None. Correctly so.
 
 ---
@@ -185,3 +185,17 @@ Orders & Supply Movement confirmed as a dependency of **every remaining category
 Three candidate cross-cutting rules surfaced: a financial rate must be *fit for the decision*, extending D-023 from "never invent" to "never misapply"; asymmetric valuation must be presented rather than hidden, since a quantified gain beside an unvaluable risk biases the decision structurally; and D-031 may need a `MITIGATES` type, since an Opportunity that reduces an exposure currently has no way to say so.
 
 ⚠ **D-011's single `Owner` field is demonstrably insufficient** — finding, action and data ownership are three distinct accountabilities. Flagged, not changed.
+
+**2026-08-07 — Final reconciliation on monetary claim boundaries.** `docs/domain/12-final-reconciliation-monetary-boundaries.md`. Nothing locked, no locked decision amended, no rate or severity score invented.
+
+Testing the six intervention types separately produced a unifying rule the taxonomy never had: **one-time benefits come from changing a stock *level*; recurring benefits come from changing a *policy*.** It also collapsed one of them — **cancel is delay wearing a different name** unless the quantity will never be consumed, in which case the stock is dead rather than excess. And it surfaced an Egypt-specific offset not previously considered: **in a devaluing currency, deferring a purchase may increase the price paid, so the deferral benefit can be negative.**
+
+A decomposition refined an earlier finding. **Reorder point = lead-time demand + safety stock**, so Mechanism 01 (lead-time correction) and 4.7 (buffer reduction) act on *different components of the same parameter* and **compose** rather than automatically contradicting. D-029 still catches genuine same-component opposition, but treating the pair as inherently contradictory would suppress a legitimate combined correction.
+
+**DP-13 resolved cleanly:** 4.7 produces a prospective **indication**, never a prospective currency claim, because level C evidence is unreachable — supplier escalation and substitution are usually unrecorded, and production rescheduling and demand suppression cannot be observed at all. But the claim that cannot be made prospectively **can be verified retrospectively**, which maps onto D-019's ladder and D-011's realization discipline without new machinery.
+
+**DP-15 produced the sharpest constraint:** a standard carrying-cost rate that includes obsolescence **is not usable as supplied**, because it smuggles a risk inside a cost and D-031 forbids netting risk. Even an authoritative finance-owned rate may need decomposition before use — which is the strongest argument for the rate-fitness rule.
+
+Four architectural amendments are pending and **none applied**: D-011's single Owner field must split into finding/action/data; D-014 rule 10 needs *purpose* added to the provenance list; D-031 needs `MITIGATES`; and D-023 should extend from *never invent* to *never misapply*.
+
+Also recorded: **the operating chain is broken at Actual Outcome** in Release 1. Procurement-side verification — price, freight, timing — is possible; production-side is not (D-007). Every mechanism's realization discipline inherits that limit.

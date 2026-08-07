@@ -224,6 +224,26 @@ Disposal cost · recovery value · marginal vs average storage cost basis · req
 
 **Added by the adversarial report:** **is warehouse space constrained?** · what purpose was finance's carrying rate built for? · are shelf lives recorded? · are supplier escalations recorded in any form? · manual override history · who owns data quality?
 
+### Final reconciliation delivered 2026-08-07 — `docs/domain/12-final-reconciliation-monetary-boundaries.md`
+
+**Nothing locked.** Eight issues tested; classification at the end of that report.
+
+| Ready to lock | Requires architectural decision |
+|---|---|
+| DP-10 six intervention types · DP-13 three-claim structure · DP-14 owner roles · `MITIGATES` (disclosure-only) · asymmetric-valuation rule · DP-15 component principle · rate-fitness principle · O&SM map | **D-011** `Owner` must split · **D-014 rule 10** add *purpose* · **D-031** add `MITIGATES` · **D-023** extend to *never misapply* |
+
+**Key results:**
+
+- **One-time benefits come from changing a stock *level*; recurring benefits come from changing a *policy*.** The unifying rule across all six interventions
+- **Cancel collapses into delay** unless the quantity will never be consumed — in which case it is dead stock, not excess
+- ⚠ **In a devaluing currency, deferring a purchase may cost more.** Deferral benefit can be **negative** — Egypt-specific and not previously considered
+- **Reorder point decomposes** into lead-time demand (M01's lever) + safety stock (4.7's lever), so the two **compose** at component level rather than automatically contradicting
+- **4.7 is a prospective *indication*, never a prospective currency claim** — the saving is verifiable only retrospectively
+- ⚠ **A carrying rate containing obsolescence is not usable as supplied** — it smuggles a risk into a cost, which D-031 forbids netting
+- **The operating chain is broken at *Actual Outcome*** in Release 1 — production-side verification is impossible (D-007)
+
+---
+
 ### Candidate cross-cutting rules raised (not locked)
 
 | Candidate | Note |
