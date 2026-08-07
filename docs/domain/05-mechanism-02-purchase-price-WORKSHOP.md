@@ -1,5 +1,9 @@
 # 05 — Saving Mechanism 02: **Procurement Price Opportunity** — WORKSHOP DRAFT
 
+> ## ⚠ SUPERSEDED BY THE PART 2.2 LOCK — retained as the workshop record
+> **The authoritative Part 2.2 statement is `docs/domain/09-part-2.2-LOCK.md`.**
+> This document is the **workshop history** and is deliberately **not rewritten**. Its references to `SAVING_OPPORTUNITY` and to a single `COST / EXPOSURE / RISK` class **predate the D-025 amendment of 2026-08-07** and are correct as a record of what was thought at the time. Read the lock document for the current model.
+>
 > ## ⚠ THIS IS NOT A LOCK DOCUMENT
 > **Status:** `WORKSHOP DRAFT` — reconciled against the preliminary DP-01 … DP-08 decisions of 2026-08-07. Nothing here is locked.
 > **Name:** approved as **Procurement Price Opportunity** (DP-01). Taxonomy §4.4's title *"Purchase price variance"* is superseded.

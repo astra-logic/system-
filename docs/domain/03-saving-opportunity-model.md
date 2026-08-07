@@ -125,9 +125,17 @@ Minimum: **typed subject · affected dimensions · direction per dimension · ef
 **6a. An Opportunity may create or deepen a linked Exposure/Risk (D-031 `LOCKED`).**
 
 ```
-OPPORTUNITY  ──may create 0..n──▶  EXPOSURE / RISK
-EXPOSURE / RISK  ──has 0..1 originating──▶  OPPORTUNITY
+OPPORTUNITY
+    ├── CREATES ──▶  EXPOSURE / RISK    introduces a new exposure
+    └── DEEPENS ──▶  EXPOSURE / RISK    worsens an existing exposure
+
+OPPORTUNITY      ──creates 0..n──▶ · ──deepens 0..n──▶  EXPOSURE / RISK
+EXPOSURE / RISK  ──has 0..1 creating · 0..n deepening Opportunities
 ```
+
+`CREATES` and `DEEPENS` are **distinct types**. **`DEEPENS` is never counted as `CREATES`** for aggregation. `DEEPENS` is a **factual relationship, not a financial valuation** — **no probability, percentage, threshold or monetary value** is assigned to it, and it is never silently netted. An Opportunity that deepens an Exposure **must disclose it to the reviewer**.
+
+The Exposure record is **not created until the intervention is actioned** (`W-47`); before that the prospective consequence is an attribute of the Opportunity's disclosure. Where several Opportunities affect one subject, **each carries its own record** and current exposure is a **derived view** (`W-48`).
 
 **Disclosed alongside the Opportunity, never subtracted from it.** Rule 6 nets *certain* incremental costs; an *uncertain* future obligation is disclosed — netting a probability against a certainty would require inventing one. **No probability scores, thresholds or risk-value calculations.**
 

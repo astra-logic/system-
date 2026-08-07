@@ -320,7 +320,7 @@ Decisions D-017 … D-024 were locked by the product owner in response to the ei
 
 **Status:** `LOCKED` 2026-08-07 · **Area:** saving taxonomy · **Closes:** M-05
 
-**Decision.** Customs demurrage, detention and clearance costs are valid candidates for the taxonomy. Root cause is classified. A financial opportunity is quantified **only where causality and avoidability are sufficiently defensible**. Where they are not, the amount is presented as **`COST / EXPOSURE / RISK`**, never as a saving opportunity. Customs data structure and availability are **not assumed** — marked `REQUIRES_FACTORY_DATA`.
+**Decision.** Customs demurrage, detention and clearance costs are valid candidates for the taxonomy. Root cause is classified. A financial opportunity is quantified **only where causality and avoidability are sufficiently defensible**. Where they are not, the amount is presented as **`OBSERVED COST`** (already incurred) or **`EXPOSURE / RISK`** (forward-looking) — never as a saving opportunity. *(Originally worded as a single `COST / EXPOSURE / RISK` destination; split by the D-025 amendment of 2026-08-07.)* Customs data structure and availability are **not assumed** — marked `REQUIRES_FACTORY_DATA`.
 
 **Why this is a genuine addition.** It gives the product a way to be *useful about money it cannot claim*. "You spent 340,000 EGP on demurrage last year — 60% from port congestion you cannot control, 40% from documentation delays you can" is valuable in both halves, and honest about which is which.
 
@@ -625,12 +625,55 @@ Minimum signature: **typed subject · affected dimensions · direction per dimen
 
 **Status:** `LOCKED` 2026-08-07 · **Area:** saving model · **Closes:** `W-45` · **Clarifies:** D-014 rule 6
 
-**Decision.** A **saving-model rule establishing a linked-finding relationship**:
+### As originally locked (`CREATES` only) — preserved
+
+> **Decision.** A **saving-model rule establishing a linked-finding relationship**:
+>
+> ```
+> OPPORTUNITY  ──may create 0..n──▶  EXPOSURE / RISK
+> EXPOSURE / RISK  ──has 0..1 originating──▶  OPPORTUNITY
+> ```
+
+### As amended 2026-08-07 by `W-49` — `DEEPENS` added
+
+**Decision.** Two **distinct** linked-finding relationship types:
 
 ```
-OPPORTUNITY  ──may create 0..n──▶  EXPOSURE / RISK
-EXPOSURE / RISK  ──has 0..1 originating──▶  OPPORTUNITY
+OPPORTUNITY
+    ├── CREATES ──▶  EXPOSURE / RISK    introduces a new exposure that did not
+    │                                    previously exist in the relevant context
+    └── DEEPENS ──▶  EXPOSURE / RISK    increases or worsens an already-existing
+                                         exposure
+
+Cardinality:
+    OPPORTUNITY      ──creates 0..n──▶  EXPOSURE / RISK
+    OPPORTUNITY      ──deepens 0..n──▶  EXPOSURE / RISK
+    EXPOSURE / RISK  ──has 0..1 creating Opportunity
+    EXPOSURE / RISK  ──has 0..n deepening Opportunities
 ```
+
+**Binding rules.**
+
+1. `CREATES` and `DEEPENS` **remain distinct relationship types**.
+2. **`DEEPENS` is never treated as `CREATES`** for aggregation or counting purposes.
+3. `EXPOSURE / RISK` carries **no intervention signature** (D-029).
+4. `DEEPENS` is a **relationship and factual finding, not a financial valuation**.
+5. **No probability, percentage, threshold or monetary value is assigned to `DEEPENS`** unless a future mechanism establishes a defensible basis under the existing locked rules.
+6. `DEEPENS` is **never silently netted** against Potential Annual Saving.
+7. An Opportunity that deepens an Exposure **must disclose that relationship to the reviewer**.
+
+**Worked example — note what is deliberately absent.**
+
+```
+Opportunity              "Move purchasing to lower-price supplier B"
+Potential Annual Saving  +1,200,000 EGP
+Existing Exposure        "Foreign-currency purchasing exposure"
+Relationship             DEEPENS
+```
+
+**No monetary value is invented for the FX exposure merely because the Opportunity deepens it.** The saving stands at its evidenced figure; the deepening is disclosed as a fact, unvalued.
+
+**Why the distinction is load-bearing.** `CREATES` brings a risk into existence; `DEEPENS` adds to one that already exists. Different remediation, different ownership — and conflating them would corrupt aggregation, since a deepening link counted as a creation would appear as a new exposure that does not exist.
 
 **Disclosure, never netting.** D-014 rule 6 nets **certain incremental costs**. An uncertain future obligation is **disclosed alongside the Opportunity, never subtracted from it** — netting a probability against a certainty would require inventing a probability, which D-017 and D-023 forbid.
 
@@ -646,6 +689,10 @@ Two results shaped the rule:
 **`EXPOSURE / RISK` carries no intervention signature.** This follows from D-025's amended principle 3: a mitigation with a defensible counterfactual **becomes an Opportunity**, and that Opportunity carries the signature. Two confirming cases — two Exposures cannot contradict, being observations rather than recommendations; and an Opportunity that *worsens* an existing Exposure is a **disclosure relationship, not a contradiction**.
 
 > **D-029 governs opposed actions. D-031 governs an action that creates or deepens a risk.** Distinct and complementary.
+
+**When the link comes into being (`W-47`).** The Exposure record is **not created until the intervention is actioned**. Before that, the prospective consequence is an **attribute of the Opportunity's disclosure** — visible to the reviewer, but not yet a standalone record. A rejected Opportunity therefore leaves no orphan exposure, and nothing is deleted.
+
+**Multiple Opportunities on one exposure (`W-48`).** Each creates its **own record**; *current exposure on a subject* is a **derived view**, exactly as balances are projections of the ledger (D-001). Merging into one mutable record would destroy which action caused what. This **confirms** the 0..1 creating cardinality rather than changing it.
 
 **Placement.** Saving Opportunity Model, per D-029's principle — *F-series foundations govern what must be captured from reality; the saving model governs what may be asserted about it.*
 

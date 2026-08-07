@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Part 2.1 **LOCKED**. **D-025 amendment applied.** D-031 and D-032 locked. One decision point remains (W-49 `DEEPENS`) before the Part 2.2 lock.
+**Current activity:** **Part 2.1 and Part 2.2 both LOCKED.** Part 2.3 not started, awaiting explicit instruction.
 **Code written:** None. Correctly so.
 
 ---
@@ -13,7 +13,7 @@
 | Phase | Name | Status |
 |---|---|---|
 | 0 | Product architecture | **Largely complete** — scope, domain model, build plan drafted |
-| 1 | Context + specifications | **In progress** — context files updated; unit specs not yet written |
+| 1 | Context + specifications | **In progress** — mechanisms 01 and 02 locked; unit specs not yet written |
 | 2–21 | Factory model through advanced optimisation | Not started. Sequence superseded for release 1 by `context/specs/00-build-plan.md` |
 
 ---
@@ -153,3 +153,11 @@ One thing blocks the amendment and was surfaced rather than assumed: the accepte
 W-47 and W-48 resolved. W-47: the Exposure record is **never created until the intervention is actioned** — before that the prospective consequence is an attribute of the Opportunity's disclosure, which avoids orphans and avoids deletion, and preserves the useful history that a recommendation was declined partly because of the risk it would create. W-48: each Opportunity creates its **own** record and *current exposure* is a derived view, exactly as balances are projections of the ledger — merging would destroy which action caused what.
 
 **W-49 remains open and is the only outstanding decision.** Recommended as a distinct `DEEPENS` relationship type, mandatory. It **extends** the accepted cardinality — an exposure gains 0..n deepening Opportunities alongside 0..1 creating — so it was flagged rather than applied. D-031 carries `CREATES` only.
+
+**2026-08-07 — PART 2.2 LOCKED.** `docs/domain/09-part-2.2-LOCK.md` is the authoritative statement. W-49 accepted and applied: `DEEPENS` added to D-031 as a distinct relationship type, never counted as `CREATES`, carrying no probability, percentage, threshold or monetary value.
+
+A consistency audit was run **before** locking rather than after, and found **six genuine stale references** — not a rubber stamp. D-021's decision body still read as a single destination despite its amendment note; the Q-03 and M-05 resolutions in the open-questions register still described the pre-amendment class model; two rows in mechanism 01 still named the old class; and the mechanism-02 workshop carried a dozen pre-amendment references. All fixed, except the workshop, which received a superseded-by header rather than a rewrite — its references are correct as a record of what was thought at the time, and the same discipline that preserved D-025's original text applies to it.
+
+Verified clean: no uncertain Exposure/Risk can reach Potential Annual Saving; no probability, threshold, confidence constant or invented monetary value exists anywhere in mechanism 02; shipment consolidation remains a future-domain gap and has not become a mechanism; and every amended decision preserves its original text verbatim, quoted and labelled.
+
+`Q-07` is called out in the lock as **growing debt** — categories 4.1–4.7 still carry percentage-over-total formulas, and each new mechanism designed under D-027 widens the gap.

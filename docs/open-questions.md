@@ -108,7 +108,7 @@ Locked by the product owner as D-017 … D-024. Full detail in `docs/domain/04-m
 | M-02 | Root cause captured at expedite time, or retrospectively? | — | `CLOSED` → **D-018.** In-workflow capture, structured categories |
 | M-03 | Minimum event count for annualisation | — | `CLOSED` → **D-019.** No universal minimum; three-state evidence ladder |
 | M-04 | Precedence between expedite premium and purchase price variance | — | `CLOSED` → **D-020.** Deduplicate at economic-mechanism level; independent effects may both be quantified |
-| M-05 | Does customs demurrage count as expedite premium? | — | `CLOSED` → **D-021.** Valid candidate; uncontrollable cost becomes `COST / EXPOSURE / RISK` |
+| M-05 | Does customs demurrage count as expedite premium? | — | `CLOSED` → **D-021**, as amended: valid candidate; uncontrollable cost becomes **`OBSERVED COST`** if incurred or **`EXPOSURE / RISK`** if forward-looking |
 | M-06 | Observation window before an opportunity may be `REALIZED` | — | `CLOSED` → **D-022.** 12 months default, early evidence distinguished |
 | M-07 | Does the carrying-cost offset use finance's rate or an assumption? | — | `CLOSED (policy)` → **D-023.** Finance-owned, no defaults. **Value still `REQUIRES_FACTORY_DATA`** (F-08) |
 | M-08 | Is FX normalisation mandatory before trending? | — | `CLOSED` → **D-024.** Tier 1, with four-way change decomposition |
@@ -158,7 +158,7 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 |---|---|---|
 | Q-01 | Is *quality rejection* a distinct root-cause category, or does it belong under *Supplier delay*? | Add it — different owner, different action |
 | Q-02 | What test makes a counterfactual "defensible" for quantification? | The lead-time gap example is a *form*, not a validated rule. Needs real events |
-| ~~Q-03~~ | `COST / EXPOSURE / RISK` — class or status? | **`LOCKED` → D-025.** Distinct class. Only `SAVING_OPPORTUNITY` is aggregable |
+| ~~Q-03~~ | `COST / EXPOSURE / RISK` — class or status? | **`LOCKED` → D-025**, **amended 2026-08-07**: findings separated by class — `FINDING → OPPORTUNITY \| OBSERVED COST \| EXPOSURE / RISK`, with `EVIDENCE GAP` outside. Only `OPPORTUNITY` is aggregable |
 | ~~Q-04~~ | `EARLY_REALIZATION_EVIDENCE` — attribute or state? | **`LOCKED` → D-026.** Attribute. Core Mission §6 lifecycle unchanged |
 | ~~Q-05~~ | Promote four-way change decomposition to foundation F10? | **`LOCKED` → D-028 (accepted as A′).** F10 is a **capture contract**, not an engine. Capture locked now; calculation deferred |
 | **Q-08** | **When does the F10 capture contract become a decomposition *engine*?** | **`DEFERRED` by D-028.** Requires at least a second mechanism to validate the abstraction. Not a blocker |

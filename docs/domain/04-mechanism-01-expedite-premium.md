@@ -37,7 +37,7 @@ This is why the three-state ladder in §7 matters so much: it lets the system sa
 | Root cause | Recommended workflow capture | `LOCKED` with defined categories (D-018) |
 | Event count | Proposed a minimum count | No universal minimum; three-state ladder (D-019) |
 | Deduplication | One currency claim per PO line | At **economic-mechanism** level; genuinely independent effects may both be quantified (D-020) |
-| Customs | Flagged as a question | Valid candidate; uncontrollable cost becomes `COST / EXPOSURE / RISK`, not a saving (D-021) |
+| Customs | Flagged as a question | Valid candidate; uncontrollable cost becomes **`OBSERVED COST`** if incurred or **`EXPOSURE / RISK`** if forward-looking, never a saving (D-021, D-025 as amended) |
 | Realization | 6–12 months, `UNKNOWN` | 12 months default; evidence strength is an **attribute**, not a state (D-022, D-026) |
 | Carrying cost | Flagged dependency | Finance-owned; **no developer defaults**, ever (D-023) |
 | FX | Recommended normalisation | Tier 1 (D-024). Raw dimensions **captured** under F10; the decomposition **calculation** is deferred (D-028) |
@@ -533,7 +533,7 @@ Nothing in this section has been assumed anywhere else in this document.
 
 Baseline precedence ladder (§13) · premium allocation to the driving PO line (§2) · the four quantification preconditions (§5) · confidence coverage inputs (§9) · adding *quality rejection* as a category (`Q-01`) · single large events never annualised (§7).
 
-**Newly locked 2026-08-07:** `COST / EXPOSURE / RISK` as a distinct class (D-025) · evidence strength as an attribute (D-026) · event-level counterfactual reasoning as a standing design principle (D-027) · **F10 financial change decomposition capture contract (D-028)**.
+**Newly locked 2026-08-07:** findings separated by class, `EVIDENCE GAP` outside the hierarchy (D-025 as amended) · evidence strength as an attribute (D-026) · event-level counterfactual reasoning as a standing design principle (D-027) · **F10 financial change decomposition capture contract (D-028)**.
 
 ### REQUIRES_FACTORY_DATA
 

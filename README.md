@@ -17,7 +17,8 @@
 | 5 | [`docs/02-handoff-part1-locked.md`](docs/02-handoff-part1-locked.md) | Part 1 locked. The 16 financial-trust rules that govern every saving figure. |
 | 6 | [`docs/domain/03-saving-opportunity-model.md`](docs/domain/03-saving-opportunity-model.md) | The saving taxonomy, calculation rules, and the guard on the headline figure. |
 | 7 | [`docs/domain/04-mechanism-01-expedite-premium.md`](docs/domain/04-mechanism-01-expedite-premium.md) | **Mechanism 01 — Part 2.1 locked.** Expedited freight / emergency purchase premium. |
-| 8 | [`docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md`](docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md) | Mechanism 02 — **workshop draft, not locked.** Purchase price variance. |
+| 8 | [`docs/domain/09-part-2.2-LOCK.md`](docs/domain/09-part-2.2-LOCK.md) | **Mechanism 02 — Part 2.2 LOCKED.** Procurement Price Opportunity. |
+| 8b | [`docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md`](docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md) | Workshop record — superseded by the lock, retained as history. |
 | 9 | [`docs/domain/06-orders-and-supply-movement-REQUIREMENT.md`](docs/domain/06-orders-and-supply-movement-REQUIREMENT.md) | Tracked requirement — **not designed, not a saving mechanism.** |
 | 9b | [`docs/domain/07-decision-report-W33-W36-W35.md`](docs/domain/07-decision-report-W33-W36-W35.md) | Decision report — W-33, W-36, W-35. |
 | 9c | [`docs/domain/08-decision-report-D025-amendment-W35-W45.md`](docs/domain/08-decision-report-D025-amendment-W35-W45.md) | **Proposed D-025 amendment — NOT APPLIED.** Plus W-35 and W-45 analysis. |
@@ -37,6 +38,15 @@ Primary KPI: **Potential Annual Saving.** Operational management is the layer th
 ## What this release is
 
 Single site. Mixed manufacturing. Primary user is the **inventory / warehouse manager**. Covers inventory, procurement and cost consequence — **not** production, BoMs, MRP, maintenance or full quality. An external finance system owns valuation; this system owns quantity truth.
+
+## Saving mechanisms
+
+| # | Mechanism | Status |
+|---|---|---|
+| 01 | Expedited freight / emergency purchase premium | **LOCKED** (Part 2.1) |
+| 02 | Procurement Price Opportunity | **LOCKED** (Part 2.2) |
+
+Neither is buildable until its factory-data dependencies are answered. That is a data problem, not a design one.
 
 ## Where the project actually is
 
@@ -65,8 +75,11 @@ docs/
 │   ├── 02-first-release-scope.md
 │   ├── 03-saving-opportunity-model.md
 │   ├── 04-mechanism-01-expedite-premium.md
-│   ├── 05-mechanism-02-purchase-price-WORKSHOP.md
-│   └── 06-orders-and-supply-movement-REQUIREMENT.md
+│   ├── 05-mechanism-02-purchase-price-WORKSHOP.md   (superseded, retained)
+│   ├── 06-orders-and-supply-movement-REQUIREMENT.md
+│   ├── 07-decision-report-W33-W36-W35.md
+│   ├── 08-decision-report-D025-amendment-W35-W45.md
+│   └── 09-part-2.2-LOCK.md
 └── decisions/
     └── decision-register.md
 
