@@ -146,6 +146,7 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | F-25 | Does any independent role have both the **authority and the capacity** to adjudicate at volume? | Independence without capacity is not a workable control |
 | F-26 | **Are supplier price-break structures recorded**, with thresholds and effective dates? | Capture is irreversible (D-028 reasoning); the consuming mechanism does not exist yet |
 | F-27 | Are substitute / alternate items identified in master data? | Without it, cross-item contradiction is **undetectable in release 1** and must be stated as a limit |
+| F-28 | Are **volume rebates and annual-volume agreements** recorded, with thresholds and achievement to date? | Cases 2–3 of the DP-09 boundary test cannot be classified without it |
 
 ### Modelling questions raised by the lock — need confirmation before Part 2.2
 

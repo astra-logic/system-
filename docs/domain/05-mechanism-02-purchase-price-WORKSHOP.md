@@ -941,3 +941,206 @@ None. Consistent with D-018 and D-011 ("rejections are data" becomes load-bearin
 ### New open questions
 
 `W-28` — is self-adjudication acceptable with the conflict recorded as a confidence condition? · `W-29` — should rejection rates by adjudicator be visible as an integrity metric?
+
+
+---
+---
+
+# FINAL RECONCILIATION — 2026-08-07
+
+> W-25, W-26 and DP-09. **Still not a lock document.**
+
+## A. W-25 — contradiction control as a cross-cutting rule
+
+### 1. Alternatives
+
+| | Option |
+|---|---|
+| **A** | Mechanism-specific control |
+| **B** | Cross-cutting shared rule, wholly universal |
+| **C** | Cross-cutting rule **+** mechanism-specific implementation |
+
+### 2. Recommendation: **C** — and **A is not merely weaker, it is impossible**
+
+### 3. Why
+
+**A is structurally incapable of doing the job.** Contradiction is *inherently cross-mechanism*: mechanism 02 cannot detect a conflict with 4.1 because it does not own 4.1's opportunities and never sees them. A mechanism-specific control can only ever see one side of a contradiction. This is not a trade-off — it disqualifies A.
+
+**B is under-specified.** A wholly universal engine would have to *infer* each opportunity's effect on quantity, stock or supplier share. Only the originating mechanism knows that *"enforce contract price"* touches no quantity dimension while *"consolidate to supplier X"* moves supplier share. A universal rule with no mechanism-specific part would either guess — which is inventing — or model every mechanism centrally, which is B collapsing into C anyway.
+
+**C is what remains, and it decomposes cleanly.**
+
+### 5. What becomes universal, and what stays local
+
+| Element | Scope |
+|---|---|
+| **The invariant** — two open opportunities must not recommend opposed actions on intersecting subject, dimension and window | **Universal.** Per-mechanism, mechanism N+1 forgets it — the D-025 structural-safety argument |
+| **The signature vocabulary** — subject types, dimension names, direction values | **Universal.** Detection is impossible if mechanisms declare in different vocabularies |
+| **The detection test** — four-way intersection | **Universal.** Operates over signatures; mechanism-agnostic by construction |
+| **The allowed resolutions** — net · suspend · supersede · adjudicate | **Universal as a set.** Which one applies is per-case |
+| **Populating the signature** | **Mechanism-specific, necessarily.** Only mechanism 02 knows what a price-break intervention does to order quantity |
+
+**How future mechanisms inherit it.** By declaring a signature. A mechanism that produces opportunities without one cannot be integrated — which is the enforcement, and it is structural rather than procedural.
+
+### 4. Interaction with locked decisions
+
+**D-020 is not changed — it is extended.** D-020 governs *attribution of shared benefit*; contradiction control governs *executability of opposed actions*. Different questions, tests, and failure modes.
+
+They do interact at **resolution**: where two opportunities are both double-counted and contradictory — same lever, opposite directions — netting resolves both at once. Distinct at detection, shared at resolution.
+
+`PROPOSED` — **D-020 gains a cross-reference, not an amendment**, stating explicitly that it does *not* cover contradiction. Without that note, someone implementing deduplication will reasonably believe contradiction is handled.
+
+**The Opportunity model is affected materially:** every Opportunity gains an **intervention signature**. Additive; D-025's classes are untouched.
+
+**A consistency check against W-26 falls out of this.** If `COST / EXPOSURE / RISK` has no intervention, it has no signature, and therefore **cannot contradict anything**. That is coherent — and it independently supports the direction of §B below.
+
+### Where it belongs — and the distinguishing test
+
+A useful principle emerges from asking this:
+
+> **F-series foundations govern what must be captured from reality.**
+> **The saving model governs what may be asserted about it.**
+
+F10 imposes an **irreversible capture obligation on operational events**. Contradiction control imposes no capture obligation at all — it is a property of *derived findings*. So it is **not** a new F-foundation.
+
+`PROPOSED` placement:
+
+| Where | What |
+|---|---|
+| **Saving Opportunity Model** (`03-…`) | The invariant, the signature vocabulary, the detection test, the allowed resolutions. Its subject is the Opportunity object, which that document owns |
+| **F9** (factory operating model) | A cross-reference only |
+| **Code standards** | The enforcement rule — an opportunity without a signature cannot be presented |
+| **Architecture** | Listed as a cross-cutting position |
+
+**No numeric thresholds.** The four-way intersection test is structural.
+
+### 6. Factory data still required
+
+None new. `F-27` (substitute items) already governs whether cross-item contradiction is detectable at all in release 1.
+
+### 7. New open questions
+
+`W-30` — do `COST / EXPOSURE / RISK` records carry a signature? (Analysis says no) · `W-31` — is the dimension vocabulary a **locked list**, or extensible per mechanism? Extensible risks divergence; locked risks blocking a future mechanism · `W-32` — who adjudicates a detected contradiction, and does DP-07's independence property apply?
+
+---
+
+## B. W-26 — exposure lifecycle
+
+### Answering the sub-questions first, because they determine the answer
+
+**What would "approval" mean?** Nothing coherent. Approving an opportunity means *"yes, take this action."* Exposure has no action by construction — DP-04 says that if a defensible alternative existed it would not be exposure. "Approve" could only mean *acknowledge*, which is a different verb with different semantics.
+
+**Can exposure be "realized"?** **No — and this is the disqualifying point.** In this product `REALIZED` means *verified financial benefit*. "Realized exposure" reads as though exposure became a saving. That is precisely the accidental implication this investigation exists to prevent. **Any option that reuses the opportunity lifecycle vocabulary fails on this alone.**
+
+**Does it need an owner?** **Conditionally.** Systemic exposure has no owner in any meaningful sense — nobody owns the exchange rate. Specific exposure plausibly has someone who should watch it. Conditional ownership is itself evidence that one class is holding two different things.
+
+**Does it need status?** Something like it, but **not workflow status** — rather *currency of observation*: is this still true? An FX exposure from eight months ago that has since reversed is **stale**, not "expired". That is a state of an observation, not a stage of a process.
+
+**Can it generate actions?** Yes, but of a different kind: *"consider hedging"*, *"negotiate a fixed-price contract for next year"*. Critically:
+
+```
+Opportunity → action → REALIZED SAVING        (verifies a claim)
+Exposure    → action → FUTURE OPPORTUNITY     (creates conditions)
+```
+
+The second does not realize anything. It changes the world so that a defensible alternative may exist next time.
+
+### 1. Alternatives
+
+| | Option | Assessment |
+|---|---|---|
+| **A** | Exposure gets its own lifecycle | Fails if it reuses opportunity vocabulary. A parallel lifecycle with different words is possible but implies a workflow that mostly does not exist |
+| **B** | No lifecycle — a finding with an observation state | Correct for the *observation* aspect, but does not address that two different things are inside one class |
+| **C** | **Separate `COST` from `EXPOSURE / RISK`** | **Strongest — see below** |
+| **D** | Another model | C combined with B is the defensible model |
+
+### 2. Recommendation: **C combined with B**
+
+```
+Observed Cost      historical fact · basis ACTUAL · no lifecycle · observation state only
+Exposure / Risk    forward-looking condition · basis FORECAST or ESTIMATED
+                   · no opportunity lifecycle · may carry a mitigation action
+```
+
+**Neither carries the opportunity lifecycle. Neither can be `REALIZED`.**
+
+### 3. Why — the argument that decides it
+
+The two genuinely differ, and **D-002 already knows it**:
+
+- **Observed Cost** is money *actually spent*, with no defensible alternative — demurrage from port congestion. A fact about the past. Basis `ACTUAL`.
+- **Exposure / Risk** is money *at risk going forward* — unhedged FX on foreign-denominated commitments. A forward-looking condition. Basis `FORECAST` or `ESTIMATED`.
+
+Holding them in one class means any aggregate mixes `ACTUAL` historical spend with `FORECAST` future risk. Under D-002's weakest-basis rule that aggregate becomes `FORECAST` — **understating the certainty of the historical half**, and doing so invisibly.
+
+**The single class hides a basis distinction that D-002 would otherwise enforce.** That is the decisive argument: this is not a taxonomy preference, it is a provenance defect.
+
+### 4. Interaction with locked decisions — **this touches a locked decision**
+
+⚠ **D-025 locked a single `COST / EXPOSURE / RISK` class.** Splitting it is a **material reinterpretation, not an editorial change**, and is therefore **not being done here.** It requires an explicit amendment decision.
+
+What can be said without amending anything: D-025's placement of the class **under `Opportunity`** was a structural-safety decision about aggregation — and it succeeded at that. What it did not decide, because the question had not surfaced, is whether the class inherits `Opportunity`'s **lifecycle**. **It does not follow, and it should not be assumed.**
+
+**Does it belong in the same hierarchy?** On behaviour: no approval semantics, no realization semantics, conditional ownership, observation-state rather than workflow-state, and actions that *create* rather than *verify*. It shares with Opportunity only *"a finding about money"*. That is a weaker relationship than the current parenting implies.
+
+### 5. What becomes cross-cutting
+
+The rule that no non-`SAVING_OPPORTUNITY` finding may carry lifecycle vocabulary implying realization. That belongs in the Saving Opportunity Model and the code standards, alongside W-25's invariant.
+
+### 6. Factory data still required
+
+`F-07` FX source and policy — without it, systemic and specific movement cannot be separated, and both land in the same class for the wrong reason.
+
+### 7. New open questions
+
+`W-33` — **does splitting `COST` from `EXPOSURE / RISK` require an explicit amendment to D-025?** (Analysis: yes) · `W-34` — do exposure mitigation actions carry intervention signatures, or are they advisory and therefore outside contradiction detection?
+
+---
+
+## C. DP-09 — final adversarial boundary test
+
+**Test:** *does the counterfactual change the quantity purchased?*
+
+| # | Case | Classification | Notes |
+|---|---|---|---|
+| 1 | Contract price not applied | **Mechanism 02** | Quantity unchanged, price wrong. Clean |
+| 2 | Volume rebate | **Depends** — threshold already met and rebate unclaimed → **M02**; threshold requires buying more → **quantity** | ⚠ Surfaces refinement (a) |
+| 3 | Annual-volume agreement | **Depends** — volume already achieved, price not applied → **M02**; requires committing more → **quantity** | ⚠ Surfaces refinement (d) |
+| 4 | Supplier price break | **Depends** — earned but not applied → **M02**; requires buying more → **quantity** | The DP-09 case itself. Clean |
+| 5 | MOQ | **Quantity mechanism** — MOQ is a *constraint* forcing excess, not a price opportunity. **But**: negotiating MOQ down may come with a price *increase* → then **both, for different economic effects** | Good adversarial case |
+| 6 | EOQ-driven quantity | **Quantity mechanism**, entirely. Not M02 at all | `P-08`'s scepticism about EOQ's assumptions still stands |
+| 7 | Split purchasing across suppliers | **M02** at constant total quantity — **or requires more evidence** if the split exists for supply security, in which case the comparability gate fails on reliability | ⚠ Surfaces refinement (c) |
+| 8 | Consolidation | **Ambiguous as named** — see refinement (c) | ⚠ Real taxonomy finding |
+| 9 | Same quantity / different payment terms | **M02 by boundary, blocked by comparability gate** (DP-03) | ⚠ Surfaces refinement (b) |
+| 10 | Same quantity / different Incoterm | **M02 by boundary, gated by comparability** unless landed cost is normalisable (`F-19`) | Same as 9 |
+| 11 | Different quantity because of a price break | **Quantity mechanism** — price is an input | Clean |
+| 12 | Different quantity because of MOQ | **Quantity mechanism** | Clean |
+
+### Does the boundary survive? **Yes — 12/12 classify.** But the test surfaced four refinements.
+
+**(a) "Quantity purchased" must be scoped to a window, not an order.**
+Volume rebates and annual agreements aggregate across a period. Without this scoping, cases 2 and 3 are ambiguous. The boundary should read: *does the counterfactual change the quantity purchased **over the relevant window**?*
+
+**(b) The boundary classifies; the comparability gates still decide.**
+Cases 9 and 10 land in mechanism 02 *by boundary* and are then blocked *by comparability*. The two rules **compose**: the boundary answers **which mechanism**, the gates answer **whether quantifiable**. Worth stating explicitly, because otherwise someone will read the boundary as licensing a claim on its own.
+
+**(c) "Consolidation" is ambiguous, and taxonomy 4.5 spans both meanings.**
+- **Supplier consolidation** — same total quantity, fewer suppliers → **mechanism 02**
+- **Temporal consolidation** — fewer, larger orders → changes order quantity → **quantity mechanism**
+
+Taxonomy §4.5 *"Order consolidation"* as currently named covers both. **It needs splitting or renaming.** Feeds `Q-07`.
+
+**(d) Annual-volume agreements create commitment risk, which is neither price nor inventory.**
+Committing to 100 tonnes over a year at unchanged purchase quantity changes only the contract structure — so by the boundary it is mechanism 02. But the commitment creates an **obligation if demand falls**, which is neither a price opportunity nor an inventory cost. It looks like a **new exposure type** that no mechanism currently owns.
+
+### 4. Interaction with locked decisions
+
+None broken. The boundary is *more* consistent with D-027 than the alternatives, because it keys on the counterfactual — the object D-027 made central — rather than on a supplier term.
+
+### 6. Factory data still required
+
+`F-26` supplier break structures · `F-19` duty and clearing attributable to a PO line (cases 9–10) · `F-28` **are volume rebates and annual-volume agreements recorded, with thresholds and achievement to date?** (cases 2–3)
+
+### 7. New open questions
+
+`W-35` — split or rename taxonomy 4.5 to separate supplier from temporal consolidation · `W-36` — does commitment risk from annual-volume agreements need an owner, and is it a new exposure type? · `W-37` — confirm the boundary's window scoping per refinement (a)
