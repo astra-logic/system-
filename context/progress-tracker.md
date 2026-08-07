@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Part 2 workshop begun — mechanism 01 designed. Awaiting mechanism decision points and the critical-path answers.
+**Current activity:** Part 2.1 reconciled against the decision lock. All eight mechanism decision points closed. Awaiting factory data.
 **Code written:** None. Correctly so.
 
 ---
@@ -42,6 +42,8 @@
 
 **Mechanism 01 workshop** — `docs/domain/04-mechanism-01-expedite-premium.md`. Expedited freight / emergency purchase premium designed against all twelve required questions, stopping at eight business decision points. Key findings: the premium is a symptom with a price tag, not waste; most fixes require *more* stock, so the carrying-cost offset is mandatory; root cause is not in transactional data and needs a capture step in the procurement workflow; and in an Egyptian import context, un-normalised FX will manufacture large false opportunities (D-016).
 
+**Part 2.1 decision lock reconciled** — D-017 … D-024 recorded. All eight Part 2 decision points closed. `04-mechanism-01-expedite-premium.md` rewritten; `03-saving-opportunity-model.md` reconciled; D-012 amended (deduplication), D-015 strengthened, D-016 superseded by D-024. The structural change: **avoidability weights rejected, so quantification moves from category level to intervention level** — a testable counterfactual over identified events, not a percentage over a total.
+
 ---
 
 ## Blocked
@@ -60,8 +62,10 @@ Implementation cannot start. Critical path, in order of urgency:
 | N-07 / N-08 / N-09 | The saving detectors and the headline figure |
 | B-07 / N-06 pilot factory history | Whether planning returns real numbers at go-live |
 | **N-07 / F-01 separable freight capture** | **Gates mechanism 01 entirely** — without it, event counts rather than currency |
-| M-01 … M-08 mechanism decision points | Mechanism 01's figures and their basis |
-| **A-09 FX (escalation proposed)** | Every financial comparison across periods |
+| ~~M-01 … M-08~~ | **CLOSED** by D-017 … D-024 |
+| **A-09 FX — now Tier 1** (D-024) | Every financial comparison across periods |
+| **F-01 … F-10 factory data** | Mechanism 01 cannot be quantified without them. `F-01` and `F-09` are the sharpest |
+| Q-03 / Q-04 / Q-05 modelling choices | Shared structure — confirm before Part 2.2 |
 
 ---
 
@@ -87,3 +91,7 @@ Implementation cannot start. Critical path, in order of urgency:
 **2026-08-06** — Handoff `02-handoff-part1-locked.md` received. The 16 financial-trust rules adopted as D-014; they confirm D-011/D-012 and close N-08. Part 2 workshop executed for mechanism 01 (expedite premium): full design across the twelve required questions, stopping at eight decision points requiring business judgment. D-015 proposes lead-time correction as the defensible first slice — no assumed rates, no carrying-cost offset, no FX exposure in the causal claim, and verification entirely inside our own data. D-016 raises FX normalisation as mandatory and recommends escalating A-09 to Tier 1. Still no code.
 
 **Note on missing inputs:** the handoff references `02-potential-annual-saving-engine-plan.md` and existing product audit/critique documents. Neither has been provided. `docs/domain/03-saving-opportunity-model.md` covers adjacent ground but is this project's own derivation, not the referenced source.
+
+**2026-08-07** — Part 2.1 decision lock received and reconciled. Eight decisions recorded (D-017 … D-024), all eight Part 2 decision points closed. The largest change: numerical avoidability weights rejected — correctly, since they conflicted with already-locked rule 15 (confidence from evidence, never category constants). Quantification consequently moves from the category level to the intervention level: a testable counterfactual over identified events replaces a percentage over a total. Also new: `COST / EXPOSURE / RISK` as a first-class output that can never aggregate into Potential Annual Saving; the three-state evidence ladder; mechanism-level deduplication (amending D-012); and FX decomposition escalated to Tier 1.
+
+Three conflicts flagged rather than silently resolved: `EARLY REALIZATION EVIDENCE` vs the locked Core Mission §6 lifecycle (`Q-04`); `COST / EXPOSURE / RISK` as class vs status (`Q-03`); and saving-model categories 4.1–4.7, which predate D-017 and still describe weighted calculations (`Q-07`). Part 2.1 design is ready to lock; the mechanism is not buildable until `F-01` … `F-10` are answered. Still no code.

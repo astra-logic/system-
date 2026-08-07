@@ -4,7 +4,7 @@
 >
 > Nothing in this register has been assumed anywhere else in the project. Where a question blocks work, it says so.
 
-**Status key:** `OPEN` unanswered · `PROPOSED` recommendation on the table, awaiting a decision · `ANSWERED` decided and recorded in `docs/decisions/decision-register.md`
+**Status key:** `OPEN` unanswered · `PROPOSED` recommendation awaiting a decision · `ANSWERED` / `CLOSED` decided and recorded in `docs/decisions/decision-register.md` · `LOCKED` settled by the product owner · `REQUIRES_FACTORY_DATA` cannot be reasoned into existence
 
 ---
 
@@ -34,7 +34,7 @@
 | A-06 | Is full lot genealogy required at first release? | F7 | `OPEN` — narrowed: no production means no input→output genealogy in release 1. Lot-level stock visibility only |
 | A-07 | Costing method(s) to support: standard, moving average, FIFO? | F8 | `CLOSED` — finance owns valuation (D-008). No costing engine here |
 | A-08 | Is standard cost per site or global? | F1/F8 | `CLOSED` — single site; cost is imported (D-008) |
-| A-09 | Multi-currency at first release? | C1 | `OPEN` — **escalation to Tier 1 recommended** (D-016). Import-dependent factory + EGP devaluation means un-normalised FX manufactures false opportunities |
+| A-09 | Multi-currency and FX at first release? | C1 | **`TIER 1` — escalated 2026-08-07 by D-024.** FX normalisation is mandatory for any cross-period financial comparison. Remaining work is the factory-data side (`F-07`) |
 | A-10 | Location hierarchy fixed-depth or arbitrary? | C2 | `OPEN` |
 | A-11 | Who owns item master data? | C3 | `OPEN` |
 | A-12 | Minimum sample size before a supplier metric is shown? | C4 | `OPEN` |
@@ -82,12 +82,13 @@ Full context in `docs/domain/02-first-release-scope.md`.
 | N-04 | Are catch-weight items required? | Ledger and UoM design — must be decided before the ledger is built | `OPEN` |
 | N-05 | Handheld/tablet on the floor, or desk? | Interaction model, and the D4 dark-UI question | `OPEN` |
 | N-06 | Does the pilot factory have usable consumption history? | Whether reorder-point planning functions at go-live | `OPEN` |
-| N-07 | Are expedite flags and freight premiums captured on purchase orders? | The most defensible saving detector (4.8) | `OPEN` |
+| N-07 | Are expedite flags and freight premiums captured on purchase orders? | Mechanism 01 entirely | `OPEN` — **= `F-01`, the single hardest blocker in the project** |
 | N-08 | Minimum consumption history before annualisation is permitted? | Every annualised figure | `ANSWERED` — locked rule 11: 12 months usable history preferred minimum; below that, never a silent confident annual number |
 | N-09 | Cost reference staleness threshold? | `STALE_DATA` transitions across all financial figures | `OPEN` |
-| N-10 | What is the carrying-cost rate, and does finance own it? | Most of the recurring saving taxonomy | `OPEN` |
+| N-10 | What is the carrying-cost rate, and does finance own it? | Most of the recurring saving taxonomy | `POLICY LOCKED` → D-023 (finance-owned, no defaults). **Value still `REQUIRES_FACTORY_DATA`** (= `F-08`) |
 | N-11 | Target service level for safety stock? | Safety-stock opportunities (4.7) | `OPEN` |
 | N-12 | Who owns and approves saving opportunities? | The opportunity lifecycle | `OPEN` |
+| N-13 | Does an *intervention* need its own owner, distinct from the opportunity owner? | Raised by D-018's workflow capture — the classifier, the approver and the fixer may be three people | `OPEN` |
 
 N-01 … N-06 come from `docs/domain/02-first-release-scope.md`; N-07 … N-12 from `docs/domain/03-saving-opportunity-model.md`.
 
@@ -97,30 +98,51 @@ N-01 … N-06 come from `docs/domain/02-first-release-scope.md`; N-07 … N-12 f
 
 ---
 
-## Tier 5 — Mechanism decision points (business judgment required)
+## Tier 5 — Mechanism 01 decision points — **ALL CLOSED 2026-08-07**
 
-From `docs/domain/04-mechanism-01-expedite-premium.md` §14. **These must not be defaulted by an engineer or an agent.**
+Locked by the product owner as D-017 … D-024. Full detail in `docs/domain/04-mechanism-01-expedite-premium.md` §16.
 
 | ID | Decision | Why it cannot be defaulted | Status |
 |---|---|---|---|
-| M-01 | Avoidability weights by root cause | Multiplies every figure in the mechanism; largest driver of the headline contribution and range width | `OPEN` |
-| M-02 | Root cause captured at expedite time, or retrospectively? | A procurement workflow change, not a software choice. Decides whether the mechanism yields currency or only event counts | `OPEN` |
-| M-03 | Minimum event count for annualisation | Trades coverage against stability; a business tolerance | `OPEN` |
-| M-04 | Precedence between expedite premium and purchase price variance | Changes which team is told to act | `PROPOSED` — expedite takes precedence |
-| M-05 | Does customs demurrage count as expedite premium? | May be the largest component in an Egyptian import context | `OPEN` |
-| M-06 | Observation window before an opportunity may be `REALIZED` | Trades credibility against speed of visible wins — reputationally the most consequential choice here | `OPEN` |
-| M-07 | Does the carrying-cost offset use finance's rate or an assumption? | Decides whether net benefit is `CALCULATED` or `ASSUMED` | `OPEN` — depends on N-10 |
-| M-08 | Is FX normalisation mandatory before trending? | Without it, the engine generates confident false opportunities | `PROPOSED` — yes (D-016) |
+| M-01 | Avoidability weights by root cause | — | `CLOSED` → **D-017.** Categorical, never weighted. The weighting proposal is rejected outright |
+| M-02 | Root cause captured at expedite time, or retrospectively? | — | `CLOSED` → **D-018.** In-workflow capture, structured categories |
+| M-03 | Minimum event count for annualisation | — | `CLOSED` → **D-019.** No universal minimum; three-state evidence ladder |
+| M-04 | Precedence between expedite premium and purchase price variance | — | `CLOSED` → **D-020.** Deduplicate at economic-mechanism level; independent effects may both be quantified |
+| M-05 | Does customs demurrage count as expedite premium? | — | `CLOSED` → **D-021.** Valid candidate; uncontrollable cost becomes `COST / EXPOSURE / RISK` |
+| M-06 | Observation window before an opportunity may be `REALIZED` | — | `CLOSED` → **D-022.** 12 months default, early evidence distinguished |
+| M-07 | Does the carrying-cost offset use finance's rate or an assumption? | — | `CLOSED (policy)` → **D-023.** Finance-owned, no defaults. **Value still `REQUIRES_FACTORY_DATA`** (F-08) |
+| M-08 | Is FX normalisation mandatory before trending? | — | `CLOSED` → **D-024.** Tier 1, with four-way change decomposition |
 
-### Requires factory data
+All eight Part 2.1 decision points are closed. **What remains is factual, not judgmental** — questions about the factory that cannot be reasoned into existence.
 
-| ID | Question |
-|---|---|
-| F-01 | Does the factory record freight cost separably, per shipment, attributable to PO lines? (= `N-07`, gates the whole mechanism) |
-| F-02 | Are customs demurrage/detention/storage charges captured, and can they be attributed to a shipment? |
-| F-03 | Do contracted standard freight rates by lane and mode exist in maintained form? |
-| F-04 | Does finance capitalise freight into inventory value, or expense it? |
-| F-05 | Will buyers reliably classify expedite root cause if asked at the time? |
+### Requires factory data — `REQUIRES_FACTORY_DATA`
+
+| ID | Question | Consequence if unanswered |
+|---|---|---|
+| F-01 | Does the factory record freight cost separably, per shipment, attributable to PO lines? (= `N-07`) | **Gates mechanism 01 entirely.** Without it: event counts, no currency |
+| F-02 | Are customs demurrage/detention/storage charges captured, and attributable to a shipment? | May be the largest premium category; structure is **not assumed** |
+| F-03 | Do contracted standard freight rates by lane and mode exist in maintained form? | Baseline falls from Tier A to trailing median |
+| F-04 | Does finance capitalise freight into inventory value, or expense it? | Double-count risk against excess-stock valuation |
+| F-05 | Will buyers reliably classify expedite root cause at the time of the event? | Low coverage degrades the mechanism to event counting |
+| F-06 | How is an expedite recognised today — flag, mode field, reason code, or nothing? | Determines whether events are identifiable without inference |
+| F-07 | FX rate history, source, and finance's effective-dating policy | Tier 1 (D-024). Without it, cross-period comparison is `INSUFFICIENT_DATA` |
+| F-08 | Finance's authoritative carrying-cost rate — exists? owner? provenance? | Any intervention requiring more stock (= `N-10`) |
+| F-09 | Master-data lead-time quality, and whether actual receipt timing is recorded well enough to compare | **The first slice (D-015) depends entirely on this** |
+| F-10 | Volume and purchase history sufficient to normalise verification against demand changes | Confounder handling in realization |
+
+### Modelling questions raised by the lock — need confirmation before Part 2.2
+
+| ID | Question | Recommendation |
+|---|---|---|
+| Q-01 | Is *quality rejection* a distinct root-cause category, or does it belong under *Supplier delay*? | Add it — different owner, different action |
+| Q-02 | What test makes a counterfactual "defensible" for quantification? | The lead-time gap example is a *form*, not a validated rule. Needs real events |
+| Q-03 | Is `COST / EXPOSURE / RISK` a distinct object class, or a status on Saving Opportunity? | **Distinct class**, so aggregation cannot reach it |
+| Q-04 | Is `EARLY REALIZATION EVIDENCE` an attribute on `IN_PROGRESS`, or a lifecycle state? | **Attribute** — Core Mission §6 lifecycle is locked and must not be extended silently |
+| Q-05 | Promote four-way change decomposition to cross-cutting foundation **F10**? | **Yes** — it governs every financial trend, not one mechanism |
+| Q-06 | Does a lead-time correction create other costs not yet modelled? | Unknown; test during the vertical slice |
+| Q-07 | Categories 4.1–4.7 of the saving model predate D-017 and still describe weighted/threshold calculations | Re-express each as *intervention + counterfactual* before specification |
+
+**Q-03, Q-04 and Q-05 affect shared structure**, not mechanism 01 alone, and should be confirmed before Part 2.2 begins.
 
 ---
 

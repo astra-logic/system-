@@ -20,6 +20,12 @@
 10. **Never present a potential saving as realised.** (D-011) `REALIZED` is reachable only through measurement against a baseline captured at `APPROVED` — never by assertion.
 10a. **One-time and recurring impact are never summed.** Potential Annual Saving contains recurring impact only; capital release is reported separately. (D-012)
 10b. **Aggregates carry the weakest basis among their inputs**, including `STALE_DATA`. (D-002 as amended)
+10c. **No numerical avoidability weights**, anywhere, in any form. Avoidability is categorical. Quantification requires a specific intervention and a testable counterfactual over identified events. (D-017)
+10d. **No default carrying-cost rate.** Not 15%, not 20%, not any value. Finance owns it; absent it, the dependent output is `INSUFFICIENT_DATA`. (D-023)
+10e. **`COST / EXPOSURE / RISK` never aggregates into Potential Annual Saving** — structurally, not by convention. (D-021)
+10f. **No cross-period financial comparison without FX normalisation.** Where the operational/price/FX/volume-mix decomposition cannot be performed reliably, mark it — never fabricate it. (D-024)
+10g. **Deduplication is at the economic-mechanism level**, and attribution must be explainable — never a silent filter. (D-020)
+10h. **A single event may detect an opportunity but not support an annual figure.** OPPORTUNITY DETECTED · ANNUALIZATION ELIGIBLE · VERIFIED REALIZATION are distinct. (D-019)
 11. **Every event carries effective time and recorded time.** (F5)
 12. **Quality hold stock is excluded from Available.** (F3)
 13. **A manufacturing order freezes its BoM and routing version at release.** (C10)

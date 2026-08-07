@@ -4,7 +4,7 @@
 >
 > Every entry records what was decided, why, what was rejected, and what it costs. **No entry is `ACCEPTED` until a human accepts it.** Proposals below are recommendations from planning, not settled facts.
 
-**Status:** `PROPOSED` · `ACCEPTED` · `REJECTED` · `SUPERSEDED`
+**Status:** `PROPOSED` · `ACCEPTED` · `LOCKED` (settled by the product owner; not revisited without a new decision) · `REJECTED` · `SUPERSEDED`
 
 ---
 
@@ -165,7 +165,11 @@ Operational management is reclassified as `ENABLER`. The saving engine is `CORE`
 
 **Status:** `PROPOSED` · **Area:** F9 · **Depends on:** D-002, D-011
 
-**Decision.** The Potential Annual Saving figure must: be expressed as a **range**, not a point; carry the **weakest basis** among its inputs; **deduplicate overlapping opportunities** by subject and show the deduction; report **recurring impact only** in the annual figure, with one-time capital release stated separately; and refuse to annualise below a minimum history window (`N-08`). Alongside it the system displays its own **realised-versus-identified ratio**.
+**Decision.** The Potential Annual Saving figure must: be expressed as a **range**, not a point; carry the **weakest basis** among its inputs; **deduplicate overlapping opportunities** and show the deduction; report **recurring impact only** in the annual figure, with one-time capital release stated separately; and refuse to annualise below a minimum history window (`N-08`). Alongside it the system displays its own **realised-versus-identified ratio**.
+
+**Amended 2026-08-07 by D-020.** The original deduplication rule — *"key = (item, PO line, period); any PO line contributes to at most one currency claim"* — is **withdrawn as too blunt.** Deduplication happens at the **economic-mechanism** level: genuinely independent effects on the same transaction may both be quantified, and attribution must be explainable. All other provisions of D-012 stand unchanged.
+
+**Amended 2026-08-07 by D-021.** `COST / EXPOSURE / RISK` amounts never enter this aggregate and must be structurally incapable of doing so.
 
 **Why.** This is the number the entire product is judged on, and it is the easiest to inflate invisibly — through double counting, one-time/recurring conflation, thin-history annualisation, or basis laundering by aggregation. It will be audited by a finance manager, and it must survive that.
 
@@ -224,13 +228,15 @@ Operational management is reclassified as `ENABLER`. The saving engine is `CORE`
 
 **Cost.** A modest first claim. That is the correct trade for the first number the factory ever sees from this product.
 
-**Blocked by.** `N-07` (separable freight capture). Without it the mechanism yields event counts, not currency.
+**Blocked by.** `N-07` / `F-01` (separable freight capture). Without it the mechanism yields event counts, not currency.
+
+**Strengthened 2026-08-07 by D-017.** With numerical avoidability weights rejected, quantification requires a testable counterfactual over identified events. Lead-time correction is the case where such a counterfactual is genuinely computable *and* where the intervention may require no additional inventory — so it is now the first slice for two independent reasons, not one.
 
 ---
 
 ## D-016 — FX normalisation is mandatory before any financial trending
 
-**Status:** `PROPOSED` — **recommended for Tier 1 escalation** · **Area:** F4, F8, all saving mechanisms
+**Status:** `SUPERSEDED` by D-024 (2026-08-07) — the proposal was accepted, locked at Tier 1, and extended with the four-way change decomposition · **Area:** F4, F8, all saving mechanisms
 
 **Decision.** All financial comparison, trending and annualisation must be FX-normalised to a stated finance-owned policy rate before figures are compared across periods. `A-09` (multi-currency) is escalated from an ordinary architectural question toward a foundational one.
 
@@ -241,3 +247,129 @@ Operational management is reclassified as `ENABLER`. The saving engine is `CORE`
 **Cost.** FX policy, rate source and effective-dating must be settled early, and every historical comparison carries a normalisation step.
 
 **Requires.** Finance to own the policy rate and its effective dates (locked rule 8).
+
+---
+
+# Part 2.1 Decision Lock — 2026-08-07
+
+Decisions D-017 … D-024 were locked by the product owner in response to the eight decision points raised by `docs/domain/04-mechanism-01-expedite-premium.md`. They close Tier-5 questions M-01 … M-08.
+
+---
+
+## D-017 — Avoidability is categorical, never weighted
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F9, mechanism 01 · **Closes:** M-01 · **Corrects:** the draft-1 proposal in mechanism 01 §5
+
+**Decision.** Avoidability is classified from evidence into `HIGH` · `LOW` · `NOT AVOIDABLE` · `UNKNOWN`. **No numerical avoidability weights are to be invented**, in any form, unless observed evidence later supports them. `HIGH` avoidability does **not** mean 100% saving. The system must permanently distinguish *opportunity identified* from *financial saving that can be safely quantified*.
+
+**What changed and why.** Draft 1 proposed `avoidable premium = Σ (premium × weight per cause)`. That proposal was wrong, and it conflicted with an already-locked rule: **D-014 rule 15 forbids confidence derived from category constants**, and an avoidability weight is precisely a category constant. It manufactured false precision in the shape of a formula — a weight of 0.8 on "wrong lead time" looks rigorous and is invented.
+
+**Consequence — the structural change.** Quantification moves from the **category level** to the **intervention level**. The system cannot say "80% of wrong-lead-time premium is recoverable." It can say "if item X's lead time were corrected from 18 to 32 days, these four identified events would not have triggered, and here is what they cost." A countable counterfactual over specific events replaces a percentage over a total.
+
+**Rejected.** Weighted avoidability. Easier to compute, produces a bigger and more confident-looking number, and would not survive a finance audit.
+
+**Cost.** Fewer quantified opportunities, and quantification requires a stated intervention rather than a classification alone. That is the intended trade.
+
+---
+
+## D-018 — Root cause is captured in the operational workflow
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** mechanism 01, procurement workflow · **Closes:** M-02
+
+**Decision.** Root cause is captured at the moment of the expedite event, not reconstructed later, via structured categories: supplier delay · incorrect lead time · late PO release · unexpected demand · production change · stock policy issue · material master issue · logistics/customs issue · other (requires explanation).
+
+**Why.** Root cause is absent from transactional data. Without capture, the mechanism produces a cost total rather than an actionable opportunity. Structured categories rather than free text keep the burden low and the data analysable. This makes concrete the Core Mission's claim that management is the operating layer of the saving engine.
+
+**Cost.** A change to how procurement works, not only to software. Classification coverage becomes a measured input to confidence (D-014 rule 15).
+
+**Open against this decision.** `Q-01` — *quality rejection* was identified in draft 1 as a distinct cause with its own owner and action, and is not in the locked list. `Limitation` — *production change* is capturable but not analysable in release 1, since production is out of scope (D-007). The limit must be visible in the product.
+
+---
+
+## D-019 — Three-state evidence ladder; no universal minimum event count
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F9 · **Closes:** M-03 · **Supersedes:** the minimum-event-count proposal in mechanism 01 draft 1 §7
+
+**Decision.** No universal minimum event count. A single event may identify an opportunity but generally may not support a defensible recurring annual saving. Three states are held apart: **OPPORTUNITY DETECTED** → **ANNUALIZATION ELIGIBLE** → **VERIFIED REALIZATION**.
+
+**Reconciles with D-014 rule 11.** Rule 11 sets the *time window* (12 months usable history preferred). D-019 refuses to reduce *sufficiency* to a counted threshold. Complementary, not competing.
+
+**Why.** A counted threshold is another category constant. Evidence sufficiency is assessed per case.
+
+**Scope note.** This ladder is not mechanism-specific. It is a general concept of the saving engine and should govern every mechanism — recorded against `docs/domain/03-saving-opportunity-model.md`.
+
+---
+
+## D-020 — Deduplication happens at the economic-mechanism level
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F9 · **Closes:** M-04 · **Amends:** D-012
+
+**Decision.** One economic benefit has one financial owner. Deduplication is performed at the **economic-mechanism** level, not merely at transaction level. Genuinely independent effects may both be quantified; where one effect is a component or consequence of another, deduplicate. **The system must be able to explain why an amount belongs to a particular mechanism.**
+
+**What changed and why.** D-012 stated *"deduplication key = (item, PO line, period); any PO line contributes to at most one currency claim."* Too blunt. A single PO line can carry two genuinely independent effects — an air-freight premium (logistics cost, fixed by planning) and a spot-price premium (procurement cost, fixed by sourcing). Suppressing one understates reality and misdirects the fix. **D-012's one-claim-per-line rule is amended accordingly**; its other provisions (range, weakest basis, one-time separated from recurring, realised ratio) stand unchanged.
+
+**New requirement.** Attribution must be **explainable**, not a silent filter.
+
+---
+
+## D-021 — Customs cost is in scope; uncontrollable cost is exposure, not saving
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** saving taxonomy · **Closes:** M-05
+
+**Decision.** Customs demurrage, detention and clearance costs are valid candidates for the taxonomy. Root cause is classified. A financial opportunity is quantified **only where causality and avoidability are sufficiently defensible**. Where they are not, the amount is presented as **`COST / EXPOSURE / RISK`**, never as a saving opportunity. Customs data structure and availability are **not assumed** — marked `REQUIRES_FACTORY_DATA`.
+
+**Why this is a genuine addition.** It gives the product a way to be *useful about money it cannot claim*. "You spent 340,000 EGP on demurrage last year — 60% from port congestion you cannot control, 40% from documentation delays you can" is valuable in both halves, and honest about which is which.
+
+**Binding consequence.** `COST / EXPOSURE / RISK` amounts **never aggregate into Potential Annual Saving** and must be structurally incapable of leaking into it.
+
+**Generalises.** Same posture already taken for stockout risk (`03-saving-opportunity-model.md` §4.9). The pattern is now consistent.
+
+**Open.** `Q-03` — distinct object class, or a status on Saving Opportunity? **Recommend distinct class**, so aggregation cannot reach it.
+
+---
+
+## D-022 — 12-month realization window, with early evidence distinguished
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F9 · **Closes:** M-06
+
+**Decision.** Default verification window is **12 months**. Useful early evidence is not hidden: **EARLY REALIZATION EVIDENCE** (visible improvement, not yet sufficient for a full annual claim) is distinguished from **STRONG / VERIFIED REALIZATION**. The system must not claim a verified annual saving because cost dropped for a short period. Verification must consider confounders: demand, volume, FX, freight rates, supplier changes, seasonality, production changes, other operational changes.
+
+**Governing principle.** *A reduction in premium is evidence of improvement, not automatically proof of causation.*
+
+**Conflict flagged.** Core Mission §6 locks the lifecycle as `Potential → Approved → In Progress → Realized` (+ `Rejected`, `Expired`). `EARLY REALIZATION EVIDENCE` must **not** silently become a seventh state. `PROPOSED` — model it as an **evidence-strength attribute on `IN_PROGRESS`**, preserving the locked lifecycle. Recorded as `Q-04`, requires confirmation.
+
+---
+
+## D-023 — Carrying-cost rate is finance-owned; no developer defaults
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F8, F9 · **Closes:** M-07 (policy) · **Sharpens:** N-10
+
+**Decision.** Any carrying-cost rate used in a financial calculation is **finance-owned**. **No hidden developer defaults** — not 15%, not 20%, not 25%, not any value. The authoritative input carries provenance: value · source · owner · effective date · currency/basis · last updated · status. If unavailable, it is **not silently invented**; the dependent output is `INSUFFICIENT_DATA`. Any financial output materially dependent on an assumed rate must **visibly disclose that dependency**.
+
+**Why.** This rate underpins most recurring saving figures. A default buried in code would silently determine the product's headline number, and would be indefensible the first time anyone asked where it came from.
+
+**Status split.** The *policy* is locked. The *value* remains `REQUIRES_FACTORY_DATA` (`F-08`).
+
+**Reinforces.** D-015's nomination of lead-time correction as the first slice — it is the case that may need no carrying-cost input at all.
+
+---
+
+## D-024 — FX normalisation is Tier 1; financial change is decomposed, never assumed
+
+**Status:** `LOCKED` 2026-08-07 · **Area:** F4, F8, all mechanisms · **Closes:** M-08 · **Supersedes:** D-016 (proposal now locked and extended)
+
+**Decision.** FX normalisation is a **Tier-1 requirement** for multi-currency financial comparison. Changes in EGP-denominated cost must not be interpreted as purely operational when FX may explain part of the movement. Conceptually, where data allows:
+
+```
+Observed financial change = operational effect + price/rate effect + FX effect + volume/mix effect
+```
+
+**The decomposition is never fabricated.** Where it cannot be performed reliably, the conclusion is marked `INSUFFICIENT_DATA` / `ASSUMED` / `LIMITED_CONFIDENCE`.
+
+**Scope is wider than one mechanism.** This governs every financial trend the product shows — price variance, carrying cost, excess-stock value, the headline figure itself.
+
+**Open.** `Q-05` — promote to cross-cutting foundation **F10 — Financial change decomposition** in `01-factory-operating-model.md`? **Recommended.**
+
+**Consequence.** `A-09` (multi-currency) is **escalated to Tier 1**.
+
+**Requires.** Finance to own FX policy, rate source and effective dating (`F-07`).

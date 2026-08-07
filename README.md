@@ -16,7 +16,7 @@
 | 4 | [`docs/domain/02-first-release-scope.md`](docs/domain/02-first-release-scope.md) | What the first release is, and the four consequences that reshape the product. |
 | 5 | [`docs/02-handoff-part1-locked.md`](docs/02-handoff-part1-locked.md) | Part 1 locked. The 16 financial-trust rules that govern every saving figure. |
 | 6 | [`docs/domain/03-saving-opportunity-model.md`](docs/domain/03-saving-opportunity-model.md) | The saving taxonomy, calculation rules, and the guard on the headline figure. |
-| 7 | [`docs/domain/04-mechanism-01-expedite-premium.md`](docs/domain/04-mechanism-01-expedite-premium.md) | Mechanism 01 workshop — expedited freight / emergency purchase premium. |
+| 7 | [`docs/domain/04-mechanism-01-expedite-premium.md`](docs/domain/04-mechanism-01-expedite-premium.md) | **Mechanism 01 — Part 2.1 locked.** Expedited freight / emergency purchase premium. |
 | 8 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
 | 9 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
 | 10 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
@@ -83,3 +83,4 @@ context/                         Bible §52 six-file system
 4. No feature exists because ERP software usually has it.
 5. The system never fakes certainty. If it does not know, it says so.
 6. Potential is never presented as realised, and the headline saving figure is never a single confident point.
+7. No constant is invented to make a calculation complete — no avoidability weights, no default carrying-cost rate, no minimum event count. A missing input yields `INSUFFICIENT_DATA`.

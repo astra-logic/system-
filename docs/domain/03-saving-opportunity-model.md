@@ -1,6 +1,6 @@
 # 03 — Saving Opportunity Model
 
-> **Status:** Draft 1. Planning only.
+> **Status:** Draft 1, reconciled 2026-08-07 against the Part 2.1 decision lock (D-017 … D-024). Planning only.
 > **Source of authority:** `docs/01-core-mission.md` (North Star), `docs/00-product-bible.md` (§36, §37, §38).
 > **Supersedes:** the recommendation structure in D-003, which is now under-specified.
 
@@ -59,6 +59,28 @@ Replaces D-003's recommendation structure. Every opportunity carries:
 
 ---
 
+## 2a. Reconciliation with the Part 2.1 lock *(2026-08-07)*
+
+Three concepts introduced while designing mechanism 01 are **general to the saving engine**, not specific to that mechanism, and govern this model:
+
+**1. The three-state evidence ladder (D-019).** No universal minimum event count anywhere in the taxonomy. Every category holds these apart:
+
+```
+OPPORTUNITY DETECTED  →  ANNUALIZATION ELIGIBLE  →  VERIFIED REALIZATION
+```
+
+A single event may detect an opportunity while its annual saving remains `INSUFFICIENT_DATA`. This complements — does not replace — D-014 rule 11's 12-month preferred window: rule 11 sets the *time* bar, D-019 refuses to reduce *sufficiency* to a counted threshold.
+
+**2. `COST / EXPOSURE / RISK` is a first-class output (D-021).** Money the factory is spending or exposed to, where causality and avoidability are not defensible enough to claim a saving. It **never aggregates into Potential Annual Saving** and must be structurally incapable of doing so. This generalises what §4.9 already required for stockout risk, and it makes the product useful about money it cannot claim.
+
+**3. Avoidability is categorical, never weighted (D-017).** No category in this taxonomy may compute a saving by applying a percentage to a total. Quantification requires a **specific intervention with a testable counterfactual over identified events**. This applies to every category below, not only to expedite premium.
+
+**4. FX normalisation and change decomposition (D-024).** Every figure in §4 that compares across periods must be FX-normalised, and where the four-way decomposition (operational / price / FX / volume-mix) cannot be performed reliably, the conclusion is marked rather than presented with false precision.
+
+**5. Deduplication is at the economic-mechanism level (D-020).** Not per transaction. Genuinely independent effects may both be quantified; attribution must be explainable.
+
+---
+
 ## 3. Lifecycle
 
 Adopting the core mission's §6 vocabulary as canonical (per `code-standards.md`: the domain vocabulary is *the* vocabulary):
@@ -70,6 +92,8 @@ POTENTIAL → APPROVED → IN_PROGRESS → REALIZED
 ```
 
 With one addition carried over from D-003, because it is the gate that makes the whole thing falsifiable:
+
+**Amended 2026-08-07 (D-022).** The default verification window is **12 months**, and verification strength is distinguished: `EARLY REALIZATION EVIDENCE` (visible improvement, not yet sufficient for a full annual claim) versus `STRONG / VERIFIED REALIZATION`. Per `Q-04` this is `PROPOSED` as an **evidence-strength attribute on `IN_PROGRESS`**, not a seventh lifecycle state — the Core Mission §6 lifecycle is locked and must not be silently extended.
 
 **Between `IN_PROGRESS` and `REALIZED` sits measurement.** An opportunity may not enter `REALIZED` by assertion. It enters when an outcome is observed against a baseline captured *before* the action. An action taken whose measured outcome does not materialise resolves to `EXPIRED` or is re-opened — never silently to `REALIZED`.
 
@@ -123,11 +147,14 @@ Each category below states its inputs, its impact type, and — critically — *
 **Refuses when:** lead-time sample below `A-12` · service-level target undefined (`P-06`)
 **⚠** Reducing safety stock trades capital against stockout risk. **An opportunity that presents only the capital gain and hides the risk it creates is dishonest.** Both sides must be shown.
 
+> **4.1 – 4.7 note (2026-08-07):** the calculations below predate the Part 2.1 lock. None may compute a saving by weighting a category. Each must be re-expressed as *intervention + testable counterfactual* before it is specified, per D-017. Recorded as `Q-07`.
+
 ### 4.8 Emergency purchasing / expedited freight premium
 **Impact:** recurring
 **Calculation:** `premium paid over standard price/freight`, summed and annualised
 **Refuses when:** expedite flag or freight premium is not captured (`NEW-07`)
 **✓ The most defensible category in the release** — it measures money actually spent, not money hypothetically saveable.
+**→ Fully designed in `docs/domain/04-mechanism-01-expedite-premium.md` (Part 2.1).** That document supersedes this summary for this category.
 
 ### 4.9 Stockout avoidance
 **Impact:** avoided cost
@@ -145,6 +172,8 @@ A single headline figure — *"Potential Annual Saving: €487,000"* — is the 
 **2. One-time treated as annual.** A €200,000 working-capital release is not €200,000 per year. **Rule:** one-time and recurring impacts are aggregated separately and displayed separately. "Potential Annual Saving" contains recurring impact only. Capital release is reported as its own figure, labelled as one-time.
 
 **3. Annualising from thin history.** Two months of consumption multiplied by six is not an annual figure — it is a guess wearing a precise number's clothing. **Rule:** annualisation requires a minimum history window (`NEW-08`); below it, the opportunity returns `INSUFFICIENT_DATA`.
+
+**0. Exposure leaking into saving.** `COST / EXPOSURE / RISK` amounts (D-021) are not opportunities and must be structurally incapable of entering this aggregate — not merely filtered out by convention.
 
 **4. Basis laundering by aggregation.** Summing an `ACTUAL`-based opportunity with an `ASSUMED`-based one yields a total that looks precise and is not. **Rule:** per D-002's contagion rule, an aggregate carries the *weakest* basis among its components. A total containing any `ASSUMED` input is `ASSUMED`. A total containing any stale cost is `STALE_DATA`.
 
