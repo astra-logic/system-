@@ -186,3 +186,58 @@ Operational management is reclassified as `ENABLER`. The saving engine is `CORE`
 **Rejected.** Keeping the slice at cost and deferring the saving engine wholesale to Stage 4. Lower risk per unit; defers the product's central risk to the point where it is most expensive to discover.
 
 **Cost.** One saving category must be built earlier than its stage would suggest. Recommended: **expedite/freight premium (4.8)** — it measures money actually spent, needs no assumed carrying rate, and is therefore the most defensible thing to prove the mechanism with.
+
+---
+
+## D-014 — The 16 financial-trust rules are locked project law
+
+**Status:** `ACCEPTED` 2026-08-06 (locked by the user) · **Area:** F9, financial integrity · **Source:** `docs/02-handoff-part1-locked.md`
+
+**Decision.** The sixteen financial-trust rules of the handoff are adopted verbatim as binding constraints on every saving figure the product produces. They confirm and extend D-011 and D-012.
+
+**Questions they close:**
+
+| Rule | Closes |
+|---|---|
+| 11 — 12 months usable history as preferred minimum for demand-based annualisation | `N-08` |
+| 12 — below that, never a silent confident annual number | `N-08` |
+| 15 — confidence from evidence and data coverage, never category constants | Constrains `A-03` |
+| 10 — financial inputs carry source, owner, effective date, freshness, status | Extends the D-002 envelope for imported financial inputs |
+| 13 — missing data yields `INSUFFICIENT_DATA` / `CANNOT_CALCULATE`, never zero | Confirms D-002 |
+| 16 — generated or demo data is never presented as real factory transactions | Confirms Bible §47 |
+
+**Why.** These were already the direction of travel in D-011 and D-012; being locked by the product owner makes them law rather than recommendation. Rule 15 in particular removes a temptation that would otherwise have crept in — assigning confidence by category because it is easier than computing coverage.
+
+**Cost.** None beyond what D-012 already imposed. They make the product slower to show impressive numbers, which is the intent.
+
+---
+
+## D-015 — Expedite premium is the first mechanism; its defensible core is lead-time correction
+
+**Status:** `PROPOSED` · **Area:** saving taxonomy · **Detail:** `docs/domain/04-mechanism-01-expedite-premium.md`
+
+**Decision.** Build the expedited-freight / emergency-purchase premium mechanism first, and take as its first deliverable the narrowest fully defensible slice: **items whose master-data lead time is demonstrably wrong, evidenced by repeated expedites, where the fix is a parameter correction the system can verify within its own data.**
+
+**Why.** It needs no assumed carrying-cost rate, no external baseline, and carries no FX exposure in the causal claim. Cause, action and verification all sit inside the system. It is the cleanest available end-to-end proof that the saving loop works, and it fits D-013's vertical slice exactly.
+
+**Rejected.** Building the full premium taxonomy at once — most of it depends on unresolved capture (`N-07`), unratified avoidability weights, and the carrying-cost rate (`N-10`).
+
+**Cost.** A modest first claim. That is the correct trade for the first number the factory ever sees from this product.
+
+**Blocked by.** `N-07` (separable freight capture). Without it the mechanism yields event counts, not currency.
+
+---
+
+## D-016 — FX normalisation is mandatory before any financial trending
+
+**Status:** `PROPOSED` — **recommended for Tier 1 escalation** · **Area:** F4, F8, all saving mechanisms
+
+**Decision.** All financial comparison, trending and annualisation must be FX-normalised to a stated finance-owned policy rate before figures are compared across periods. `A-09` (multi-currency) is escalated from an ordinary architectural question toward a foundational one.
+
+**Why.** The factory is in Egypt and import-dependent. Freight and imported material are commonly USD/EUR-denominated while reporting is EGP. Following the EGP devaluations, a premium or price that appears to have grown substantially year-on-year may be **entirely currency movement with no operational change**. Without normalisation the saving engine will generate large, confident, wholly false opportunities — the exact failure the locked rules exist to prevent.
+
+**Rejected.** Treating multi-currency as a later feature. Defensible for a domestic factory; not for this one.
+
+**Cost.** FX policy, rate source and effective-dating must be settled early, and every historical comparison carries a normalisation step.
+
+**Requires.** Finance to own the policy rate and its effective dates (locked rule 8).

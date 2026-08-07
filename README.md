@@ -14,11 +14,13 @@
 | 2 | [`docs/01-core-mission.md`](docs/01-core-mission.md) | The North Star: Potential Annual Saving. Mind map, concentric circles, feature classification. |
 | 3 | [`docs/domain/01-factory-operating-model.md`](docs/domain/01-factory-operating-model.md) | The domain model. Nine foundations, fourteen domains, five challenges to the brief. |
 | 4 | [`docs/domain/02-first-release-scope.md`](docs/domain/02-first-release-scope.md) | What the first release is, and the four consequences that reshape the product. |
-| 5 | [`docs/domain/03-saving-opportunity-model.md`](docs/domain/03-saving-opportunity-model.md) | The saving taxonomy, calculation rules, and the guard on the headline figure. |
-| 6 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
-| 7 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
-| 8 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
-| 9 | [`context/`](context/) | The six-file working context system (Bible §52). |
+| 5 | [`docs/02-handoff-part1-locked.md`](docs/02-handoff-part1-locked.md) | Part 1 locked. The 16 financial-trust rules that govern every saving figure. |
+| 6 | [`docs/domain/03-saving-opportunity-model.md`](docs/domain/03-saving-opportunity-model.md) | The saving taxonomy, calculation rules, and the guard on the headline figure. |
+| 7 | [`docs/domain/04-mechanism-01-expedite-premium.md`](docs/domain/04-mechanism-01-expedite-premium.md) | Mechanism 01 workshop — expedited freight / emergency purchase premium. |
+| 8 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
+| 9 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
+| 10 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
+| 11 | [`context/`](context/) | The six-file working context system (Bible §52). |
 
 ---
 
@@ -52,11 +54,13 @@ The Product Bible is explicit (§2, §48, §56-09, and its final directive): the
 docs/
 ├── 00-product-bible.md          Founding document — do not edit casually
 ├── 01-core-mission.md           North Star — do not edit casually
+├── 02-handoff-part1-locked.md   16 locked financial-trust rules
 ├── open-questions.md            Register of everything unresolved
 ├── domain/
 │   ├── 01-factory-operating-model.md
 │   ├── 02-first-release-scope.md
-│   └── 03-saving-opportunity-model.md
+│   ├── 03-saving-opportunity-model.md
+│   └── 04-mechanism-01-expedite-premium.md
 └── decisions/
     └── decision-register.md
 

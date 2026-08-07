@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Scope settled, North Star absorbed, saving model drafted. Awaiting stack and the critical-path answers.
+**Current activity:** Part 2 workshop begun — mechanism 01 designed. Awaiting mechanism decision points and the critical-path answers.
 **Code written:** None. Correctly so.
 
 ---
@@ -38,6 +38,10 @@
 
 **Saving Opportunity Model** — `docs/domain/03-saving-opportunity-model.md`. The object, lifecycle, a nine-category Circle 1 taxonomy with per-category calculation and refusal conditions, and the aggregation rules that stop the headline number being inflated. Six new open questions (N-07 … N-12).
 
+**Locked financial-trust rules adopted** — the 16 rules of `docs/02-handoff-part1-locked.md`, recorded as D-014. They close N-08 (12-month annualisation minimum) and constrain A-03 (confidence from coverage, not constants).
+
+**Mechanism 01 workshop** — `docs/domain/04-mechanism-01-expedite-premium.md`. Expedited freight / emergency purchase premium designed against all twelve required questions, stopping at eight business decision points. Key findings: the premium is a symptom with a price tag, not waste; most fixes require *more* stock, so the carrying-cost offset is mandatory; root cause is not in transactional data and needs a capture step in the procurement workflow; and in an Egyptian import context, un-normalised FX will manufacture large false opportunities (D-016).
+
 ---
 
 ## Blocked
@@ -55,6 +59,9 @@ Implementation cannot start. Critical path, in order of urgency:
 | **N-10 carrying-cost rate** | **Most of the recurring saving taxonomy** — determines whether the North-Star number is `CALCULATED` or `ASSUMED` |
 | N-07 / N-08 / N-09 | The saving detectors and the headline figure |
 | B-07 / N-06 pilot factory history | Whether planning returns real numbers at go-live |
+| **N-07 / F-01 separable freight capture** | **Gates mechanism 01 entirely** — without it, event counts rather than currency |
+| M-01 … M-08 mechanism decision points | Mechanism 01's figures and their basis |
+| **A-09 FX (escalation proposed)** | Every financial comparison across periods |
 
 ---
 
@@ -76,3 +83,7 @@ Implementation cannot start. Critical path, in order of urgency:
 **2026-08-06** — Five of seven Tier 1 blocking questions answered: mixed manufacturing, inventory/warehouse manager as primary user, inventory + procurement + cost wedge, single site, finance owns valuation. D-005 superseded by D-008 — no costing engine is needed here, which is a significant scope reduction. First-release scope document and build plan draft 1 written. Six new scope-driven questions raised (N-01 … N-06). Still no code, per Bible §2 and §57.
 
 **2026-08-06** — `01-core-mission.md` received and absorbed. North Star is Potential Annual Saving; operational management reclassified as ENABLER. Saving Opportunity Model written, including the aggregation guard that keeps the headline figure honest (range, weakest basis, deduplication, one-time separated from recurring, realised-versus-identified ratio). D-003 superseded, D-002 amended, D-011 … D-013 added. Build order unchanged — trust still precedes intelligence — but the vertical slice now extends to one quantified saving opportunity. Still no code.
+
+**2026-08-06** — Handoff `02-handoff-part1-locked.md` received. The 16 financial-trust rules adopted as D-014; they confirm D-011/D-012 and close N-08. Part 2 workshop executed for mechanism 01 (expedite premium): full design across the twelve required questions, stopping at eight decision points requiring business judgment. D-015 proposes lead-time correction as the defensible first slice — no assumed rates, no carrying-cost offset, no FX exposure in the causal claim, and verification entirely inside our own data. D-016 raises FX normalisation as mandatory and recommends escalating A-09 to Tier 1. Still no code.
+
+**Note on missing inputs:** the handoff references `02-potential-annual-saving-engine-plan.md` and existing product audit/critique documents. Neither has been provided. `docs/domain/03-saving-opportunity-model.md` covers adjacent ground but is this project's own derivation, not the referenced source.

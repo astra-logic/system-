@@ -28,13 +28,13 @@
 |---|---|---|---|
 | A-01 | Balances projected synchronously or asynchronously? | F2 | `OPEN` |
 | A-02 | Hard or soft reservation? | F3 | `OPEN` |
-| A-03 | How is confidence defined and computed? | F4 | `OPEN` |
+| A-03 | How is confidence defined and computed? | F4 | `CONSTRAINED` — locked rule 15: from evidence/data coverage, never category constants. Exact formula still `OPEN` |
 | A-04 | Who may close/reopen an accounting period? | F5 | `OPEN` |
 | A-05 | Are catch-weight items required? | F6 | `OPEN` — **likely yes** under mixed manufacturing (see N-04) |
 | A-06 | Is full lot genealogy required at first release? | F7 | `OPEN` — narrowed: no production means no input→output genealogy in release 1. Lot-level stock visibility only |
 | A-07 | Costing method(s) to support: standard, moving average, FIFO? | F8 | `CLOSED` — finance owns valuation (D-008). No costing engine here |
 | A-08 | Is standard cost per site or global? | F1/F8 | `CLOSED` — single site; cost is imported (D-008) |
-| A-09 | Multi-currency at first release? | C1 | `OPEN` |
+| A-09 | Multi-currency at first release? | C1 | `OPEN` — **escalation to Tier 1 recommended** (D-016). Import-dependent factory + EGP devaluation means un-normalised FX manufactures false opportunities |
 | A-10 | Location hierarchy fixed-depth or arbitrary? | C2 | `OPEN` |
 | A-11 | Who owns item master data? | C3 | `OPEN` |
 | A-12 | Minimum sample size before a supplier metric is shown? | C4 | `OPEN` |
@@ -83,7 +83,7 @@ Full context in `docs/domain/02-first-release-scope.md`.
 | N-05 | Handheld/tablet on the floor, or desk? | Interaction model, and the D4 dark-UI question | `OPEN` |
 | N-06 | Does the pilot factory have usable consumption history? | Whether reorder-point planning functions at go-live | `OPEN` |
 | N-07 | Are expedite flags and freight premiums captured on purchase orders? | The most defensible saving detector (4.8) | `OPEN` |
-| N-08 | Minimum consumption history before annualisation is permitted? | Every annualised figure | `OPEN` |
+| N-08 | Minimum consumption history before annualisation is permitted? | Every annualised figure | `ANSWERED` — locked rule 11: 12 months usable history preferred minimum; below that, never a silent confident annual number |
 | N-09 | Cost reference staleness threshold? | `STALE_DATA` transitions across all financial figures | `OPEN` |
 | N-10 | What is the carrying-cost rate, and does finance own it? | Most of the recurring saving taxonomy | `OPEN` |
 | N-11 | Target service level for safety stock? | Safety-stock opportunities (4.7) | `OPEN` |
@@ -97,6 +97,33 @@ N-01 … N-06 come from `docs/domain/02-first-release-scope.md`; N-07 … N-12 f
 
 ---
 
+## Tier 5 — Mechanism decision points (business judgment required)
+
+From `docs/domain/04-mechanism-01-expedite-premium.md` §14. **These must not be defaulted by an engineer or an agent.**
+
+| ID | Decision | Why it cannot be defaulted | Status |
+|---|---|---|---|
+| M-01 | Avoidability weights by root cause | Multiplies every figure in the mechanism; largest driver of the headline contribution and range width | `OPEN` |
+| M-02 | Root cause captured at expedite time, or retrospectively? | A procurement workflow change, not a software choice. Decides whether the mechanism yields currency or only event counts | `OPEN` |
+| M-03 | Minimum event count for annualisation | Trades coverage against stability; a business tolerance | `OPEN` |
+| M-04 | Precedence between expedite premium and purchase price variance | Changes which team is told to act | `PROPOSED` — expedite takes precedence |
+| M-05 | Does customs demurrage count as expedite premium? | May be the largest component in an Egyptian import context | `OPEN` |
+| M-06 | Observation window before an opportunity may be `REALIZED` | Trades credibility against speed of visible wins — reputationally the most consequential choice here | `OPEN` |
+| M-07 | Does the carrying-cost offset use finance's rate or an assumption? | Decides whether net benefit is `CALCULATED` or `ASSUMED` | `OPEN` — depends on N-10 |
+| M-08 | Is FX normalisation mandatory before trending? | Without it, the engine generates confident false opportunities | `PROPOSED` — yes (D-016) |
+
+### Requires factory data
+
+| ID | Question |
+|---|---|
+| F-01 | Does the factory record freight cost separably, per shipment, attributable to PO lines? (= `N-07`, gates the whole mechanism) |
+| F-02 | Are customs demurrage/detention/storage charges captured, and can they be attributed to a shipment? |
+| F-03 | Do contracted standard freight rates by lane and mode exist in maintained form? |
+| F-04 | Does finance capitalise freight into inventory value, or expense it? |
+| F-05 | Will buyers reliably classify expedite root cause if asked at the time? |
+
+---
+
 ## Answered
 
 | ID | Question | Answer | Recorded in |
@@ -106,3 +133,4 @@ N-01 … N-06 come from `docs/domain/02-first-release-scope.md`; N-07 … N-12 f
 | B-03 | Manufacturing type | Mixed | D-009 |
 | B-04 | Deployment scope | Single site, site-scoped records | D-004 |
 | B-06 | Valuation ownership | Finance owns it; we own quantity truth | D-008 |
+| N-08 | Annualisation minimum history | 12 months usable, preferred minimum | D-014 (locked rule 11) |
