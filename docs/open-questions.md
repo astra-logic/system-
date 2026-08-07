@@ -82,8 +82,18 @@ Full context in `docs/domain/02-first-release-scope.md`.
 | N-04 | Are catch-weight items required? | Ledger and UoM design — must be decided before the ledger is built | `OPEN` |
 | N-05 | Handheld/tablet on the floor, or desk? | Interaction model, and the D4 dark-UI question | `OPEN` |
 | N-06 | Does the pilot factory have usable consumption history? | Whether reorder-point planning functions at go-live | `OPEN` |
+| N-07 | Are expedite flags and freight premiums captured on purchase orders? | The most defensible saving detector (4.8) | `OPEN` |
+| N-08 | Minimum consumption history before annualisation is permitted? | Every annualised figure | `OPEN` |
+| N-09 | Cost reference staleness threshold? | `STALE_DATA` transitions across all financial figures | `OPEN` |
+| N-10 | What is the carrying-cost rate, and does finance own it? | Most of the recurring saving taxonomy | `OPEN` |
+| N-11 | Target service level for safety stock? | Safety-stock opportunities (4.7) | `OPEN` |
+| N-12 | Who owns and approves saving opportunities? | The opportunity lifecycle | `OPEN` |
 
-**N-03, N-04 and N-06 are the urgent ones.** The first two are ledger-shaping and expensive to retrofit; N-06 determines whether the planning layer returns real numbers or `INSUFFICIENT_DATA` for every item on day one.
+N-01 … N-06 come from `docs/domain/02-first-release-scope.md`; N-07 … N-12 from `docs/domain/03-saving-opportunity-model.md`.
+
+**N-03 and N-04 are urgent because they shape the ledger** and are expensive to retrofit. **N-06** determines whether the planning layer returns real numbers or `INSUFFICIENT_DATA` for every item on day one.
+
+**N-10 is the sharpest question in the register.** The carrying-cost rate underpins most recurring saving figures in the taxonomy. If the team invents it, most of the North-Star number is `ASSUMED` and must visibly say so. If finance owns a real rate, most of it becomes `CALCULATED`. This single input does more to determine the product's credibility than any feature in the build plan.
 
 ---
 

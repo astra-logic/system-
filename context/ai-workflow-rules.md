@@ -17,10 +17,12 @@
 3. **Record decisions that affect architecture** in `docs/decisions/decision-register.md`, including what was rejected and what it costs.
 4. **Challenge conflicts with the philosophy** rather than complying quietly. (Bible, final directive)
 5. **Break down requirements that are too broad.** Breadth is this project's principal risk.
-6. **Do not add a feature because ERP software usually has it.** Apply the Bible §5 test: does it improve control, decision quality, financial performance, manufacturing performance, inventory efficiency, user speed, or data trust?
+6. **Do not add a feature because ERP software usually has it.** Apply the Bible §5 test *and* the North Star test of `docs/01-core-mission.md` §11: does it help identify a saving opportunity, quantify one, execute an action that creates savings, prevent future losses, or improve the operational foundation required for those? If not, it needs explicit justification.
+6a. **Classify every feature** as `CORE` · `ENABLER` · `ADJACENT` · `OUTER` (core-mission §12), and apply the product test of §13: *if we removed this, would the system become less capable of discovering, explaining, executing or sustaining Potential Annual Saving?*
 7. **Update documentation in the same change as the decision it reflects.** Stale context files are worse than none.
 8. **One implementation unit, one objective, explicit acceptance criteria.** (Bible §49)
 9. **Do not generate fake factory data** and present it as real, in any artefact, at any stage. (Bible §47)
+10. **Never present a potential saving as realised**, and never produce the headline Potential Annual Saving figure as a single confident point. D-012's rules — range, weakest basis, deduplication, one-time separated from recurring — are binding. This is the number the whole product is judged on.
 
 ---
 

@@ -17,7 +17,9 @@
 7. **Every derived value carries its provenance envelope.** No exceptions, no "temporarily". (D-002)
 8. **Basis degrades contagiously.** Anything computed from a forecast is at best a forecast.
 9. **`INSUFFICIENT_DATA` is a normal return value**, designed and rendered, never an error or a zero.
-10. **Never present a potential saving as realised.** (D-003)
+10. **Never present a potential saving as realised.** (D-011) `REALIZED` is reachable only through measurement against a baseline captured at `APPROVED` — never by assertion.
+10a. **One-time and recurring impact are never summed.** Potential Annual Saving contains recurring impact only; capital release is reported separately. (D-012)
+10b. **Aggregates carry the weakest basis among their inputs**, including `STALE_DATA`. (D-002 as amended)
 11. **Every event carries effective time and recorded time.** (F5)
 12. **Quality hold stock is excluded from Available.** (F3)
 13. **A manufacturing order freezes its BoM and routing version at release.** (C10)

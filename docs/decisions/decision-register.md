@@ -26,7 +26,9 @@
 
 **Status:** `PROPOSED` · **Area:** F4 · **Blocks:** analytics, recommendations, AI
 
-**Decision.** Every derived value carries `{value, unit, basis, as_of, inputs, assumptions, confidence, limitations}`. Basis degrades contagiously — anything computed from a forecast is at best a forecast. `INSUFFICIENT_DATA` is a designed state, not an error.
+**Decision.** Every derived value carries `{value, unit, basis, as_of, inputs, assumptions, confidence, limitations}`. Basis degrades contagiously — anything computed from a forecast is at best a forecast, and an aggregate carries the *weakest* basis among its components. `INSUFFICIENT_DATA` is a designed state, not an error.
+
+**Amended 2026-08-06** (`docs/01-core-mission.md` §7): basis has **eight** values, adding `STALE_DATA` — `ACTUAL · CALCULATED · FORECAST · ESTIMATED · ASSUMED · USER_DEFINED · INSUFFICIENT_DATA · STALE_DATA`. This matters most under D-008: cost is imported from finance, so when that import ages past its threshold (`N-09`), every financial figure resting on it changes basis, and contagion carries that upward through every aggregate.
 
 **Why.** §38 is otherwise unenforceable. If provenance is a label features remember to attach, some feature eventually won't, and one confident wrong number discredits every honest one beside it.
 
@@ -38,15 +40,11 @@
 
 ## D-003 — Recommendations have a lifecycle and impact claims have states
 
-**Status:** `PROPOSED` · **Area:** F9 · **Blocks:** §36, §37
+**Status:** `SUPERSEDED` by D-011 (2026-08-06) · **Area:** F9
 
-**Decision.** Recommendations are stored objects moving `PROPOSED → ACCEPTED → ACTIONED → MEASURED → REALISED / NOT_REALISED`. Impact claims are typed `potential | forecast | avoided | realised`, and only realised claims may be reported as savings. Baselines are captured before action.
+Proposed a recommendation object with lifecycle `PROPOSED → ACCEPTED → ACTIONED → MEASURED → REALISED / NOT_REALISED` and typed impact claims. Correct in principle but under-specified against `docs/01-core-mission.md` §5–§6, which defines a richer object and canonical lifecycle vocabulary. See D-011 and `docs/domain/03-saving-opportunity-model.md`.
 
-**Why.** This is the guard against the fake savings §47 explicitly forbids. It also makes the system self-auditing: a recommendation type dismissed 90% of the time is visibly broken.
-
-**Rejected.** Stateless recommendations computed on demand. Simpler; unfalsifiable and unaccountable.
-
-**Cost.** Storage and lifecycle management for something that could be a calculation. Slower to show impressive numbers — which is the point.
+Carried forward intact: **baselines are captured before the action**, and **only measured outcomes may be reported as realised**.
 
 ---
 
@@ -141,3 +139,50 @@ The one principle worth carrying forward: **a movement's cost signal is fixed wh
 **Rejected.** Synthesising demand from forecasts the factory has not made — fabrication, and forbidden by §47.
 
 **Cost.** Planning is reactive. New items have no history and must return `INSUFFICIENT_DATA` or accept user-defined values. Demand step-changes are invisible until they have happened. **The product must not imply foresight it does not have.**
+
+
+---
+
+## D-011 — Potential Annual Saving is the North Star; the Saving Opportunity is the core object
+
+**Status:** `ACCEPTED` 2026-08-06 · **Area:** F9, product framing · **Supersedes:** D-003 · **Source:** `docs/01-core-mission.md`
+
+**Decision.** The primary business KPI is **Potential Annual Saving**. The Saving Opportunity replaces the recommendation object, carrying the eighteen fields of core-mission §5 — including **separate one-time and recurring impact** — and the canonical lifecycle `POTENTIAL → APPROVED → IN_PROGRESS → REALIZED`, with `REJECTED` and `EXPIRED`. Measurement against a pre-captured baseline gates entry to `REALIZED`.
+
+Operational management is reclassified as `ENABLER`. The saving engine is `CORE`.
+
+**Why.** The core mission document is explicit that this is not an ERP measured by module count but an intelligence system measured by savings discovered and verified. The object must match that, and the one-time/recurring split is the single field most often collapsed — conflating them overstates the headline figure by roughly an order of magnitude.
+
+**Rejected.** Keeping D-003's simpler structure. Cheaper; loses root cause, data freshness, owner, and the one-time/recurring distinction, all of which the North Star depends on.
+
+**Cost.** A richer object to populate, and opportunities that cannot fill it honestly must return `INSUFFICIENT_DATA` rather than a partial figure.
+
+**Does not change the build order.** Bible §56-03 and §50 still hold: a saving engine over untrustworthy stock data produces confident nonsense. Foundations first.
+
+---
+
+## D-012 — The headline saving figure is a range, deduplicated, split by impact type
+
+**Status:** `PROPOSED` · **Area:** F9 · **Depends on:** D-002, D-011
+
+**Decision.** The Potential Annual Saving figure must: be expressed as a **range**, not a point; carry the **weakest basis** among its inputs; **deduplicate overlapping opportunities** by subject and show the deduction; report **recurring impact only** in the annual figure, with one-time capital release stated separately; and refuse to annualise below a minimum history window (`N-08`). Alongside it the system displays its own **realised-versus-identified ratio**.
+
+**Why.** This is the number the entire product is judged on, and it is the easiest to inflate invisibly — through double counting, one-time/recurring conflation, thin-history annualisation, or basis laundering by aggregation. It will be audited by a finance manager, and it must survive that.
+
+**Rejected.** A single confident headline number. More impressive; collapses under the first audit, and takes every other number in the product with it.
+
+**Cost.** A less striking dashboard. Per Bible §56-10, that is the correct trade — and per §47, the alternative is prohibited outright.
+
+---
+
+## D-013 — The vertical slice extends to a quantified saving opportunity
+
+**Status:** `PROPOSED` · **Area:** build sequence · **Amends:** D-006
+
+**Decision.** D-006's slice ran supplier → PO → receipt → stock → consumption → cost. It now runs one step further: **to a single defensible saving opportunity for one material.**
+
+**Why.** Under D-011 the saving engine is the product. A slice that stops at cost proves the enabler and never tests the thesis. Extending it exercises D-002, D-008, D-011 and D-012 together while they are still cheap to change — and it surfaces the aggregation and basis problems early, when they are design questions rather than credibility incidents.
+
+**Rejected.** Keeping the slice at cost and deferring the saving engine wholesale to Stage 4. Lower risk per unit; defers the product's central risk to the point where it is most expensive to discover.
+
+**Cost.** One saving category must be built earlier than its stage would suggest. Recommended: **expedite/freight premium (4.8)** — it measures money actually spent, needs no assumed carrying rate, and is therefore the most defensible thing to prove the mechanism with.

@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Scope settled; build plan drafted. Awaiting stack and the three critical-path answers.
+**Current activity:** Scope settled, North Star absorbed, saving model drafted. Awaiting stack and the critical-path answers.
 **Code written:** None. Correctly so.
 
 ---
@@ -32,7 +32,11 @@
 
 **First release scope** — `docs/domain/02-first-release-scope.md`. In/out by domain, plus the four consequences that reshape the product: finance owning valuation, procurement without production, mixed-mode inventory foundations, and warehouse-first navigation. Six new open questions raised.
 
-**Build plan draft 1** — `context/specs/00-build-plan.md`. Twenty units across five stages, three milestones, each with objective, boundary, dependencies and acceptance criteria per §49.
+**Build plan draft 1** — `context/specs/00-build-plan.md`. Units across five stages, three milestones, each with objective, boundary, dependencies and acceptance criteria per §49, now classified `CORE` / `ENABLER` / `ADJACENT`.
+
+**Core mission absorbed** — `docs/01-core-mission.md` received. North Star is **Potential Annual Saving**. D-003 superseded by D-011; D-002 amended with `STALE_DATA`; D-012 (headline figure rules) and D-013 (slice extends to a saving opportunity) added.
+
+**Saving Opportunity Model** — `docs/domain/03-saving-opportunity-model.md`. The object, lifecycle, a nine-category Circle 1 taxonomy with per-category calculation and refusal conditions, and the aggregation rules that stop the headline number being inflated. Six new open questions (N-07 … N-12).
 
 ---
 
@@ -48,6 +52,8 @@ Implementation cannot start. Critical path, in order of urgency:
 | N-03 consumption capture granularity | U-09 — very hard to backfill |
 | N-04 catch-weight | U-04 and U-07 — ledger-shaping |
 | N-01 finance integration contract | U-14, U-18 — all financial-impact work |
+| **N-10 carrying-cost rate** | **Most of the recurring saving taxonomy** — determines whether the North-Star number is `CALCULATED` or `ASSUMED` |
+| N-07 / N-08 / N-09 | The saving detectors and the headline figure |
 | B-07 / N-06 pilot factory history | Whether planning returns real numbers at go-live |
 
 ---
@@ -68,3 +74,5 @@ Implementation cannot start. Critical path, in order of urgency:
 **2026-08-06** — Project initialised. Product Bible received as the founding document. Factory Operating Model draft 1, open questions register, and decision register produced.
 
 **2026-08-06** — Five of seven Tier 1 blocking questions answered: mixed manufacturing, inventory/warehouse manager as primary user, inventory + procurement + cost wedge, single site, finance owns valuation. D-005 superseded by D-008 — no costing engine is needed here, which is a significant scope reduction. First-release scope document and build plan draft 1 written. Six new scope-driven questions raised (N-01 … N-06). Still no code, per Bible §2 and §57.
+
+**2026-08-06** — `01-core-mission.md` received and absorbed. North Star is Potential Annual Saving; operational management reclassified as ENABLER. Saving Opportunity Model written, including the aggregation guard that keeps the headline figure honest (range, weakest basis, deduplication, one-time separated from recurring, realised-versus-identified ratio). D-003 superseded, D-002 amended, D-011 … D-013 added. Build order unchanged — trust still precedes intelligence — but the vertical slice now extends to one quantified saving opportunity. Still no code.

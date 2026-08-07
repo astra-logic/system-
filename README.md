@@ -11,18 +11,24 @@
 | # | Document | What it is |
 |---|---|---|
 | 1 | [`docs/00-product-bible.md`](docs/00-product-bible.md) | The founding document. Vision, philosophy, principles, prohibitions. **Source of authority.** |
-| 2 | [`docs/domain/01-factory-operating-model.md`](docs/domain/01-factory-operating-model.md) | The domain model. Nine foundations, fourteen domains, five challenges to the brief. |
-| 3 | [`docs/domain/02-first-release-scope.md`](docs/domain/02-first-release-scope.md) | What the first release is, and the four consequences that reshape the product. |
-| 4 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Twenty units, five stages, three milestones, with acceptance criteria. |
-| 5 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
-| 6 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
-| 7 | [`context/`](context/) | The six-file working context system (Bible §52). |
+| 2 | [`docs/01-core-mission.md`](docs/01-core-mission.md) | The North Star: Potential Annual Saving. Mind map, concentric circles, feature classification. |
+| 3 | [`docs/domain/01-factory-operating-model.md`](docs/domain/01-factory-operating-model.md) | The domain model. Nine foundations, fourteen domains, five challenges to the brief. |
+| 4 | [`docs/domain/02-first-release-scope.md`](docs/domain/02-first-release-scope.md) | What the first release is, and the four consequences that reshape the product. |
+| 5 | [`docs/domain/03-saving-opportunity-model.md`](docs/domain/03-saving-opportunity-model.md) | The saving taxonomy, calculation rules, and the guard on the headline figure. |
+| 6 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
+| 7 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
+| 8 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
+| 9 | [`context/`](context/) | The six-file working context system (Bible §52). |
 
 ---
 
-## What this release is
+## North Star
 
-> **A system that makes stock true, and turns that truth into better buying decisions with visible financial consequence.**
+> **How much money could the factory save per year, and where is that saving coming from?**
+
+Primary KPI: **Potential Annual Saving.** Operational management is the layer that makes those savings discoverable, executable and sustainable — an `ENABLER`, not the goal.
+
+## What this release is
 
 Single site. Mixed manufacturing. Primary user is the **inventory / warehouse manager**. Covers inventory, procurement and cost consequence — **not** production, BoMs, MRP, maintenance or full quality. An external finance system owns valuation; this system owns quantity truth.
 
@@ -45,10 +51,12 @@ The Product Bible is explicit (§2, §48, §56-09, and its final directive): the
 ```
 docs/
 ├── 00-product-bible.md          Founding document — do not edit casually
+├── 01-core-mission.md           North Star — do not edit casually
 ├── open-questions.md            Register of everything unresolved
 ├── domain/
 │   ├── 01-factory-operating-model.md
-│   └── 02-first-release-scope.md
+│   ├── 02-first-release-scope.md
+│   └── 03-saving-opportunity-model.md
 └── decisions/
     └── decision-register.md
 
@@ -70,3 +78,4 @@ context/                         Bible §52 six-file system
 3. Documentation is updated in the same change as the decision it reflects.
 4. No feature exists because ERP software usually has it.
 5. The system never fakes certainty. If it does not know, it says so.
+6. Potential is never presented as realised, and the headline saving figure is never a single confident point.

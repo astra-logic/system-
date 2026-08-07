@@ -66,6 +66,8 @@
 
 **Receiving and counting are the highest-stakes screens** for the three-second rule — used repeatedly, often standing, often with gloves.
 
+**The North Star figure is displayed per D-012** — a range with its basis, one-time separated from recurring, overlap deduction shown, and the realised-versus-identified ratio beside it. A single confident point figure is prohibited. It will be audited by a finance manager, and it must survive that.
+
 **Absent capability is stated, not disguised.** No MRP, no production visibility, no BoMs in this release. Where a user might reasonably expect them, the interface says they do not exist rather than implying they might.
 
 ---

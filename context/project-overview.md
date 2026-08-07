@@ -35,6 +35,9 @@ What is happening? · Why is it happening? · What matters? · What should I do?
 | **Manufacturing type** | **Mixed** — process and discrete, per-item behaviour | D-009 |
 | **Deployment** | **Single site**, records still site-scoped | D-004 |
 | **Valuation** | **Finance owns it.** This system owns quantity truth | D-008 |
+| **North Star** | **Potential Annual Saving** | D-011 |
+| Core object | Saving Opportunity, with one-time and recurring impact separated | D-011 |
+| Headline figure | A range, deduplicated, weakest-basis, with realised ratio | D-012 |
 | Build plan | Draft 1 written | `context/specs/00-build-plan.md` |
 
 Proposed but **not yet accepted**: append-only stock ledger, provenance envelope, recommendation lifecycle, vertical-slice build order, consumption-based planning. See `docs/decisions/decision-register.md`.
@@ -43,9 +46,11 @@ Proposed but **not yet accepted**: append-only stock ledger, provenance envelope
 
 ## What the product is, in one line
 
-> **A system that makes stock true, and turns that truth into better buying decisions with visible financial consequence.**
+> **A system that discovers, quantifies and verifies how much money the factory could save per year — supported by the operational management that makes those savings executable and sustainable.**
 
-Scope detail and its consequences: `docs/domain/02-first-release-scope.md`.
+**North Star KPI: Potential Annual Saving** (`docs/01-core-mission.md`). Operational management is the `ENABLER`; the saving engine is `CORE`. This does not reorder the build — trust precedes intelligence (Bible §56-03) — but it sets what the first release must demonstrate.
+
+Scope: `docs/domain/02-first-release-scope.md`. Saving model: `docs/domain/03-saving-opportunity-model.md`.
 
 ---
 
@@ -57,6 +62,7 @@ Scope detail and its consequences: `docs/domain/02-first-release-scope.md`.
 `UNRESOLVED` — **Consumption capture granularity** (N-03) — very hard to backfill
 `UNRESOLVED` — **Catch-weight items** (N-04) — ledger-shaping
 `UNRESOLVED` — **Finance integration contract** (N-01) — blocks all financial-impact work
+`UNRESOLVED` — **Carrying-cost rate** (N-10) — underpins most of the North-Star number
 `UNRESOLVED` — **Pilot factory and its consumption history** (B-07, N-06)
 
 Full register: `docs/open-questions.md`. These are business decisions, not engineering preferences, and they are not for the implementation agent to assume.
