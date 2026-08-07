@@ -18,10 +18,11 @@
 | 6 | [`docs/domain/03-saving-opportunity-model.md`](docs/domain/03-saving-opportunity-model.md) | The saving taxonomy, calculation rules, and the guard on the headline figure. |
 | 7 | [`docs/domain/04-mechanism-01-expedite-premium.md`](docs/domain/04-mechanism-01-expedite-premium.md) | **Mechanism 01 — Part 2.1 locked.** Expedited freight / emergency purchase premium. |
 | 8 | [`docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md`](docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md) | Mechanism 02 — **workshop draft, not locked.** Purchase price variance. |
-| 9 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
-| 10 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
-| 11 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
-| 12 | [`context/`](context/) | The six-file working context system (Bible §52). |
+| 9 | [`docs/domain/06-orders-and-supply-movement-REQUIREMENT.md`](docs/domain/06-orders-and-supply-movement-REQUIREMENT.md) | Tracked requirement — **not designed, not a saving mechanism.** |
+| 10 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
+| 11 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
+| 12 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
+| 13 | [`context/`](context/) | The six-file working context system (Bible §52). |
 
 ---
 
@@ -62,7 +63,8 @@ docs/
 │   ├── 02-first-release-scope.md
 │   ├── 03-saving-opportunity-model.md
 │   ├── 04-mechanism-01-expedite-premium.md
-│   └── 05-mechanism-02-purchase-price-WORKSHOP.md
+│   ├── 05-mechanism-02-purchase-price-WORKSHOP.md
+│   └── 06-orders-and-supply-movement-REQUIREMENT.md
 └── decisions/
     └── decision-register.md
 

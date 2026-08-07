@@ -140,6 +140,9 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | F-19 | Are duty and clearing costs attributable to a PO line? | Landed-cost comparability |
 | F-20 | Is there an approved-supplier list; are single-source items identified? | Whether an alternative was permissible |
 | F-21 | Is specification / grade recorded well enough to establish equivalence? | Equivalence is the hard part |
+| F-22 | Does Finance hold an **effective-dated** cost-of-funds rate, or a single scalar? | A scalar across a volatile 12 months is itself false precision |
+| F-23 | Are advance-payment / LC requirements and bank charges recorded per PO? | Often the largest real price difference in Egyptian import trade |
+| F-24 | Who could adjudicate comparability, and are they **independent** of the price decision? | Determines whether DP-07's model is operable at all |
 
 ### Modelling questions raised by the lock — need confirmation before Part 2.2
 
@@ -157,6 +160,14 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 **All shared-structure questions are now locked** — Q-03 → D-025, Q-04 → D-026, Q-05 → D-028. **Nothing in the design blocks Part 2.2.**
 
 Remaining: factual questions (`F-01` … `F-10`, `REQUIRES_FACTORY_DATA`) and two deliberate deferrals — `Q-07` (re-express saving-model categories 4.1–4.7 under D-027) and `Q-08` (the decomposition engine, awaiting a second mechanism).
+
+---
+
+## Tracked cross-cutting requirements — not designed, not blocking
+
+| Requirement | Status | Detail |
+|---|---|---|
+| **Orders & Supply Movement** | `TRACKED REQUIREMENT` — recorded 2026-08-07. **Not a saving mechanism**; classified `ENABLER`. No workshop, no model, no decisions, no build-plan unit. Not blocking anything | `docs/domain/06-orders-and-supply-movement-REQUIREMENT.md` |
 
 ---
 

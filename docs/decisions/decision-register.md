@@ -310,6 +310,8 @@ Decisions D-017 … D-024 were locked by the product owner in response to the ei
 
 **New requirement.** Attribution must be **explainable**, not a silent filter.
 
+**⚠ Terminology conflict raised 2026-08-07, not yet resolved.** This decision's text uses **"PPV"** for the mechanism from which emergency-purchase lines are excluded. Under the preliminary DP-01 decision, "PPV" now unambiguously means **Finance's accounting purchase price variance**, which is not ours under D-008 — so the sentence currently reads as though we exclude lines from Finance's metric. **D-020's wording requires amendment to "Procurement Price Opportunity"** when Part 2.2 is locked. Flagged rather than silently edited, because D-020 is a locked decision.
+
 ---
 
 ## D-021 — Customs cost is in scope; uncontrollable cost is exposure, not saving

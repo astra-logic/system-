@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Part 2.1 **LOCKED**. Part 2.2 workshop drafted for mechanism 02 (purchase price variance); awaiting review.
+**Current activity:** Part 2.1 **LOCKED**. Part 2.2 workshop reconciled against preliminary DP-01 … DP-08; awaiting resolution of two items that touch locked decisions.
 **Code written:** None. Correctly so.
 
 ---
@@ -109,3 +109,11 @@ Part 2.1 is ready for final lock. Part 2.2 not started. Still no code.
 **2026-08-07** — Part 2.2 workshop opened. Mechanism 02 identified from the approved taxonomy as **§4.4 purchase price variance** — specified, not invented, and confirmed by the U-18 sequencing line in the build plan. Workshop draft written to `docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md`; **not a lock document**, and DP-01 … DP-08 are deliberately unanswered.
 
 Three findings worth carrying into review: §4.4's existing formula `(current price − best comparable price) × annual volume` violates D-027 and must be replaced with an event-level counterfactual (W-01); the mechanism name conflates accounting PPV, which D-008 gives to finance, with procurement price opportunity, which is ours (DP-01); and unlike mechanism 01, whose evidence exists by necessity, this mechanism's evidence is the alternative that was *not* chosen — which exists only if someone recorded it (F-12, F-13). Eleven new factory-evidence requirements recorded (F-11 … F-21).
+
+**2026-08-07** — Part 2.2 preliminary decisions DP-01 … DP-08 reconciled and challenged. Mechanism renamed **Procurement Price Opportunity**; accounting PPV stays with Finance under D-008.
+
+Two findings touch locked decisions and must be settled before the Part 2.2 lock. **W-16:** D-020 controls double counting but nothing controls *contradiction* — mechanism 02 saying "buy more, save on price" while 4.1 says "you hold excess, buy less". Contradiction is the more damaging failure, because double counting inflates a number a reviewer may not audit while a self-contradicting recommendation pair destroys credibility on sight. **W-18:** D-025 locked exactly two object classes, and an evidence-capture recommendation is neither — it carries no currency at all.
+
+Also flagged: D-020's locked text uses "PPV" for the mechanism now renamed, which under DP-01 reads as Finance's metric; amendment required rather than silent edit. Three challenges returned against the decisions themselves — payment terms should probably be exclusion-first rather than adjustment-first; price breaks are arguably a different economic mechanism needing a composite sub-type; and exposure records need materiality discipline or a devaluation will drown the product in correct, unactionable findings.
+
+**Orders & Supply Movement** recorded as a tracked cross-cutting requirement, classified `ENABLER`, explicitly not a saving mechanism, not designed, not blocking.
