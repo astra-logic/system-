@@ -1,14 +1,17 @@
 # 08 — Decision Report: Proposed D-025 Amendment · W-35 · W-45
 
-> ## ⚠ NOTHING APPLIED. D-025 STANDS EXACTLY AS LOCKED.
-> This document **proposes** an amendment and **analyses** two open questions. No locked decision has been modified, no taxonomy rewritten, no mechanism created.
-> No code, no UI, no schemas. Part 2.3 not started. **Date:** 2026-08-07
+> ## STATUS UPDATE — 2026-08-07
+> **The amendment proposed in §1 was APPROVED and APPLIED**, using W-46 option **(ii)**: `EVIDENCE GAP` sits **outside** the Finding hierarchy. See the decision register — D-025's original text is preserved verbatim inside the amended entry.
+> **W-35 applied** as D-032. **W-45 applied** as D-031 (`CREATES` cardinality only).
+> §1.1's open question is **resolved**; §1.2's draft tree showed Evidence Gap *inside* `FINDING` and was **not** the version applied.
+> **Still open:** W-49 `DEEPENS` — see §4.
+> No code, no UI, no schemas. Part 2.3 not started.
 
 ---
 
 # 1. Proposed amendment to D-025
 
-## 1.1 ⚠ A gap in the accepted model that must be resolved first
+## 1.1 ⚠ A gap in the accepted model that must be resolved first — **RESOLVED as (ii)**
 
 The accepted tree shows **three** children of `FINDING`:
 
@@ -27,7 +30,9 @@ FINDING
 | **(ii)** Evidence Gap sits **outside `FINDING` entirely** | `FINDING` means "a statement about money"; Evidence Gap is a statement about *our data* and belongs elsewhere |
 | **(iii)** Evidence Gap was **omitted inadvertently** | Same as (i) |
 
-**Not assumed.** The amendment below is written for **(i)** and marked, because it is the reading most consistent with W-18's accepted reasoning — but reading (ii) is defensible, and arguably more precise: an Evidence Gap is genuinely *not* a finding about money. **Requires your decision.** Recorded as `W-46`.
+**Not assumed.** The amendment below was written for **(i)** and marked as such.
+
+> **RESOLVED 2026-08-07 as (ii)** — `EVIDENCE GAP` sits **outside** the Finding hierarchy, because it is a claim about whether the system has sufficient evidence to make a financial claim, not a claim about the factory's money. **The applied amendment follows (ii); the draft tree in §1.2 below shows (i) and is superseded.**
 
 ---
 
@@ -132,7 +137,7 @@ attribute impossible for half its members.
 
 ## 1.3 Every affected decision and document
 
-Verified by search, not assumed. **None of these have been changed.**
+Verified by search, not assumed. **All have now been applied.**
 
 ### Decisions
 
@@ -143,6 +148,8 @@ Verified by search, not assumed. **None of these have been changed.**
 | **D-011** | Lifecycle | **No change.** Lifecycle stays with `OPPORTUNITY` alone — that is the point |
 | **D-029** | Intervention signature on every Opportunity | **No change**, but see W-45 §3 — confirms exposure carries none |
 | **D-002** | Provenance | **No change.** Strengthened: the mixed aggregate becomes structurally impossible rather than mislabelled |
+
+> **All changes in this section have now been applied.**
 
 ### Documents
 
@@ -327,10 +334,12 @@ So the mitigation — the only thing an Exposure could act through — **is an O
 
 | Item | Status |
 |---|---|
-| D-025 | **UNCHANGED.** Amendment proposed only |
-| `W-46` Evidence Gap placement | **Blocks the amendment** — three readings, not assumed |
-| W-35 | Recommendation: retire and redistribute §4.5. **No rewrite performed** |
-| W-45 | Recommendation: saving-model rule + linked relationship. Exposure carries no signature |
+| D-025 | **AMENDED and APPLIED** 2026-08-07, using W-46 option (ii). Original text preserved verbatim |
+| `W-46` | **RESOLVED** as (ii) — outside the Finding hierarchy |
+| W-35 | **APPLIED** as **D-032** — §4.5 retired and redistributed; shipment consolidation preserved as a future-domain gap |
+| W-45 | **APPLIED** as **D-031** — `CREATES` cardinality only |
+| W-47 / W-48 | **RESOLVED** — see §4 |
+| **W-49 `DEEPENS`** | **OPEN — the only outstanding decision** |
 | Part 2.2 lock | **Not created** |
 | Part 2.3 | **Not started** |
 
