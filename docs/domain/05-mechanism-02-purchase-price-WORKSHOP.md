@@ -586,3 +586,358 @@ Forcing it into `SAVING_OPPORTUNITY` with `INSUFFICIENT_DATA` would place an obj
 
 **Interaction with future inventory / MOQ mechanisms.**
 Covered in DP-05 and DP-06. The essential points: price breaks and MOQ are frequently the same supplier term; price and inventory optimisation pull in opposite directions; and **contradiction control is missing from every locked decision so far**.
+
+
+---
+---
+
+# SECOND RECONCILIATION — 2026-08-07
+
+> Six focused investigations. **Still not a lock document.** DP-03 reconciled as instructed; the rest are analysis with recommendations, not decisions.
+
+## DP-03 — reconciled as instructed `RECONCILED`
+
+**Exclusion is now the default.** Where payment and financing conditions differ materially and no approved Finance model can normalise them without false precision, the alternatives are **NON-EQUIVALENT** and no saving is quantified.
+
+A Finance-owned, effective-dated normalisation model may be introduced later. **It is not required for this mechanism's initial defensible operation** — which is the point: the mechanism can be honest on day one with no financing rate in existence anywhere.
+
+Consequence to note: this makes `F-16` (terms recorded per PO) a **gate**, not an enhancement. Without recorded terms, comparability is *unestablished* — and per §2 below, unestablished is not equivalent.
+
+---
+
+## 1. DP-05 — the price-break boundary
+
+### The alternatives
+
+| | Position |
+|---|---|
+| **A** | Price breaks stay wholly inside mechanism 02 (the original DP-05) |
+| **B** | Price breaks move wholly to the future quantity/MOQ mechanism (the current lean) |
+| **C** | **The boundary is not drawn at "price break" at all** |
+
+### Recommendation: **C**
+
+> **The boundary is whether the counterfactual changes the quantity purchased.**
+>
+> - Counterfactual holds quantity constant, changes price → **mechanism 02**
+> - Counterfactual increases quantity to obtain a price → **quantity / inventory mechanism**
+
+### Reasoning — why B is drawn at the wrong object
+
+The instinct behind B is right: a lower unit price obtained by buying more is a *quantity* decision with an inventory consequence, not a sourcing decision. But "price break" is a **supplier term**, not an economic property, and at least three price-break-shaped facts involve **no quantity change at all**:
+
+**(a) The break was already earned and not applied.** We ordered 5,000 kg; the supplier's break sits at 3,000 kg; we were invoiced the sub-break price anyway. Quantity unchanged, price simply wrong. This is the *contract-not-applied* case wearing price-break clothing — the strongest evidence tier in the whole mechanism.
+
+**(b) Contracting structure, not quantity.** Three purchases of 1,000 kg across a quarter, each priced at the low tier, where the supplier's terms permit annual-volume pricing on the same total. **Total quantity unchanged. No inventory consequence.** Only the contract structure changes.
+
+**(c) Split across suppliers.** 2,000 from A and 2,000 from B, each below the break; one supplier at 4,000 reaches it. **Total quantity and total inventory unchanged.** (Overlaps 4.5 consolidation — see below.)
+
+Under position **B**, all three would be exiled to a mechanism that does not exist yet, and (a) in particular would leave the taxonomy's most defensible case homeless. Under **C**, they stay where they belong, and only *"buy more than you need to reach a break"* leaves.
+
+### Can price breaks ever be pure purchase-price opportunity?
+
+**Yes — cases (a), (b) and (c).** Each has a counterfactual that holds quantity constant.
+
+### Does moving them out create a gap?
+
+**Under B, yes** — a real one, since (a) is the strongest case in the mechanism.
+**Under C, no gap, only a deferral**: quantity-increasing opportunities wait for the quantity mechanism.
+
+But that deferral carries an **F10-shaped obligation**. Supplier price-break structures must be **captured now** even though the mechanism consuming them does not exist, because capture is irreversible and a break structure not recorded at the time of the offer cannot be reconstructed. Same reasoning as D-028. New: `F-26`.
+
+### How should the future quantity mechanism consume price-break information?
+
+It requires, and mechanism 02 should **expose rather than compute**:
+- the break structure (thresholds and prices per supplier item)
+- current order quantity and frequency
+- consumption rate
+- the item's stock policy
+- finance-owned carrying-cost basis (`F-08`)
+
+Mechanism 02 owns the **price side** as an input. It never computes the net.
+
+### Could the same supplier offer produce both mechanisms?
+
+**Yes, and legitimately.** One price list can generate a *pure price* opportunity (we are above a break and not receiving it) and a *quantity* opportunity (buying more would reach the next break). These are **different money on different quantities** — not double counting. They compose rather than contradict.
+
+The contradiction risk is not internal. It is against **4.1 excess stock**, and it is handled by §4 below.
+
+### Conflict with locked decisions
+
+None. Position C is *more* consistent with D-027 than either A or B, because it keys the boundary on the **counterfactual** — the object D-027 made central — rather than on a supplier term.
+
+### Factory evidence required
+
+`F-26` are supplier price-break structures recorded, with thresholds and effective dates? · `F-08` carrying-cost basis (quantity side only) · `F-17` historical price lists.
+
+### New open questions
+
+`DP-09` — adopt boundary C, or hold to B? **Recorded as requiring resolution before lock.**
+
+---
+
+## 2. Evidence and comparability model
+
+### The alternatives
+
+| | Model |
+|---|---|
+| **A** | One ordered ladder (the original DP-02) — **rejected**, already |
+| **B** | Two ordered ladders combined into a score |
+| **C** | **Independent gates, with confidence computed separately** |
+
+### Recommendation: **C**
+
+The three concepts answer different questions and **must not be combined into a score**:
+
+```
+EVIDENCE CLASS      → does an alternative EXIST?
+COMPARABILITY       → is that alternative EQUIVALENT?
+FACTUAL CONDITIONS  → is the comparison COMPUTABLE?
+        ↓  ↓  ↓
+   all three are GATES  →  eligibility for quantification
+        ↓
+CONFIDENCE          → computed separately, from observed coverage (rule 15)
+```
+
+### Reasoning
+
+**Gates are not scores.** A gate is pass / fail / unestablished. Nothing is averaged, nothing is weighted, and no label ever becomes a number. This is what keeps D-014 rule 15 and D-017 intact — model **B** would violate both the moment a ladder position acquired a coefficient.
+
+**Eligibility maps onto the already-locked D-019 ladder:**
+
+| Gates | Outcome |
+|---|---|
+| Existence ✗ | **No opportunity at all** — the *no alternative → no opportunity* rule |
+| Existence ✓, equivalence ✗ or unestablished | **Opportunity detected. No currency.** |
+| All gates ✓ | **Eligible for currency quantification** |
+
+No new states invented — D-019 already provides them.
+
+**Comparability is itself multi-dimensional**, each dimension independently pass / fail / unestablished:
+
+specification & grade · incoterm · **payment & financing conditions** (now a gate, per DP-03) · quantity · supplier eligibility · timing · landed-cost basis (duty, clearing).
+
+### The rule that matters most
+
+> **An unestablished dimension is not a pass.**
+
+If incoterm is not recorded, comparability is *unestablished*, **not** *equivalent*. Treating unknown as equivalent is the single most likely route to manufactured savings in this mechanism, and it will look like a data-completeness bug rather than a financial one.
+
+### Conflict with locked decisions
+
+None. It strengthens rule 15 by removing the last place a category constant could hide.
+
+### Factory evidence required
+
+`F-15` incoterms · `F-16` terms · `F-21` specification · `F-19` duty and clearing · `F-20` approved-supplier status. **Each is a gate, so each absent attribute blocks currency for the comparisons it touches.**
+
+### New open questions
+
+`W-20` — does a single unestablished comparability dimension block currency outright, or only for the comparisons it touches? (No threshold is being proposed; this is a structural choice.)
+
+---
+
+## 3. W-18 — representing the evidence gap
+
+### The alternatives, each challenged
+
+| | Alternative | Challenge |
+|---|---|---|
+| **a** | Separate operational finding | **Weak.** "Finding" has no defined semantics here. Needs its own lifecycle and ownership, and becomes the bucket that absorbs everything awkward |
+| **b** | **Data-quality / evidence-gap object** | **Strongest** — see below |
+| **c** | Recommendation | **Risky.** "Recommendation" was deliberately retired when D-011 superseded D-003. Reintroducing it resurrects vocabulary we removed, and invites confusion with the Saving Opportunity lifecycle |
+| **d** | Observation | **Too weak.** Implies nothing should be done. The entire point is that something *should* — start capturing evidence. No owner, no lifecycle, no accountability |
+| **e** | Other non-financial entity | This is **(b)** under a vaguer name |
+
+### Recommendation: **(b) — an Evidence Gap, outside the Opportunity hierarchy**
+
+```
+Finding
+├── Opportunity                    ← D-025's locked two-class model, untouched
+│   ├── SAVING_OPPORTUNITY
+│   └── COST / EXPOSURE / RISK
+└── EVIDENCE GAP                   ← about our data, not about the factory's money
+```
+
+### Reasoning
+
+**It is honestly a different kind of statement.** An Opportunity is a claim about the factory's money. An Evidence Gap is a claim about *our own data*. Placing it outside the Opportunity hierarchy is not a workaround — it is the accurate model.
+
+**D-025 is untouched.** D-025 governs `Opportunity`. An Evidence Gap is not an Opportunity, so no amendment, no reinterpretation, no third saving class. This satisfies the constraint exactly.
+
+**It is not a mechanism-02 special case.** Mechanism 01's `F-01` — freight cost not separably captured — is *the same kind of object*. This is a general product concept we have needed since Part 2.1 and had not named. Introducing it here retroactively gives mechanism 01 somewhere to put its own gap.
+
+**It has a natural owner and a natural action** — whoever owns the data, and "begin capturing X" — which (d) lacks entirely.
+
+### The constraint that keeps it safe
+
+> **An Evidence Gap carries no opportunity value. Ever.**
+
+Sizing it — *"you may be losing money here"* — would recreate the contaminated object through the back door.
+
+The most it may carry is **spend exposure**: how much money flows through the un-evidenced area. That is an `ACTUAL` observed fact about purchase volume, **not** a claim about opportunity. It also gives last round's *prioritise capture by spend* answer a home: rank gaps by observed spend, which we can see, never by suspected opportunity, which we cannot.
+
+### Conflict with locked decisions
+
+**None** — D-025 remains as locked. Architectural consequence to accept: the product gains a second top-level finding family, which is a genuine addition to the model even though it changes nothing already locked.
+
+### Factory evidence required
+
+None new. Triggered by `F-12` / `F-13`.
+
+### New open questions
+
+`W-21` — may an Evidence Gap carry observed spend exposure, or nothing numeric at all? · `W-22` — does an Evidence Gap have a lifecycle (open → capturing → resolved), and who owns it?
+
+---
+
+## 4. W-16 — contradiction control
+
+### Testing `(item, site, period)` as instructed — **it is insufficient**
+
+| Failure | Why the key breaks |
+|---|---|
+| **Substitutable items** | Buy more of A while B, a substitute, sits in excess. Different item keys, real contradiction. Substitution groups are **not modelled in release 1** (no BoM, no alternates) — an honest limit, not a solvable gap |
+| **Supplier-level opportunities** | *"Consolidate spend to supplier X"* vs *"reduce stock of item Y, which only X supplies."* The subject is a **supplier**, not an item |
+| **Period boundaries** | An intervention has a **duration of effect**, not a period label. Buying more in Q1 creates excess in Q2. Equal-period matching misses it entirely |
+| **Site** | Correct under D-004 today. With inter-site transfer later, over-stock at one site and shortage at another is a **transfer opportunity, not a contradiction** — naive netting across sites would be wrong |
+| **Direction is not binary** | *"Buy more per order but order less often"* moves order quantity up and stock down. A single `BUY_MORE` / `BUY_LESS` flag **misclassifies it** |
+
+### Recommendation — a typed intervention signature
+
+Every opportunity's intervention declares:
+
+| Element | Values |
+|---|---|
+| **Subject** | **typed** — item · supplier · item-group · site (not assumed to be item) |
+| **Affected dimension(s)** | order quantity · stock level · order frequency · supplier share · price & terms |
+| **Direction per dimension** | increase · decrease · restructure |
+| **Effect window** | start + duration — **not** a period label |
+
+> **Contradiction test:** two open opportunities conflict when their **subjects intersect**, their **affected dimensions intersect**, their **directions oppose**, and their **effect windows overlap**.
+
+All four must hold. This correctly permits *"reduce safety stock"* and *"get a better price"* on the same item to coexist — they touch different dimensions and are not opposed.
+
+### Double counting vs contradiction — distinguished
+
+| | Double counting | Contradiction |
+|---|---|---|
+| **Question** | Is this the same money twice? | Can both actions actually be taken? |
+| **Test** | Shared economic benefit | Opposed intervention on intersecting subject, dimension and window |
+| **Failure mode** | Headline inflates | Recommendations are unexecutable |
+| **Detected at** | Aggregation | Presentation |
+| **Resolved by** | Net or attribute (D-020) | Net, supersede, or adjudicate |
+| **Visibility** | **Invisible unless audited** | **Immediately visible to the user** |
+| **Governed by** | D-020 (locked) | **Nothing yet** |
+
+### Can opportunities coexist? Must one supersede?
+
+**Coexistence is legitimate** where dimensions do not intersect. Where they do and directions oppose, three resolutions exist — **net into one combined opportunity** (same lever), **suspend both pending adjudication** (genuinely opposed), or **supersede by priority**. Which applies is a business decision, not one to infer.
+
+### Conflict with locked decisions
+
+None. It **extends** D-020 rather than altering it — D-020 governs attribution of shared benefit and is silent on opposed recommendations.
+
+### Factory evidence required
+
+`F-27` — are substitute / alternate items identified in master data? If not, cross-item contradiction is **undetectable in release 1** and must be stated as a limit rather than assumed absent.
+
+### New open questions
+
+`W-23` — is subject identity typed as proposed? · `W-24` — on detection, does the system net, suspend, supersede, or require adjudication? · `W-25` — should contradiction control be a **general locked rule** in the saving model rather than a mechanism-02 concern? (It clearly should be general; the question is whether it locks now.)
+
+---
+
+## 5. DP-04 — exposure treatment
+
+### The flooding problem, and how much of it self-solves
+
+The concern was that an EGP devaluation generates an exposure record for **every imported item simultaneously** — all correct, all unactionable, burying genuine procurement failures under macroeconomics.
+
+**Part of this dissolves under DP-04's own rule.** The classification trigger is *no defensible alternative at the relevant time*. Systemic movement by definition offers **no per-item alternative** — so it is honestly **one finding about a cause**, not thousands about items.
+
+### Recommendation — three controls, none of them a threshold
+
+**1. Aggregate by cause, not by subject.** The truthful statement after a devaluation is a single record — *"FX movement increased EGP cost of imported materials across N items"* — not N records. The cause is already known from classification, so this requires no new judgment.
+
+**2. Separate systemic from specific.** Systemic exposure (FX, market-wide movement) is **context**. Specific exposure (one supplier's unexplained increase, with no alternative evidenced) is **potentially actionable**. Different things, different treatment, and the distinction is factual rather than a threshold.
+
+**3. Actionability, not size, as the display discipline.** Where an action exists, DP-04's own rule says it is not exposure at all — it is an evidenced opportunity. So exposure is, by construction, the set of things with no action. It should be **reported**, not **worked**.
+
+**No thresholds proposed.** All three controls are structural.
+
+### Headline visibility
+
+**Never inside Potential Annual Saving** — D-025 settles that. But exposure should be visible as a **separate stated figure**, never mixed. Precedent exists: the core mission's headline already separates one-time capital release from recurring saving. Exposure is a third separate line, not a fourth ingredient of the first.
+
+### A structural consequence worth surfacing
+
+**Exposure has nothing to approve.** The D-011 lifecycle — `POTENTIAL → APPROVED → IN_PROGRESS → REALIZED` — presumes an action. Exposure with no available action cannot meaningfully traverse it.
+
+D-025 placed `COST / EXPOSURE / RISK` as a class under `Opportunity`, and `Opportunity` carries that lifecycle. **This tension only becomes visible now.** Not proposing to change D-025 — but whether exposure carries the opportunity lifecycle at all is now an open question rather than an assumption.
+
+### Conflict with locked decisions
+
+None directly. The lifecycle question above is a **consequence** of D-025 surfacing late, not a contradiction of it.
+
+### Factory evidence required
+
+`F-07` FX source and policy — without it, "market movement" and "currency movement" cannot be separated, and both land in the same bucket for the wrong reason.
+
+### New open questions
+
+`W-26` — does `COST / EXPOSURE / RISK` carry the D-011 lifecycle, a reduced one, or none? · `W-27` — is exposure shown as its own headline line, or only within the mechanisms that generate it?
+
+---
+
+## 6. DP-07 — adjudication independence
+
+### Recommendation — independence scales with the claim
+
+> **Detection needs context. Currency quantification needs independence.**
+
+| Stage | Who | Why |
+|---|---|---|
+| Detection | System | Data only |
+| **Context and comparability** | **Buyer** | They alone know why the decision was made. Their input is *evidence*, and the question is not accusatory |
+| **Currency quantification** | **Adjudicator independent of the price decision** | The claim will enter the headline and must survive audit |
+| Calculation | System, from approved evidence only | |
+
+This requires **no assumption about organisational structure** — it states a property the adjudicator must have, not a role that must exist.
+
+### Reasoning
+
+The concern is not that buyers are dishonest. It is that the incentive is **structural and unavoidable**: the person asked to confirm a better alternative existed is the person who did not take it. Unlike mechanism 01's blame-free *"why did this happen?"*, rejection here **directly suppresses the saving**.
+
+### The alternatives when no independent adjudicator exists
+
+`F-11` may show the owner or GM negotiates prices personally — common in Egyptian SMEs — in which case the adjudicator *is* the person being questioned, at every level.
+
+| | Option | Assessment |
+|---|---|---|
+| **i** | **Accept self-adjudication, record the conflict as a factual condition affecting confidence** | **Strongest.** Requires no independent adjudicator to exist. "Self-adjudicated" is a *factual condition about the evidence*, which rule 15 explicitly permits — it is not an invented constant |
+| **ii** | Escalate outside procurement (Finance, external) | Assumes capacity and willingness that are factory facts |
+| **iii** | Indication only for owner-negotiated categories | Honest, and loses real opportunities |
+
+**Option (i) is recommended** precisely because it does not require the org chart to cooperate.
+
+### Role-based approval, and a note worth flagging
+
+**Yes, necessarily** — and this is **the first concrete role requirement the saving engine has produced.** It should feed `A-20` (permission model), which remains unresolved and already blocks U-02.
+
+### Configurable by organisation
+
+**Yes.** Adjudication authority must be configurable rather than assumed, precisely because `F-11` and `F-24` may differ between the pilot factory and the next one.
+
+### Conflict with locked decisions
+
+None. Consistent with D-018 and D-011 ("rejections are data" becomes load-bearing here rather than nice-to-have).
+
+### Factory evidence required
+
+`F-24` who could adjudicate, and are they independent? · new `F-25` does any role independent of the price decision have both the **authority and the capacity** to adjudicate at the volume this would generate?
+
+### New open questions
+
+`W-28` — is self-adjudication acceptable with the conflict recorded as a confidence condition? · `W-29` — should rejection rates by adjudicator be visible as an integrity metric?

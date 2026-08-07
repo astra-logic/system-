@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Part 2.1 **LOCKED**. Part 2.2 workshop reconciled against preliminary DP-01 … DP-08; awaiting resolution of two items that touch locked decisions.
+**Current activity:** Part 2.1 **LOCKED**. Part 2.2 second reconciliation delivered; awaiting DP-09 and the shared-structure questions.
 **Code written:** None. Correctly so.
 
 ---
@@ -117,3 +117,7 @@ Two findings touch locked decisions and must be settled before the Part 2.2 lock
 Also flagged: D-020's locked text uses "PPV" for the mechanism now renamed, which under DP-01 reads as Finance's metric; amendment required rather than silent edit. Three challenges returned against the decisions themselves — payment terms should probably be exclusion-first rather than adjustment-first; price breaks are arguably a different economic mechanism needing a composite sub-type; and exposure records need materiality discipline or a devaluation will drown the product in correct, unactionable findings.
 
 **Orders & Supply Movement** recorded as a tracked cross-cutting requirement, classified `ENABLER`, explicitly not a saving mechanism, not designed, not blocking.
+
+**2026-08-07** — Second Part 2.2 reconciliation. DP-03 reconciled to exclusion-first, so the mechanism can operate honestly with no financing rate in existence anywhere; `F-16` becomes a gate rather than an enhancement.
+
+Five investigations returned. **Price breaks:** the boundary is drawn at the wrong object — it is not "price break" (a supplier term) but "does the counterfactual change quantity" (an economic property). Three price-break-shaped cases involve no quantity change at all, including *break earned but not applied*, which is the strongest evidence case in the whole mechanism; moving it out would exile it to a mechanism that does not exist. Recorded as `DP-09`, requiring resolution before lock. **Evidence model:** three independent gates with confidence computed separately, so no label ever becomes a number; an unestablished dimension is explicitly not a pass. **Evidence gap:** represented outside the Opportunity hierarchy entirely, leaving D-025 untouched — and it retroactively gives mechanism 01's `F-01` somewhere to live. **Contradiction control:** `(item, site, period)` tested and found insufficient on five counts; replaced with a typed intervention signature — subject, affected dimensions, direction per dimension, effect window. **Exposure:** the flooding problem partly self-solves under DP-04's own rule, since systemic movement offers no per-item alternative and is therefore one finding about a cause rather than thousands about items. Surfaced a late consequence of D-025: exposure has nothing to approve, so whether it carries the D-011 lifecycle is now open. **Adjudication:** independence scales with the claim — detection needs the buyer's context, currency quantification needs someone independent of the price decision. Where no independent adjudicator exists, self-adjudication recorded as a factual confidence condition is permitted by rule 15 and requires no org-chart cooperation. First concrete role requirement produced for `A-20`.

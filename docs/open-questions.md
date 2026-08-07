@@ -45,7 +45,7 @@
 | A-17 | Are labour/machine/overhead rates available, or is material cost the only real component? | C13 | `DEFERRED` to finance (D-008); relevant to N-01 granularity |
 | A-18 | Thresholds defining aging, slow-moving, excess, dead stock, stockout risk | C9 | `OPEN` |
 | A-19 | Technology stack and deployment architecture | Bible §54.21–22 | `OPEN` |
-| A-20 | Permission and role model | Bible §54.20, §44 | `OPEN` |
+| A-20 | Permission and role model | Bible §54.20, §44 | `OPEN` — **first concrete requirement received 2026-08-07**: adjudication authority must be role-based and configurable, and independent of the price decision for currency claims (DP-07) |
 
 ---
 
@@ -143,6 +143,9 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | F-22 | Does Finance hold an **effective-dated** cost-of-funds rate, or a single scalar? | A scalar across a volatile 12 months is itself false precision |
 | F-23 | Are advance-payment / LC requirements and bank charges recorded per PO? | Often the largest real price difference in Egyptian import trade |
 | F-24 | Who could adjudicate comparability, and are they **independent** of the price decision? | Determines whether DP-07's model is operable at all |
+| F-25 | Does any independent role have both the **authority and the capacity** to adjudicate at volume? | Independence without capacity is not a workable control |
+| F-26 | **Are supplier price-break structures recorded**, with thresholds and effective dates? | Capture is irreversible (D-028 reasoning); the consuming mechanism does not exist yet |
+| F-27 | Are substitute / alternate items identified in master data? | Without it, cross-item contradiction is **undetectable in release 1** and must be stated as a limit |
 
 ### Modelling questions raised by the lock — need confirmation before Part 2.2
 
