@@ -19,7 +19,8 @@
 | 7 | [`docs/domain/04-mechanism-01-expedite-premium.md`](docs/domain/04-mechanism-01-expedite-premium.md) | **Mechanism 01 — Part 2.1 locked.** Expedited freight / emergency purchase premium. |
 | 8 | [`docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md`](docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md) | Mechanism 02 — **workshop draft, not locked.** Purchase price variance. |
 | 9 | [`docs/domain/06-orders-and-supply-movement-REQUIREMENT.md`](docs/domain/06-orders-and-supply-movement-REQUIREMENT.md) | Tracked requirement — **not designed, not a saving mechanism.** |
-| 9b | [`docs/domain/07-decision-report-W33-W36-W35.md`](docs/domain/07-decision-report-W33-W36-W35.md) | Decision report — **awaiting decision. D-025 unchanged.** |
+| 9b | [`docs/domain/07-decision-report-W33-W36-W35.md`](docs/domain/07-decision-report-W33-W36-W35.md) | Decision report — W-33, W-36, W-35. |
+| 9c | [`docs/domain/08-decision-report-D025-amendment-W35-W45.md`](docs/domain/08-decision-report-D025-amendment-W35-W45.md) | **Proposed D-025 amendment — NOT APPLIED.** Plus W-35 and W-45 analysis. |
 | 10 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
 | 11 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
 | 12 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |

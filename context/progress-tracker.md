@@ -3,7 +3,7 @@
 > Updated whenever meaningful progress or a decision occurs. Honest state only — no aspirational entries.
 
 **Current phase:** Phase 0 — Product architecture
-**Current activity:** Part 2.1 **LOCKED**. W-25 and DP-09 locked as D-029/D-030. Formal decision report delivered for W-33, W-36, W-35 — **D-025 unchanged**, awaiting decision.
+**Current activity:** Part 2.1 **LOCKED**. Proposed D-025 amendment written with full before/after and impact inventory — **not applied**. W-35 and W-45 analysed. Awaiting decision.
 **Code written:** None. Correctly so.
 
 ---
@@ -135,3 +135,11 @@ Formal decision report written for W-33, W-36 and W-35. **No locked decision ame
 The report's central finding: **W-33's alternatives B and C are not competing options but orthogonal axes.** B asks where these objects sit relative to `Opportunity`; C asks whether Cost and Exposure are one thing or two. Each fixes a different defect — B fixes lifecycle inheritance, C fixes meaningless aggregation — so only their composition (option D) closes both. Alternative A fails by D-025's own principle: avoiding a meaningless aggregate under A requires a discipline, and D-025 exists precisely because discipline eventually fails. Option D is a **hardening** of D-025 rather than a relaxation, since exposure moves further from Potential Annual Saving.
 
 W-36 resolves to Exposure/Risk with no new mechanism, and produced a clarification of D-014 rule 6's scope: certain incremental costs are netted, uncertain future obligations are disclosed as linked exposure — netting a probability against a certainty would require inventing a probability. W-35 found a **third** meaning of "consolidation" — shipment consolidation, whose economic effect is freight cost and which sits adjacent to mechanism 01. Both W-36 and W-35 surfaced the same pattern (`W-45`): an Opportunity may create an Exposure that must be disclosed rather than netted.
+
+**2026-08-07** — W-33 and W-36 accepted. Proposed D-025 amendment written with verbatim before/after text and a verified impact inventory across five decisions and seven documents. **Nothing applied — D-025 stands exactly as locked.**
+
+One thing blocks the amendment and was surfaced rather than assumed: the accepted tree shows three children of `FINDING`, but W-18 placed `EVIDENCE GAP` outside the Opportunity hierarchy and it is absent from that tree. Three readings are possible and materially different — fourth child of `FINDING`, outside `FINDING` entirely, or inadvertent omission. Recorded as `W-46`; the amendment is drafted for the first reading and marked as such.
+
+**W-35** produced a correction to my own earlier recommendation. "Split §4.5 into three" was wrong phrasing — the analysis shows **two homes and one gap**. Supplier consolidation is a counterfactual shape inside mechanism 02, not a new mechanism; temporal consolidation belongs to the future quantity mechanism and is currently the least quantifiable of the three, depending on two unresolved finance-owned inputs; shipment consolidation is genuinely unowned but **not yet justified as a mechanism**, being gated by `F-01` anyway and of unmeasured materiality. It also revealed that D-030's boundary does not classify logistics cost — not a defect, since D-030 was locked to separate price from quantity and does that correctly.
+
+**W-45** tested 5/5 valid across supplier concentration, commitment, inventory, logistics disruption and FX. Two instructive results: a price-break intervention produces both a *nettable* certain cost and a *disclosable* uncertain risk, so netting and disclosure coexist rather than competing; and FX exposure exists independently of any opportunity, proving the link is optional on the exposure side. Recommended as a saving-model rule establishing a linked-finding relationship. Exposure carries **no** intervention signature — which follows from the already-accepted principle that a mitigation with a defensible counterfactual *becomes* an Opportunity.
