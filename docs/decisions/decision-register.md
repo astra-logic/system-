@@ -10,9 +10,9 @@
 
 ## D-001 — Inventory truth is an append-only movement ledger
 
-**Status:** `PROPOSED` · **Area:** F2 · **Blocks:** everything in inventory, cost, traceability
+**Status:** `LOCKED` 2026-08-08 · **AMENDED 2026-08-08** (Block 1) · **Area:** F2 · **Blocks:** everything in inventory, cost, traceability
 
-**Decision.** Stock truth is an immutable, double-entry ledger of movements. Balances are derived projections. Corrections are reversing entries, never edits.
+**Decision — unchanged, preserved verbatim.** Stock truth is an immutable, double-entry ledger of movements. Balances are derived projections. Corrections are reversing entries, never edits.
 
 **Why.** Traceability, reconciliation, valuation and §38 data trust all become properties of the model rather than features to build. Stock is conserved by construction. Backdated entries — normal in factories — are handled natively.
 
@@ -20,13 +20,52 @@
 
 **Cost.** Balance projections must be maintained or every stock screen scans history. Higher write complexity. More storage.
 
+### Amendment 2026-08-08 — additive only (Block 1, `docs/domain/15-BLOCK1-foundation-governance-closure.md`)
+
+The decision sentence above is **not altered.** Twenty-two adversarial scenarios found no structural failure in the model and three missing operational guarantees. All three are additions.
+
+```
+ADD to the bucket list:
+    OPENING BALANCE / MIGRATION
+    — the counterparty for stock existing at go-live or at data migration.
+    Never used for operational events. Segregated from ADJUSTMENT so that
+    count-accuracy analytics are not polluted at birth.
+
+ADD to the minimum movement record:
+    Source-system natural key   — the identity of the originating record,
+                                  used to reject duplicate ingestion
+    F10 capture dimensions      — original amount · currency · FX rate ·
+                                  rate date · quantity · unit basis · UoM ·
+                                  period boundary, AS APPLICABLE to the event
+                                  and never invented where absent (D-028)
+
+ADD as a stated capability:
+    Point-in-time reconstruction — the balance of any item at any past
+    instant is derivable from the ledger. A maintained current balance
+    alone does not satisfy this decision.
+
+ADD as a clarification:
+    A RETURN is a movement (stock → Supplier), not a reversal. Reversals
+    assert that a recorded event was wrong; returns assert that goods
+    physically went back. The two must not be conflated.
+
+CROSS-REFERENCE:
+    F5 period locking governs where a backdated correction may be posted.
+```
+
+**Why each is blocking.** Without an opening-balance counterparty, go-live stock can only enter through `Adjustment`, which poisons the count-accuracy metric this decision names as the trust metric for the whole system. Without a natural key, a re-imported spreadsheet — the single most likely operational event in the first months (`P-03`) — is silently accepted twice, and append-only then guarantees the *preservation* of corruption rather than protection from it. Without the F10 dimensions, this decision would lock a movement record that cannot satisfy D-028, which is already locked above it.
+
+**Point-in-time reconstruction is stated rather than implied** because a maintained-current-balance implementation satisfies the original letter and makes every backtest in the saving engine impossible.
+
+**Deliberately excluded from this amendment**, each opened as its own decision rather than guessed inside this one: in-transit ownership (`Q-10`, needs `F-15`) · source-record drift (`Q-11`, interacts with import architecture) · commercial-document immutability (`Q-09`, required before Mechanism 02 is built).
+
 ---
 
 ## D-002 — Provenance is a platform primitive, not a UI convention
 
-**Status:** `PROPOSED` · **Area:** F4 · **Blocks:** analytics, recommendations, AI
+**Status:** `LOCKED` 2026-08-08 · **AMENDED 2026-08-08** (Block 1) · **Area:** F4 · **Blocks:** analytics, recommendations, AI
 
-**Decision.** Every derived value carries `{value, unit, basis, as_of, inputs, assumptions, confidence, limitations}`. Basis degrades contagiously — anything computed from a forecast is at best a forecast, and an aggregate carries the *weakest* basis among its components. `INSUFFICIENT_DATA` is a designed state, not an error.
+**Decision — as originally written, preserved verbatim.** Every derived value carries `{value, unit, basis, as_of, inputs, assumptions, confidence, limitations}`. Basis degrades contagiously — anything computed from a forecast is at best a forecast, and an aggregate carries the *weakest* basis among its components. `INSUFFICIENT_DATA` is a designed state, not an error.
 
 **Amended 2026-08-06** (`docs/01-core-mission.md` §7): basis has **eight** values, adding `STALE_DATA` — `ACTUAL · CALCULATED · FORECAST · ESTIMATED · ASSUMED · USER_DEFINED · INSUFFICIENT_DATA · STALE_DATA`. This matters most under D-008: cost is imported from finance, so when that import ages past its threshold (`N-09`), every financial figure resting on it changes basis, and contagion carries that upward through every aggregate.
 
@@ -35,6 +74,30 @@
 **Rejected.** Per-feature provenance labelling. Cheaper; fails silently and unevenly.
 
 **Cost.** Touches every calculation and every display component. Must exist from day one — retrofitting means auditing every number in the system.
+
+### Amendment 2026-08-08 — additive only (Block 1)
+
+```
+CLARIFY scope:
+    Every value the system asserts carries the envelope — not only derived
+    values. A raw value carries basis ACTUAL (observed) or USER_DEFINED
+    (asserted), so that contagion has a defined floor.
+
+CLARIFY as_of:
+    as_of is the EFFECTIVE time of the value, per F5. Recorded time is
+    carried separately. Reproducibility depends on this distinction.
+
+STATE the limitation explicitly:
+    Provenance establishes WHAT a number is. It does not establish whether
+    using that number in a given calculation is APPROPRIATE. A correctly
+    labelled value may still be the wrong instrument for a decision.
+```
+
+**Why the first two are blocking.** *"Every **derived** value"* left raw values — a PO price, an imported on-hand figure — outside the envelope, so an aggregate mixing raw with derived had no weakest basis to compute; the contagion rule had a hole at its own base, and every mechanism aggregates raw with derived. And F5 establishes **two** timestamps while the envelope carries one `as_of`; reproducibility is the point of provenance, and an ambiguous timestamp defeats it.
+
+**Why the third is stated rather than fixed.** D-002 prevents **mislabelling**, not **misuse.** A correctly-labelled, finance-owned, authoritative rate can still be the wrong instrument — which is exactly the failure DP-15 found and D-023's amendment now governs. Provenance answers *what a number is*, never *whether using it here is appropriate*. Left unstated, D-002 would be trusted to do a job it was never designed for.
+
+**Deliberately excluded, opened as one follow-on decision (`Q-12`, basis semantics):** the `ESTIMATED` / `ASSUMED` boundary · a basis value for imported-unverified and third-party-asserted data · source conflict resolution · `STALE_DATA` scope · whether inputs carry their own `as_of`. Each is a real gap; none blocks the lock, because each concerns *which* value to use rather than *whether the envelope exists*.
 
 ---
 
@@ -159,6 +222,26 @@ Operational management is reclassified as `ENABLER`. The saving engine is `CORE`
 
 **Does not change the build order.** Bible §56-03 and §50 still hold: a saving engine over untrustworthy stock data produces confident nonsense. Foundations first.
 
+### Amendment 2026-08-08 — the `Owner` field splits into three (Block 2, closes `DP-14`)
+
+> *Original field, preserved:* `Owner — the person accountable.`
+
+**As amended.** One field held three accountabilities that do not collapse. Replaced by three **factory-facing** fields:
+
+| Field | Accountable for | Test that proves it distinct |
+|---|---|---|
+| **Finding Owner** | The finding **being addressed** — *"whose problem is this?"* | 4.1: inventory detects the excess |
+| **Action Owner** | **Executing** the intervention | 4.1: **purchasing** defers the order |
+| **Data Owner** | **Input data quality.** The natural owner of an `EVIDENCE GAP` | An evidence gap's fix belongs to whoever owns the data, not whoever owns the finding |
+
+**Mechanism Owner is not a field on a finding.** Accountability for the *detector's* correctness — its counterfactual logic, refusal conditions and evidence gates — is internal product governance, not factory-facing.
+
+⚠ **The adjudicator (DP-07) is a reviewer, not an owner**, and must not be collapsed into Finding Owner. Approval of a currency claim belongs to an adjudicator independent of the underlying decision; folding that into ownership silently loses the independence requirement.
+
+**Configurable, and one person may hold several.** Distinct *fields* do not require distinct *people* — common in an SME. **No organisational structure is invented by defining a field.** Where no suitable owner exists the finding is **unowned and visibly so**, never hidden: an unowned finding is itself the signal that nobody is accountable for that class of problem.
+
+**Affected.** Saving Opportunity object (`03-saving-opportunity-model.md` §2) · build plan U-17 · code standards · `A-20` — this is the second concrete requirement the saving engine has produced for the permission model. **No calculation changes.**
+
 ---
 
 ## D-012 — The headline saving figure is a range, deduplicated, split by impact type
@@ -213,6 +296,26 @@ Operational management is reclassified as `ENABLER`. The saving engine is `CORE`
 **Why.** These were already the direction of travel in D-011 and D-012; being locked by the product owner makes them law rather than recommendation. Rule 15 in particular removes a temptation that would otherwise have crept in — assigning confidence by category because it is easier than computing coverage.
 
 **Cost.** None beyond what D-012 already imposed. They make the product slower to show impressive numbers, which is the intent.
+
+### Amendment 2026-08-08 — rule 10 gains `purpose` (Block 2; one amendment with D-023)
+
+> *Rule 10 as locked, preserved:* financial inputs carry **source · owner · effective date · freshness · status.**
+
+**As amended,** the provenance list for a financial rate gains one field:
+
+```
+purpose  — what this rate was CONSTRUCTED FOR, stated by whoever owns it.
+           STRUCTURED, not free text.
+
+A mechanism declares the purpose it requires.
+Mismatch BLOCKS currency quantification and raises an EVIDENCE GAP.
+```
+
+**Why it must be structured — a conclusion changed on re-test.** Block 1 recorded that purpose *might* be derivable from D-002's `limitations`. It is not: `limitations` is **free text**, and a mechanism cannot **match** against free text. If the requirement were disclosure only, free text would suffice. But DP-15's obsolescence case demands **blocking** — disclosure does not prevent netting a risk into a saving, which D-031 forbids. Blocking requires a machine-comparable field.
+
+**Nothing is invented.** No universal rate is created and no purpose is inferred; the purpose is **stated by the rate's owner**, and where they have never been asked, that is an `EVIDENCE GAP` (`F-08`), not a default.
+
+**Affected calculations.** Every figure using carrying cost, cost of funds, ordering cost or an FX policy rate.
 
 ---
 
@@ -355,6 +458,29 @@ Decisions D-017 … D-024 were locked by the product owner in response to the ei
 **Status split.** The *policy* is locked. The *value* remains `REQUIRES_FACTORY_DATA` (`F-08`).
 
 **Reinforces.** D-015's nomination of lead-time correction as the first slice — it is the case that may need no carrying-cost input at all.
+
+### Amendment 2026-08-08 — extended from *never invent* to *never misapply* (Block 2)
+
+> *Original scope, preserved:* a rate must never be invented, and must be authoritative and finance-owned.
+
+**As amended,** three genuinely distinct requirements, the third of which was covered nowhere:
+
+| | Requirement | Was it covered? |
+|---|---|---|
+| 1 | Never invent a rate | Yes — as originally locked |
+| 2 | Use an authoritative, owned rate | Implied by 1 |
+| 3 | **Use a rate appropriate to the decision** | **No** |
+
+**Two demonstrations that 3 is distinct** — both pass 1 and 2 and produce a wrong answer:
+
+- A finance **valuation** rate is authoritative and **inappropriate for a marginal decision**.
+- A carrying rate **containing obsolescence** is authoritative and **contains a risk we are forbidden to net** (D-031).
+
+**Operational test.** A rate carries its `purpose` (D-014 rule 10 as amended). A mechanism declares the purpose it requires. **Mismatch blocks currency quantification and raises an `EVIDENCE GAP`.**
+
+**Rejected.** *Leave fitness to mechanism authors* — this is the failure mode that already occurred twice in the DP-10 … DP-15 audit. *Maintain per-decision rates ourselves* — creates rates we do not own, which is D-023's original prohibition re-entering through the back door.
+
+**Hidden assumption surfaced.** That a rate's purpose is knowable. **It requires asking finance a question they may never have been asked** — recorded as a factory fact under `F-08`, not assumed.
 
 ---
 
@@ -623,7 +749,9 @@ Minimum signature: **typed subject · affected dimensions · direction per dimen
 
 ## D-031 — An Opportunity may create or deepen a linked Exposure / Risk
 
-**Status:** `LOCKED` 2026-08-07 · **Area:** saving model · **Closes:** `W-45` · **Clarifies:** D-014 rule 6
+**Status:** `LOCKED` 2026-08-07 · **AMENDED 2026-08-07** by `W-49` (`DEEPENS`) · **AMENDED 2026-08-08** by Block 2 (`MITIGATES`) · **Area:** saving model · **Closes:** `W-45` · **Clarifies:** D-014 rule 6
+
+> *Status-line correction 2026-08-08.* The W-49 amendment was applied to this decision's body on 2026-08-07 but never recorded on its status line, unlike D-025's. Reported in Block 1, corrected here. **No substance changed by the correction.**
 
 ### As originally locked (`CREATES` only) — preserved
 
@@ -694,6 +822,37 @@ Two results shaped the rule:
 
 **Multiple Opportunities on one exposure (`W-48`).** Each creates its **own record**; *current exposure on a subject* is a **derived view**, exactly as balances are projections of the ledger (D-001). Merging into one mutable record would destroy which action caused what. This **confirms** the 0..1 creating cardinality rather than changing it.
 
+### As amended 2026-08-08 by Block 2 — `MITIGATES` added
+
+**Decision.** A **third** linked-finding relationship type, **disclosure-only**:
+
+```
+OPPORTUNITY
+    ├── CREATES   ──▶  EXPOSURE / RISK   introduces a new exposure
+    ├── DEEPENS   ──▶  EXPOSURE / RISK   worsens an existing exposure
+    └── MITIGATES ──▶  EXPOSURE / RISK   reduces an existing exposure
+
+Cardinality:  OPPORTUNITY ──mitigates 0..n──▶ EXPOSURE / RISK
+              EXPOSURE / RISK ──has 0..n mitigating Opportunities
+```
+
+**Binding rules.**
+
+1. The exposure **must already exist** — that is precisely what separates `MITIGATES` from `CREATES`.
+2. **Never netted into Potential Annual Saving.** Mitigating an unvaluable exposure yields an unvaluable benefit; netting it would require valuing the exposure, which this decision forbids.
+3. **No probability, percentage, severity score or monetary value.** Partial mitigation is stated **qualitatively only** — quantifying "partial" requires a severity measure that D-017 and D-023 forbid.
+4. The relationship carries **no intervention signature**; the Opportunity carries one (D-029).
+5. Verification is by **supersession** — a later exposure observation at a lower level, per D-025 principle 4. Nothing is mutated.
+6. If the exposure later becomes valuable, the mitigation acquires a defensible counterfactual and **becomes an Opportunity in its own right** (D-025 principle 3) — never a netted benefit on the mitigating Opportunity.
+
+**The case that requires it.** Mechanism 01's reorder-point fix carries an incremental carrying cost, a quantified expedite reduction — and a **reduction in stockout exposure that is otherwise invisible.** Without `MITIGATES`, an Opportunity whose main justification is risk reduction **shows only its cost and looks purely bad.** Symmetry independently supports it: if disclosing a risk *increase* is mandatory, disclosing a risk *reduction* is equally informative.
+
+**Re-tested against a cheaper alternative, and it survives.** Could supersession alone express this — a new observation at a lower level, with the chain showing the reduction? **That works retrospectively and fails prospectively.** The problem is at *decision time*, before the action is taken and before any new observation exists. **Supersession handles verification; it does not handle disclosure.**
+
+**Rejected.** *Omit it* — leaves risk-reducing Opportunities looking unjustified, biasing the factory against correct actions. *Model it as a negative `DEEPENS`* — a signed relationship invites arithmetic on something deliberately unvalued.
+
+**Affects no calculation.** It is disclosure, not arithmetic.
+
 **Placement.** Saving Opportunity Model, per D-029's principle — *F-series foundations govern what must be captured from reality; the saving model governs what may be asserted about it.*
 
 ---
@@ -715,3 +874,334 @@ Two results shaped the rule:
 **Note on D-030.** This case revealed that D-030's boundary does not classify **logistics cost**. That is **not a defect** — D-030 was locked to separate price from quantity and does so correctly. Shipment consolidation sits in a third economic domain the boundary was never written to address.
 
 **Also recorded:** *ordering cost* (`F-31`) is an unknown of the same class as the carrying-cost rate — **finance-owned, no invented default**, by analogy with D-023.
+
+---
+
+# Block 1 / Block 2 closure and Part 2.3 lock — 2026-08-08
+
+Decisions D-033 … D-041 were locked following the Block 1 and Block 2 closures and the Part 2.3
+workshop. Full analysis: `docs/domain/15-BLOCK1-foundation-governance-closure.md`,
+`docs/domain/16-BLOCK2-monetary-boundaries.md`, `docs/domain/17-part-2.3-LOCK.md`.
+
+---
+
+## D-033 — Inventory position correction: six interventions, and what each may claim
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** saving taxonomy, F9 · **Closes:** `DP-10` · **Sharpens:** D-012
+
+**Decision.** "Excess stock" is not one opportunity. It is **six interventions with different counterfactuals, different offsets and different one-time/recurring profiles.**
+
+| Intervention | Changes | One-time | Recurring | May enter Potential Annual Saving |
+|---|---|:--:|:--:|---|
+| (a) Cancel a future purchase | An order is never placed | ● | | **Nothing recurring.** Collapses into (b) unless the quantity will *never* be consumed — in which case the existing stock is **dead, not excess** |
+| (b) Delay a future purchase | Timing only | ● | | **Nothing.** Financing value of the timing only, and it **may be negative** |
+| (c) Reduce future order quantity | Average stock falls; order count rises | | ● | Carrying reduction **net of** the ordering-cost increase |
+| (d) Reduce reorder point | Average stock falls permanently | ● | ● | **Recurring carrying only.** The one-time step-down is a **position change, not a saving** |
+| (e) Reduce safety stock | As (d), harder counterfactual | ● | ● | Recurring carrying only, and only after D-037's evidence bar |
+| (f) Dispose of stock never to be consumed | Stock leaves; recovery and disposal cost | ● | ● | **Carrying avoided only. Never the stock value** |
+
+**The unifying rule.**
+
+> **One-time benefits come from changing a stock *level*. Recurring benefits come from changing a *policy*.**
+
+**Binding consequences.**
+
+1. **The principal is never a saving and is never called a "release."** You cannot un-buy stock. For excess, the outflow is **delayed, never avoided.**
+2. ⚠ **Excess stock with no pending order produces no Opportunity at all.** The deferral counterfactual requires *something to defer*. Stock that will be consumed over a horizon so long that no order exists to move is a **position, not a finding** — reported as such (`B2-04`), never as an Opportunity.
+3. **Deferral benefit is `INSUFFICIENT_DATA` without an expected-price-movement input (`F-39`).** Assuming zero movement is itself an invented assumption, and in a high-inflation, devaluing-currency economy it is *known* to be wrong in a predictable direction. A deferral opportunity that ignores expected price movement is not conservative — it is wrong.
+4. Counting both a cancellation and the policy error that caused it **double counts** (D-020).
+
+**Rejected.** Treating all six as one "excess stock" mechanism — different counterfactuals, different offsets, different recurrence. Collapsing them is what produced the original invalid formula in §4.1.
+
+**Hidden assumption surfaced.** *That reducing stock is always beneficial.* In a devaluing currency it may not be.
+
+**Open.** `B2-03` — whether a disposal **tax effect** belongs entirely to finance (D-008) or is disclosable here. Not claimed either way.
+
+---
+
+## D-034 — Taxonomy closure: §4.2 retired, §4.9 reclassified
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** saving taxonomy · **Closes:** `DP-11`, `DP-12`
+
+### §4.2 slow-moving stock — **retired as a saving category**
+
+Four attempts to find an independent intervention; all four fail.
+
+| Attempt | Result |
+|---|---|
+| Slow but appropriately stocked | No intervention. Coverage is right; the item will be used |
+| Slow as a sourcing signal | That is temporal consolidation, not a category of its own |
+| Slow as an inventory-turns KPI | Analytics, not a mechanism |
+| **Slow relative to shelf life** | ⚠ **A genuine counterfactual** — *"sold or returned today, recovery is X; held to expiry, zero"* — but it is **§4.3's disposal decision triggered earlier**, not an independent mechanism |
+
+**Preserved, not deleted.** §4.2 survives as (i) a **detection signal** feeding §4.1 and §4.3, (ii) a **trigger** that advances §4.3's disposal decision for shelf-life items (`F-34`), and (iii) an **`EXPOSURE / RISK`** where no action is available.
+
+**Why retiring it matters structurally.** Its entire risk profile was borrowed from §4.1 and §4.3 — it would have claimed their money under a third name. Retirement removes a structural double count. And its turnover cut-off is a threshold (`A-18`): tolerable for a *detection signal*, **not** tolerable for anything producing currency — a further argument for retirement rather than repair.
+
+### §4.9 stockout — **reclassified as `EXPOSURE / RISK`. No new class.**
+
+Every existing class was tested before creating anything:
+
+| Class | Fits? |
+|---|---|
+| `OPPORTUNITY` | **No** — no counterfactual. *"You are at risk"* is a projection, not a foregone alternative |
+| `OBSERVED COST` | **No** — a past stockout has no attributable cost in Release 1 (D-007 removes production impact; there is no sales module) |
+| `EVIDENCE GAP` | **No** — it is a claim about the factory, not about our data |
+| **`EXPOSURE / RISK`** | **Yes** — forward-looking, `FORECAST`-derived, may carry mitigation |
+
+⚠ **Recorded consequence — exposure counts and expedite counts are not additive.** Mechanism 01 measures the premium paid **to avoid** a stockout; §4.9 measures the **risk of** one. Where an expedite occurred the stockout did not happen: the exposure was mitigated before it was ever recorded and **leaves no trace**. Not a defect, but anyone reading the two figures together must be told they do not sum.
+
+**Even a mitigation cannot be valued.** Expediting has a knowable cost and an unvaluable benefit. That asymmetry is a human decision, not a system quantification (D-041).
+
+---
+
+## D-035 — Carrying cost is component-wise; a whole rate is invalid for a marginal decision
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F8, F9 · **Closes:** `DP-15` · **Sharpens:** D-023
+
+**Decision.** No carrying-cost figure is ever produced from a single supplied rate. Each component is classified independently, and only components that are `ACTUAL` or defensibly `CALCULATED` **and generate incremental cash flow** may enter a currency claim.
+
+| Component | Classification | Reasoning |
+|---|---|---|
+| **Capital** | **`CALCULATED`** — never `ACTUAL` | An opportunity cost, not an invoice. Governed by D-036's single-channel rule |
+| **Space** | `ACTUAL` if external storage is rented · **NOT VALID** for an owned, unconstrained warehouse (`F-33`) | No incremental cash flow when the building is paid for and half empty |
+| **Handling** | `ACTUAL` if overtime or per-move contracted · **NOT VALID** if salaried staff below capacity | Marginal labour cost may genuinely be zero |
+| **Insurance** | `ACTUAL` if value-based and adjusting · **NOT VALID** if a fixed annual declared value | A fixed premium does not move with stock |
+| **Obsolescence** | **`EXPOSURE / RISK`** | Not a cost at all. Inside a rate it would be **netted — which D-031 forbids** |
+| **Shrinkage / damage** | **Splits** — past shrinkage is `ACTUAL` (a ledger adjustment); future shrinkage is **`EXPOSURE`** | A rate conflates the two |
+| **Disposal** | `ACTUAL` when incurred — **and it is a cost of the intervention, not a carrying cost** (`F-38`) | Misclassified if placed inside a carrying rate |
+| **Inventory taxes / duties** | Jurisdiction-dependent (`F-40`) | Factory fact required |
+
+**The conclusion this forces.**
+
+> **A typical finance carrying-cost rate contains at least two `EXPOSURE` components (obsolescence, future shrinkage) and frequently two that are NOT VALID for a marginal decision (own-warehouse space, salaried handling). Used whole, it is almost certainly invalid for these mechanisms** — it would net a risk into a saving and claim costs that generate no incremental cash flow.
+
+This is a harder line than "possibly unfit," and it is better supported: the failure is structural, not a matter of precision.
+
+**Excess is not dead.** For **excess** stock, capital is **tied**. For **dead** stock, capital is **lost, not tied** — only recovery value remains at stake. ⚠ **Disposal does not release capital.** Scrapping converts a book asset into a book loss: an accounting event, not a cash event. §4.3 may therefore be far smaller than it appears.
+
+**Requires.** `F-08` must return **components and their construction purpose**, not a single number. Without it, the dependent output is `INSUFFICIENT_DATA` (D-023).
+
+**Rejected.** A single average rate — rejected. A single *marginal* rate — **also rejected**: not observable, and the question was never *which rate* but *which components apply.*
+
+---
+
+## D-036 — The financing effect has exactly one channel
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F9, all quantity mechanisms · **Closes:** `B2-01` · **Depends on:** D-020, D-033, D-035
+
+**The contradiction this resolves.** The financing value of a deferred outlay (D-033 (b)) and the capital component of carrying cost (D-035) are **the same economic quantity.** Cost of capital *is* the financing cost of tied-up money. Prior analysis treated them as independent; claiming both counts the financing twice.
+
+**The identity is exact, not approximate.** Deferring an outlay of value `V` by `D` days has financing value `V × r × D/365`. Over any window `W ⊇ D`, that same deferral lowers average inventory value by `V × D/W`, whose capital cost over `W` is `(V × D/W) × r × W/365` — **the same product.** Two framings of one quantity.
+
+**Decision.**
+
+> **The financing effect is claimed exactly once, through the channel determined by the intervention's own recurrence — never both, and never summed.**
+
+```
+LEVEL-CHANGE intervention (defer, cancel)
+    → ONE-TIME financing value over the deferral window
+    → no recurring carrying claim, because no policy changed
+
+POLICY-CHANGE intervention (order quantity, reorder point, safety stock)
+    → RECURRING capital component of carrying cost over the annualisation window
+    → the one-time step-down is a POSITION CHANGE, NOT A SAVING (D-033)
+```
+
+⚠ **This corrects Block 2's own characterisation.** Block 2 recorded `B2-01` as *"a genuine choice between two valid channels."* On derivation it is **not a choice** — it is determined by the intervention type, and the two framings converge on the same number. The rule is therefore a derivation from locked material rather than a preference, which is a stronger result and a narrower one.
+
+**What makes it structurally safe.** The one-time step-down of a policy change is already excluded by D-033, so a policy change **cannot** also claim a deferral value for the transition. And a pure deferral changes no policy, so it **cannot** claim a recurring carrying reduction. The two channels are mutually exclusive **by construction**, not by discipline — the same reasoning as D-025.
+
+**Requires.** `F-22` — an **effective-dated** cost-of-funds rate. A single scalar across a volatile twelve months is itself false precision. Absent it, the financing component is `INSUFFICIENT_DATA` in **both** channels.
+
+---
+
+## D-037 — Safety stock: prospective indication, retrospective realization
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** saving taxonomy, F9 · **Closes:** `DP-13` · **Uses:** D-019, D-011 unchanged
+
+**Decision.** A backtest of the observed inventory floor supports a **prospective indication** and **never a prospective currency claim.** The saving becomes measurable only **retrospectively**, after the reduction is made and observed.
+
+**The three claims, precisely separated.**
+
+```
+CAN CLAIM     "On-hand for item X never fell below L in the observed window."
+              ACTUAL. Available from the ledger. No claim about sufficiency.
+
+CAN CLAIM     "...and no recorded intervention explains that floor."
+              Stronger. Still absence of evidence of insufficiency.
+
+CANNOT CLAIM  "L would have been sufficient."
+              Requires ruling out interferences that are structurally
+              unobservable in Release 1.
+```
+
+**The full interference set, and its observability.**
+
+| Interference | Observable in Release 1? |
+|---|---|
+| Expedites / emergency purchases | **Only via Mechanism 01's capture** (`F-01`, `F-06`) — so `F-01` gates this decision too |
+| Manual order overrides | Only with override history (`F-36`) |
+| Supplier escalation | **Usually unrecorded** (`F-35`) |
+| Substitution | Needs `F-27` — likely unavailable |
+| Production rescheduling | **No — out of scope (D-007)** |
+| **Demand suppression** | **Structurally unrecordable.** No record exists of an order never placed |
+| **Missing orders** | Detectable only if planned-vs-actual ordering is reconstructable |
+| Managed demand | Invisible — a good planner's success erases the evidence of how close it came |
+
+⚠ **The floor is not neutral in either direction.** Prior analysis listed only interferences that propped the floor **up**. The opposite case exists: a planner **misses a reorder**, stock runs unusually low, demand happens to be quiet, no stockout occurs. **Backtesting to that floor sets the target at a level reached by mistake and validated by luck.**
+
+**The resolution, and why it is a good one.** If safety stock is reduced and twelve months later there are no stockouts and no recorded interventions, that is **observed evidence, not a model.** The claim that cannot be made prospectively can be **verified retrospectively.** This maps exactly onto structures already locked — D-019's ladder (`OPPORTUNITY DETECTED` without currency) and D-011's realization discipline (baseline captured at `APPROVED`, measured afterwards). **No new machinery.**
+
+**When evidence is insufficient**, the system states the level reached and **names what could not be ruled out** — a specific list, never a hedge.
+
+**Rejected.** Statistical service-level modelling — unfalsifiable, and it requires exactly the assumed probabilities D-017 and D-023 forbid. Naive backtesting — already rejected.
+
+**Open, not assumed.** `B2-02` — for items whose demand is **failure-driven or externally fixed**, production cannot be resequenced around them and demand cannot be quietly suppressed, so the two fatal blind spots shrink materially. Whether such a class exists in this factory is an `EVIDENCE GAP`. The carve-out is recorded as a **question**, not applied as an assumption.
+
+---
+
+## D-038 — Mechanism 03: Quantity & Inventory Economics, and its four subtypes
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** saving taxonomy · **Applies:** D-030 · **Closes:** the "future quantity / inventory mechanism" referenced by D-032
+
+**Decision.** Part 2.3's mechanism is:
+
+> **Mechanism 03 — Quantity & Inventory Economics** identifies a defensible opportunity where a **change to the quantity, timing or frequency of purchase, or to the inventory level held**, produces a defensible economic consequence at unchanged material requirement.
+
+**It is one mechanism with four subtypes, not four mechanisms.** The reason is structural, not aesthetic: **D-020 deduplicates at the economic-mechanism level.** Subtypes A, B and C all lower average inventory and would all claim the capital component; as separate mechanisms, the same money could be claimed twice with nothing structurally preventing it. As subtypes of one mechanism sharing **one quantification base**, the double count is impossible by construction.
+
+| | Subtype | Intervention | Position effect | Recurrence |
+|---|---|---|---|---|
+| **A** | **Order policy** | Change order quantity / frequency | **Lowers the peak. Trough unchanged** | Recurring |
+| **B** | **Buffer policy** | Change reorder point / safety stock | **Lowers the trough** | Recurring |
+| **C** | **Position correction** | Defer · cancel · dispose | One-off level change | One-time |
+| **D** | **Quantity–price coupling** | MOQ · price breaks · volume commitments | Either | **Composes with Mechanism 02** |
+
+**The peak/trough separation is the load-bearing result** and is locked as D-039.
+
+**Boundary — what is *in*.** Order quantity · order frequency · lot and batch sizing · temporal consolidation (D-032's redistribution lands here) · reorder point · safety stock · excess-stock position correction · dead-stock disposal · MOQ · price breaks and volume commitments *(quantity side only)*.
+
+**Boundary — what is *not* a mechanism and must never become a category.**
+
+| | Why not |
+|---|---|
+| **Lead time · lead-time variability · demand variability · annual volume · unit cost** | **Inputs**, not opportunities. Never a finding of their own |
+| **Ordering cost · carrying cost** | **Cost components** (`F-31`, `F-08`), consumed by the calculation. Not findings |
+| **Service level** | A **policy parameter** the factory sets (`N-11`, `P-06`). We never invent one, and we never derive a saving from one |
+| **Stockout risk** | **`EXPOSURE / RISK`** (D-034). Never an Opportunity, never valued |
+| **Slow-moving stock** | **Retired** (D-034). A detection signal only |
+| **Supplier minimums** | A **constraint** on the counterfactual, not an opportunity. Becomes one only when an alternative is evidenced |
+| **Supplier consolidation** | **Mechanism 02** (D-032). Same quantity, fewer suppliers |
+| **Shipment consolidation** | **Unowned future-domain gap** (D-032). Logistics cost, not quantity economics |
+| **Dead stock** | A **state**, not an intervention. The intervention is disposal — subtype C(f) |
+
+**Rejected.** *One flat "inventory optimisation" mechanism* — the four subtypes have different evidence bars, and merging them would let subtype A's defensible claims inherit subtype B's unreachable ones. *Four separate mechanisms* — breaks D-020's structural dedup, as above.
+
+### ⚠ Two findings that shape the mechanism
+
+**1. Mechanism 03 has two products, not one.** It produces Opportunities **and** an **inventory cost model** consumed by other mechanisms. Mechanism 01's reorder-point fix and Mechanism 02's price-break case both need an incremental carrying cost to net under D-014 rule 6, and that number comes from here. **Mechanism 03 is therefore load-bearing for M01 and M02 even where it produces no Opportunity of its own** — and the reverse also holds: an intervention that *raises* safety stock to avoid expedites is a **Mechanism 01 Opportunity consuming Mechanism 03's cost model**, not a Mechanism 03 finding.
+
+**2. It is the first mechanism whose subtypes can contradict each other.** Temporal consolidation (fewer, larger orders) and order-quantity reduction (smaller, more frequent) oppose on the same dimension for the same subject. M01 and M02 had no such property. **D-029 handles it unchanged**, but the mechanism must run contradiction detection **over its own outputs** before presenting them — a requirement no previous mechanism had.
+
+---
+
+## D-039 — Quantification is a counterfactual replay; peak and trough are separate claims
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F9, Mechanism 03 · **Applies:** D-027, D-037 · **Depends on:** D-001 point-in-time reconstruction
+
+**Decision — one method for all subtypes.**
+
+> **The inventory position path under the counterfactual is obtained by replaying the recorded issue events against the counterfactual ordering policy. It is never obtained from a formula.**
+
+`Q/2`, average-inventory approximations and service-level models are **forbidden**: each assumes smooth depletion and instantaneous replenishment, which is exactly the invented-constant failure D-017 and D-027 exist to prevent. The replay is a **backtest over recorded events**, which is what D-027 requires.
+
+**This is why D-001's point-in-time reconstruction had to be locked.** Without it there is no observed position path to replay against.
+
+### The separation that makes subtype A defensible
+
+Under a reorder-point policy, the two parameters act on **different parts of the position path**:
+
+```
+trough  =  reorder point  −  demand during lead time      ← set by the BUFFER
+peak    =  trough  +  order quantity                       ← set by ORDER QUANTITY
+```
+
+> **Order quantity moves the peak. The reorder point moves the trough.**
+
+**Binding consequence.**
+
+| | Claim | Evidence bar |
+|---|---|---|
+| **A counterfactual path that never falls below the observed floor** | Makes **no claim about stockout sufficiency** | Quantifiable — D-037's bar does not apply |
+| **A counterfactual path that lowers the floor** | Claims the lower level would have sufficed | **Inherits D-037 in full. Prospective indication only** |
+
+**This gives Mechanism 03 a defensible first slice for the same reason D-015 gave Mechanism 01 one:** subtype A's counterfactual is testable entirely inside recorded data.
+
+**Required gate.** The counterfactual order quantity must be **at least the maximum observed lead-time demand over the window**. Below that the item would reorder again before the first order arrives, the trough falls, and D-037 applies after all. Not a threshold we invent — it is read from recorded lead times and issues.
+
+### ⚠ The offset a naive model hides
+
+Reducing order quantity **increases the number of replenishment cycles**, and therefore the number of occasions on which the item is exposed to lead-time variability — **even at an unchanged reorder point.** The trough is unchanged; the frequency of approaching it is not.
+
+**This is disclosed as `DEEPENS` on the stockout exposure (D-031), qualitatively.** No probability, no expected-stockout count, no severity score — those would require exactly the invented probability D-017 forbids. **Direction is stated; magnitude is not.**
+
+---
+
+## D-040 — EOQ may generate a hypothesis; it may never generate a number
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** C6, Mechanism 03 · **Closes:** `P-08` · **Confirms:** build plan U-16
+
+**Decision.** Classical EOQ is **not a saving method in this product**, in any release. It may at most **propose a candidate order quantity** for evaluation by D-039's replay. **The saving figure always comes from the replay, never from the formula.**
+
+**Assumption-by-assumption test.**
+
+| EOQ assumption | Observable? | Verdict |
+|---|---|---|
+| Stable, known, continuous demand | Consumption is observed (D-010); **stability is falsifiable from history, never confirmable** | Testable, usually violated |
+| **Known ordering cost `S`** | `F-31` — unknown; **no invented default** (D-032, by analogy with D-023) | **BLOCKS** |
+| **Known holding cost `H`** | `F-08` — and D-035 proves a *whole* rate is invalid, so `H` must be built component-wise | **BLOCKS** |
+| Constant lead time | Measurable order-date → receipt-date | Falsifiable, usually violated |
+| **No shortages permitted** | — | ⚠ **Structurally inconsistent with safety stock existing at all.** EOQ and safety stock are two models bolted together, not one theory |
+| No quantity discounts | `F-26` price breaks | Violated wherever breaks exist — the EOQ answer is then simply wrong |
+| Instantaneous replenishment | Violated for every import | Affects the position path directly |
+| Fixed unit cost | Violated — EGP depreciation and supplier increases (`F-39`) | Violated |
+| No capacity constraint | `F-33` | Unknown |
+
+**Two independent grounds for refusal.** Its two required inputs are precisely the two the project has already forbidden inventing. And it is a **prescriptive optimiser** where D-027 requires an **event-level counterfactual**: *"the optimum is 437 units"* is a model output, not evidence about what happened.
+
+### ⚠ EOQ's own mathematics argues against small quantity claims
+
+The total-cost curve is **flat near the optimum** — a substantial deviation from `Q*` changes total relevant cost only slightly. That is a property of the formula, not a factory fact, and it cuts one way:
+
+> **Small quantity changes produce savings inside the noise of the inputs.** A materiality gate is therefore required before any subtype A claim is presented.
+
+**The gate's threshold is not invented here.** It is a finance-owned materiality question, recorded as `B3-03`. Stating the property is not the same as choosing a number.
+
+**Rejected.** *EOQ with assumed `S` and `H`* — produces a large, confident, indefensible number faster than any honest method, which is exactly the failure D-027 was elevated to prevent. *EOQ as a "direction indicator" only* — still needs both blocked inputs to point anywhere.
+
+---
+
+## D-041 — The net figure declares its own incompleteness
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F9, all mechanisms · **Extends:** D-002, D-012, D-031
+
+**Decision.** Every Opportunity presents three **separately-typed** components:
+
+```
+BENEFIT                measurable, evidenced
+CERTAIN COST / OFFSET  netted (D-014 rule 6)
+EXPOSURE / RISK        disclosed, never netted (D-031)
+```
+
+> **Where an exposure exists and cannot be valued, the net figure must itself declare that it excludes an unvalued risk — and that the exclusion is always in the optimistic direction.**
+
+**Why the last clause is the whole rule.** Linking the exposure is not sufficient. A reader can see `benefit − cost = net` and take the net at face value while the linked risk sits elsewhere on the page. **The number itself must carry its own incompleteness**, and its **direction**: what is excluded is always a cost or a risk, so the net is optimistic, never pessimistic.
+
+**Why it matters most here.** Every subtype A and B claim is a quantified benefit standing beside an **unvaluable** stockout exposure (D-034). Without this rule the presentation is **structurally biased toward cutting inventory** — the single most dangerous failure mode available to a mechanism of this kind.
+
+**No new machinery.** It is the same discipline as D-002's basis: **a number that carries what is wrong with it.**
+
+**Rejected.** *Present the risk beside the number* — proximity is not a property of the number. *Suppress the number where risk is unvalued* — discards defensible benefit.
+
+**Hidden assumption surfaced.** That readers integrate adjacent information. **They read the number.**

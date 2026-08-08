@@ -16,7 +16,7 @@
 | B-02 | What is the MVP boundary? | **Inventory + procurement + cost.** No production, maintenance, full quality, BoMs or MRP | `ANSWERED` → D-007 |
 | B-03 | Discrete, process/batch, or mixed manufacturing? | **Mixed.** Item behaviour is per item, not per system | `ANSWERED` → D-009 |
 | B-04 | Single site, multi-site, or multi-tenant? | **Single site**, records still site-scoped | `ANSWERED` → D-004 |
-| B-05 | Is inventory truth an append-only movement ledger? | F2 — the foundation of traceability and §38 data trust | `PROPOSED` — yes → D-001 |
+| B-05 | Is inventory truth an append-only movement ledger? | **Yes.** F2 — the foundation of traceability and §38 data trust | **`LOCKED` 2026-08-08 → D-001 (amended)** |
 | B-06 | Does this system own valuation, or feed an existing finance system? | **Finance owns valuation.** This system owns quantity truth | `ANSWERED` → D-008 |
 | B-07 | Is there a real pilot factory, and does it have usable historical data? | Determines whether reorder-point planning can function at go-live — see N-06 | `OPEN` |
 
@@ -60,7 +60,7 @@
 | P-05 | What data must come from integrations? | `OPEN` |
 | P-06 | How is safety stock calculated? | `OPEN` |
 | P-07 | How is demand uncertainty represented? | `OPEN` |
-| P-08 | When is EOQ appropriate — and when is it misleading? | `OPEN` — see C6; treat with suspicion |
+| P-08 | When is EOQ appropriate — and when is it misleading? | **`CLOSED` 2026-08-08 → D-040.** **Never** as a source of a saving figure. It requires exactly the two inputs the project forbids inventing (`F-31`, `F-08`), its *no shortages* assumption is structurally inconsistent with safety stock existing, and it is a **prescriptive optimiser** where D-027 requires an **event-level counterfactual**. It may at most **propose a candidate quantity** for evaluation by the replay |
 | P-09 | How is supplier reliability calculated? | `OPEN` — depends on A-12 |
 | P-10 | Which financial metrics are authoritative? | `OPEN` |
 | P-11 | Which AI capabilities are safe to introduce? | `OPEN` — depends on F4 |
@@ -86,7 +86,7 @@ Full context in `docs/domain/02-first-release-scope.md`.
 | N-08 | Minimum consumption history before annualisation is permitted? | Every annualised figure | `ANSWERED` — locked rule 11: 12 months usable history preferred minimum; below that, never a silent confident annual number |
 | N-09 | Cost reference staleness threshold? | `STALE_DATA` transitions across all financial figures | `OPEN` |
 | N-10 | What is the carrying-cost rate, and does finance own it? | Most of the recurring saving taxonomy | `POLICY LOCKED` → D-023 (finance-owned, no defaults). **Value still `REQUIRES_FACTORY_DATA`** (= `F-08`) |
-| N-11 | Target service level for safety stock? | Safety-stock opportunities (4.7) | `OPEN` |
+| N-11 | Target service level for safety stock? | Safety-stock opportunities (4.7) | `OPEN` — **constrained 2026-08-08 by D-037 / D-040:** a service level is a **policy the factory states**, never a parameter we fit. **No statistical service-level model may be built**, and no saving may be derived from one |
 | N-12 | Who owns and approves saving opportunities? | The opportunity lifecycle | `OPEN` |
 | N-13 | Does an *intervention* need its own owner, distinct from the opportunity owner? | Raised by D-018's workflow capture — the classifier, the approver and the fixer may be three people | `OPEN` |
 
@@ -149,8 +149,22 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | F-28 | Are **volume rebates and annual-volume agreements** recorded, with thresholds and achievement to date? | Cases 2–3 of the DP-09 boundary test cannot be classified without it |
 | F-29 | Can the factory distinguish a **crystallised** cost from an **open** exposure in its own records? | W-33 option D |
 | F-30 | Do volume agreements carry **penalty or shortfall clauses**, and are those terms recorded? | W-36 |
-| F-31 | Is **ordering cost** known, and does Finance own it? | W-35, temporal consolidation |
+| F-31 | Is **ordering cost** known, and does Finance own it? | **Gates Mechanism 03 subtype A entirely.** No default, by analogy with D-023 |
 | F-32 | Are shipments recorded such that multiple POs on one shipment are identifiable? | W-35, shipment consolidation |
+| **F-33** | **Is warehouse space constrained?** | **Decides whether the space component of carrying cost exists at all.** A manager knows this — it is a question, not a file |
+| F-34 | Are shelf lives recorded? | §4.2's shelf-life trigger into §4.3 |
+| F-35 | Are supplier escalations recorded in any form? | D-037 level-B evidence |
+| F-36 | Manual order override history | D-037 level-B evidence |
+| F-37 | Who owns master and transactional data quality? | The **Data Owner** field (D-011 as amended); `EVIDENCE GAP` ownership |
+| F-38 | Disposal cost and recovery value | §4.3's net |
+| **F-39** | **Expected price movement over a deferral window** | ⚠ **Deferral benefit can be negative.** Without it, §4.1's deferral is `INSUFFICIENT_DATA` — assuming zero is itself an invented assumption |
+| F-40 | Inventory taxes / duties on held stock | A carrying component (D-035) |
+| **F-41** | **Are partial receipts recorded as separate receipt events against the PO line?** | ⚠ **Without it Mechanism 03 subtype A computes from PO quantity and produces fictional findings** |
+| F-42 | Will suppliers **accept** smaller, more frequent orders — and is there a **minimum order value** as well as a minimum quantity? | Subtype A's intervention may be unavailable in practice |
+| **F-43** | **Does freight cost per shipment vary with order size, and is it borne by the factory?** | ⚠ Gates subtype A's net for imported items. **The offset belongs to the unowned logistics domain (D-032)** |
+| F-44 | Are **order multiples / pack sizes** recorded, distinct from MOQ? | `Q′` may not be freely chosen |
+
+`F-33` … `F-40` were raised by the DP-10 … DP-15 audit and the readiness audit but were never carried into this register. **Corrected 2026-08-08.** `F-41` … `F-44` are new from Part 2.3.
 
 ### Modelling questions raised by the lock — need confirmation before Part 2.2
 
@@ -163,11 +177,20 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | ~~Q-05~~ | Promote four-way change decomposition to foundation F10? | **`LOCKED` → D-028 (accepted as A′).** F10 is a **capture contract**, not an engine. Capture locked now; calculation deferred |
 | **Q-08** | **When does the F10 capture contract become a decomposition *engine*?** | **`DEFERRED` by D-028.** Requires at least a second mechanism to validate the abstraction. Not a blocker |
 | Q-06 | Does a lead-time correction create other costs not yet modelled? | Unknown; test during the vertical slice |
-| Q-07 | Categories 4.1–4.7 of the saving model predate D-017 and still describe weighted/threshold calculations | Re-express each as *intervention + counterfactual* before specification |
+| ~~Q-07~~ | Categories 4.1–4.7 of the saving model predate D-017 and still describe weighted/threshold calculations | **`CLOSED` 2026-08-08.** §4.1, §4.2, §4.3, §4.6, §4.7 and §4.9 re-expressed as *intervention + counterfactual* (D-033 … D-039). §4.4 superseded by Mechanism 02; §4.5 retired by D-032. Superseded formulas retained as history |
+
+### Decisions authorised by Block 1 and not yet taken — none blocks architecture
+
+| ID | Decision to be taken | Status |
+|---|---|---|
+| **Q-09** | **Commercial-document immutability.** Mechanism 02 rests on PO lines, quotations, contracts and price changes; none are stock movements, and D-001 correctly never claimed document scope. U-12 already requires post-send changes as history, but **no decision states it** | `OPEN` — **required before Mechanism 02 is built.** Does not block architecture |
+| **Q-10** | **In-transit ownership.** `In Transit` exists as a bucket; nothing says *whose stock is in it*. Under EXW/FOB it is ours and belongs in the ledger; under DDP it is the supplier's and is `Incoming` under F3 — **not a movement at all**. The same shipment is either a ledger entry or not, depending on the incoterm | `OPEN` — gated by `F-15` |
+| **Q-11** | **Source-record drift.** D-001 requires a source document; it says nothing about the source **changing or being deleted** after import. The ledger stays immutable; its evidence does not | `OPEN` — interacts with import architecture (`A-19`) |
+| **Q-12** | **Basis semantics.** Five D-002 gaps, better resolved as one decision than five patches: the `ESTIMATED`/`ASSUMED` boundary · a basis for **imported-unverified** and **third-party-asserted** data (a declined quotation is Mechanism 02's whole counterfactual — what basis does a counterparty's claim carry?) · source conflict resolution · `STALE_DATA` scope · whether inputs carry their own `as_of` | `OPEN` — refines D-002; no calculation depends on it |
 
 **All shared-structure questions are now locked** — Q-03 → D-025, Q-04 → D-026, Q-05 → D-028. **Nothing in the design blocks Part 2.2.**
 
-Remaining: factual questions (`F-01` … `F-10`, `REQUIRES_FACTORY_DATA`) and two deliberate deferrals — `Q-07` (re-express saving-model categories 4.1–4.7 under D-027) and `Q-08` (the decomposition engine, awaiting a second mechanism).
+**Updated 2026-08-08.** `Q-07` is **closed** — the taxonomy is re-expressed. Remaining: the factual questions (`F-01` … `F-44`, `REQUIRES_FACTORY_DATA`), one deliberate deferral — `Q-08`, the decomposition engine, which now has its **second and third mechanisms** and could be revisited — and the four decisions Block 1 authorised, `Q-09` … `Q-12`, **none of which blocks architecture.**
 
 ---
 
@@ -177,8 +200,9 @@ Remaining: factual questions (`F-01` … `F-10`, `REQUIRES_FACTORY_DATA`) and tw
 |---|---|
 | **Shipment consolidation** | Real economic effect — freight cost reduced by combining shipments. **Owned by no mechanism.** Mechanism 01 measures the *premium paid to compress time*; this measures *fixed-cost amortisation* — a different mechanism. **Not created** (D-032): gated by `F-01` anyway, materiality unmeasured. **Preserved, not deleted.** Revisit when `F-01` is answered |
 | **Logistics-cost domain** | D-030's boundary separates *price* from *quantity* and does so correctly. Shipment consolidation revealed a **third economic domain** the boundary was never written to address. Not a defect in D-030; recorded so it is not rediscovered as a bug |
-| **Disposal economics** | **New, from the Q-07 audit.** Recovery value and disposal cost — required by 4.3, owned by no mechanism, unavailable |
-| **Time value of deferred outlay** | **New, from the Q-07 audit.** 4.1's real financial benefit is the financing cost over the deferral period (`F-22`), not the principal. No mechanism claims it |
+| ~~Disposal economics~~ | **`OWNED` 2026-08-08 → Mechanism 03 subtype C(f)** (D-033, D-035). Recovery value and disposal cost are one-time and require `F-38`. ⚠ **Disposal does not release capital** — the carrying avoided may be near zero. Only the **tax effect** remains unowned (`B2-03`) |
+| ~~Time value of deferred outlay~~ | **`OWNED` 2026-08-08 → Mechanism 03 subtype C(b)** (D-033, D-036). It is the **single financing channel** for level-change interventions, requires `F-22`, needs `F-39`, and **may be negative** |
+| **Logistics cost — freight per shipment** | ⚠ **Escalated 2026-08-08.** Previously "acknowledged, unowned"; it is now a **required offset** for Mechanism 03 subtype A on imported items, so the gap **blocks a currency claim** rather than merely existing. Recorded as `B3-02`. **Still not built** — creating a mechanism for an effect of unknown size is challenge D1's breadth risk |
 
 ---
 
@@ -186,71 +210,60 @@ Remaining: factual questions (`F-01` … `F-10`, `REQUIRES_FACTORY_DATA`) and tw
 
 | Requirement | Status | Detail |
 |---|---|---|
-| **Orders & Supply Movement** | `TRACKED REQUIREMENT` — recorded 2026-08-07. **Not a saving mechanism**; classified `ENABLER`. No workshop, no model, no decisions, no build-plan unit. Not blocking anything | `docs/domain/06-orders-and-supply-movement-REQUIREMENT.md` |
+| **Orders & Supply Movement** | `TRACKED REQUIREMENT` — recorded 2026-08-07. **Not a saving mechanism**; classified `ENABLER`. No workshop, no model, no decisions, no build-plan unit. **Classification re-tested and unchanged 2026-08-08.** ⚠ **It is now evidentially load-bearing:** Mechanism 03's position path is computed from **receipt** events including **partials** (`F-41`), and without them subtype A produces fictional findings | `docs/domain/06-orders-and-supply-movement-REQUIREMENT.md` |
 
 ---
 
-## Q-07 audit — decision points awaiting review (2026-08-07)
+## DP-10 … DP-15 — **ALL CLOSED 2026-08-08**
 
-Full analysis in `docs/domain/10-Q07-saving-model-reconciliation.md`. **Nothing rewritten, nothing locked.**
+Workshopped in `10-Q07-saving-model-reconciliation.md`, adversarially tested in `11-…`, reconciled in `12-…`, re-opened adversarially in `16-BLOCK2-…`, and locked in `17-part-2.3-LOCK.md`.
 
-| ID | Decision | Status |
+| ID | Decision | Closed as |
 |---|---|---|
-**Adversarially tested 2026-08-07** → `docs/domain/11-DP10-DP15-adversarial-decision-report.md`. **Nothing locked.**
+| ~~DP-10~~ | Capital release | **D-033.** Six interventions. One-time = level change, recurring = policy change. Principal is never a saving. ⚠ **Excess with no pending order produces no Opportunity** — nothing to defer. Deferral needs `F-39` and may be **negative** |
+| ~~DP-11~~ | Retire 4.2 | **D-034.** Retired as a saving category; preserved as a detection signal, a shelf-life trigger into §4.3, and an exposure |
+| ~~DP-12~~ | Reclassify 4.9 | **D-034.** `EXPOSURE / RISK`. **No new class.** ⚠ Exposure and expedite counts are **not additive** |
+| ~~DP-13~~ | Backtested safety stock | **D-037.** Prospective indication, retrospective realization. ⚠ The observed floor may **enshrine a lucky error**. Gated by `F-01` |
+| ~~DP-14~~ | Ownership | **D-011 amendment.** Finding · Action · Data. Adjudicator stays a **reviewer**; mechanism owner is not factory-facing |
+| ~~DP-15~~ | Carrying cost | **D-035.** Component-wise. ⚠ **A whole finance rate is almost certainly *invalid*, not merely imprecise** — it nets `EXPOSURE` into a saving. Disposal does not free capital |
 
-| ID | Decision | Verdict |
-|---|---|---|
-| **DP-10** | Capital release | **Structure ready to lock.** Outflow is *delayed, never avoided* for excess; benefit is **one-time, not recurring**; principal is a **position, not a release**. Values need `F-22`/`F-08` |
-| **DP-11** | Retire 4.2 | **Ready to lock.** Four attempts to find an independent mechanism; three failed. The fourth — **slow relative to shelf life** — is a genuine `EXPOSURE / RISK`, not a saving |
-| **DP-12** | Reclassify 4.9 | **Ready to lock.** Two findings recorded: historical stockout events are **operational data, not findings**; and D-031 lacks a **`MITIGATES`** type |
-| **DP-13** | Backtested safety stock | **Approach survives; the claim does not.** Supports *"no recorded intervention explains the floor"* — absence of evidence of insufficiency, **not** evidence of sufficiency. **Gated by `F-01`** |
-| **DP-14** | Ownership | **Structure ready.** Three roles — finding · action · data. ⚠ **D-011's single `Owner` field must split** |
-| **DP-15** | Carrying cost | **Principle ready.** The marginal-vs-average framing is wrong — the question is **which components apply**. ⚠ **Disposal does not free capital**, so 4.3 may be far smaller than it appears |
+### Category verdicts — **all applied 2026-08-08**
 
-### Category verdicts
-
-| Category | Verdict |
+| Category | Applied |
 |---|---|
-| 4.1 excess stock | Rewrite. **Capital release is a cash-flow timing effect, not a benefit of its principal** |
-| 4.2 slow-moving | **Retire as a category** — no independent intervention; detection signal only |
-| 4.3 dead stock | Rewrite. Exclusion principle survives; **average-rate-on-marginal-decision** problem |
-| 4.6 MOQ | Rewrite. Composes with M02 **in the opposite direction** |
-| 4.7 safety stock | Rewrite. **Backtested form is materially stronger than modelled** |
-| 4.9 stockout | **Reclassify** as `EXPOSURE / RISK` — conclusion survives, home changes |
-
-### New factory-data dependencies
-
-Disposal cost · recovery value · marginal vs average storage cost basis · requirement-at-order-time · price impact of MOQ reduction · `A-18` coverage policy (blocks 4.1 and 4.3).
-
-**Added by the adversarial report:** **is warehouse space constrained?** · what purpose was finance's carrying rate built for? · are shelf lives recorded? · are supplier escalations recorded in any form? · manual override history · who owns data quality?
-
-### Final reconciliation delivered 2026-08-07 — `docs/domain/12-final-reconciliation-monetary-boundaries.md`
-
-**Nothing locked.** Eight issues tested; classification at the end of that report.
-
-| Ready to lock | Requires architectural decision |
-|---|---|
-| DP-10 six intervention types · DP-13 three-claim structure · DP-14 owner roles · `MITIGATES` (disclosure-only) · asymmetric-valuation rule · DP-15 component principle · rate-fitness principle · O&SM map | **D-011** `Owner` must split · **D-014 rule 10** add *purpose* · **D-031** add `MITIGATES` · **D-023** extend to *never misapply* |
-
-**Key results:**
-
-- **One-time benefits come from changing a stock *level*; recurring benefits come from changing a *policy*.** The unifying rule across all six interventions
-- **Cancel collapses into delay** unless the quantity will never be consumed — in which case it is dead stock, not excess
-- ⚠ **In a devaluing currency, deferring a purchase may cost more.** Deferral benefit can be **negative** — Egypt-specific and not previously considered
-- **Reorder point decomposes** into lead-time demand (M01's lever) + safety stock (4.7's lever), so the two **compose** at component level rather than automatically contradicting
-- **4.7 is a prospective *indication*, never a prospective currency claim** — the saving is verifiable only retrospectively
-- ⚠ **A carrying rate containing obsolescence is not usable as supplied** — it smuggles a risk into a cost, which D-031 forbids netting
-- **The operating chain is broken at *Actual Outcome*** in Release 1 — production-side verification is impossible (D-007)
+| 4.1 excess stock | **Rewritten** → D-033. Capital release is cash-flow timing, never a benefit of its principal |
+| 4.2 slow-moving | **Retired** → D-034 |
+| 4.3 dead stock | **Rewritten** → D-033 (f), D-035. Disposal does not release capital |
+| 4.6 MOQ | **Reshaped** → D-038 subtype D. ⚠ As written it had **no intervention** — an Opportunity only where an alternative is evidenced |
+| 4.7 safety stock | **Rewritten** → D-037, D-039 |
+| 4.9 stockout | **Reclassified** → D-034 |
 
 ---
 
-### Candidate cross-cutting rules raised (not locked)
+## Block 2 questions — resolved or open
 
-| Candidate | Note |
+| ID | Question | Status |
+|---|---|---|
+| ~~B2-01~~ | Which channel claims the financing effect — deferral, or capital-in-carrying-cost? | **`CLOSED` → D-036.** ⚠ **Not a choice.** They are the same product over different windows; the intervention's recurrence determines which applies. Never both, never summed |
+| **B2-02** | Does a class of items exist whose demand **cannot be rescheduled or suppressed** (maintenance spares, failure-driven demand), narrowing D-037's blind spots? | `OPEN` — `REQUIRES_FACTORY_DATA`. Recorded as a **question**, never applied as an assumption |
+| **B2-03** | Does the disposal **tax effect** belong to finance entirely (D-008), or is it disclosable here? | `OPEN` — not claimed either way |
+| **B2-04** | Where is *"excess without pending orders"* reported, given it is a **position and not an Opportunity**? | `OPEN` — a presentation question, not a monetary one |
+
+## Block 3 / Part 2.3 questions
+
+| ID | Question | Status |
+|---|---|---|
+| **B3-01** | Within subtype A, **temporal consolidation and order-quantity reduction contradict each other.** Which is right depends on the sign of `ordering cost + freight − carrying` | `OPEN` — resolvable only with `F-31`, `F-08` and `F-43`. Until then **both are `OPPORTUNITY DETECTED` without currency**, presented as an open question to the factory, never silently resolved |
+| **B3-02** | **Freight per shipment is owned by no mechanism** (D-032's preserved logistics gap). It is now a required offset for subtype A on imported items | `OPEN` — ⚠ **the gap now blocks a currency claim** rather than merely being acknowledged |
+| **B3-03** | **Materiality gate for quantity changes.** EOQ's cost curve is flat near the optimum, so small quantity changes produce savings inside the noise of the inputs | `OPEN` — the threshold is **finance-owned**, never chosen here. Stating the property is not the same as picking a number |
+
+### Cross-cutting rules raised earlier — **now locked**
+
+| Candidate | Locked as |
 |---|---|
-| **A financial rate must be fit for the decision it is used in** | Extends D-023 beyond *never invent* to *never misapply*. A finance-owned average can be authoritative and still be the wrong instrument |
-| **Asymmetric valuation must be presented, not hidden** | A quantified benefit beside an unvaluable risk biases the decision structurally. Affects 4.7, 4.1 and any future mechanism trading certainty against risk |
-| **`MITIGATES`** relationship type | An Opportunity that *reduces* an exposure currently cannot say so. Would extend D-031 a second time |
+| A financial rate must be **fit for the decision** it is used in | **D-023 amendment** + **D-014 rule 10 `purpose`**. ⚠ Purpose must be **structured**, not free text — a mechanism cannot match against prose, and DP-15's obsolescence case demands **blocking**, not disclosure |
+| **Asymmetric valuation** must be presented, not hidden | **D-041.** The net figure declares its own incompleteness, and the exclusion is always optimistic |
+| **`MITIGATES`** relationship type | **D-031 second amendment.** Disclosure-only, never netted, no severity score |
 
 ---
 

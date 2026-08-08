@@ -99,6 +99,10 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 - Cost-bearing movements carry the F10 capture dimensions (U-01b).
 - On hand, reserved, available, incoming, projected are each computed per F3's definitions and never conflated.
 - Backdated movements produce correct balances at both effective and recorded time.
+- **A second movement bearing a source-system natural key already recorded is refused**, not accepted and corrected afterwards. (D-001 as amended)
+- **Go-live stock is seeded through `Opening Balance / Migration`**, which is structurally incapable of use by an operational event. No item shows a day-one `Adjustment`. (D-001 as amended)
+- **Point-in-time reconstruction:** the balance of any item at any past instant is derivable, and is verified by independent recomputation against a historical instant — not only against the present. **A maintained current balance alone fails this unit.** (D-001 as amended, D-039)
+- **A return is recorded as `stock → Supplier` with its own reason code**, never as a reversal. (D-001 as amended)
 
 ### U-08 · Lot and serial tracking `ENABLER`
 **Objective.** F7 per-item tracking.
@@ -148,7 +152,8 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 **Acceptance.** Items with insufficient history return `INSUFFICIENT_DATA`, never a fabricated average.
 
 ### U-16 · Reorder-point planning `CORE`
-**Boundary.** Reorder point / min–max on consumption history. **No MRP, no EOQ** — see P-08; EOQ's assumptions rarely hold and presenting it as an optimum when they fail violates §56-10.
+**Boundary.** Reorder point / min–max on consumption history. **No MRP, no EOQ.** `P-08` is now **closed by D-040**: EOQ requires exactly the two inputs the project forbids inventing (`F-31` ordering cost, `F-08` holding components), its *no shortages* assumption is structurally inconsistent with safety stock existing, and it is a prescriptive optimiser where D-027 requires an event-level counterfactual. It may at most **propose a candidate quantity**; it may never produce a figure.
+**Also forbidden here:** any statistical service-level or safety-stock model. `N-11` is a **policy the factory states**, never a parameter we fit. (D-037, D-040)
 **Depends on.** U-15. **Open:** N-06, P-06 (safety stock).
 **Acceptance.** Every planning output shows inputs, logic, assumptions, output, confidence and limitations (§30). A run is a reproducible stored snapshot — same inputs, same result, forever.
 
@@ -161,19 +166,27 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 - Baselines are captured at `APPROVED`, never reconstructed at `REALIZED`.
 - `REALIZED` is reachable only through observed measurement, never by assertion.
 - Rejections record a reason and are analysable by category.
+- **Three owner fields — Finding, Action, Data — not one.** Configurable; one person may hold several; an unowned finding is **visible, never hidden**. The adjudicator is a **reviewer**, modelled separately, and is never the Finding Owner. **Mechanism Owner is not a field on a finding.** (D-011 as amended)
+- **`CREATES`, `DEEPENS` and `MITIGATES` are three distinct relationship types**, none of them valued and none of them netted. (D-031 as amended twice)
+- **A net figure carrying an unvalued exposure states so on the number itself**, and states that the exclusion is optimistic. (D-041)
 
 > **Built in the vertical slice (D-013), not deferred to here.** Listed at U-17 for dependency clarity; proven far earlier against one material.
 
 ### U-18 · Saving opportunity detectors `CORE`
 **Objective.** The Circle 1 taxonomy of `docs/domain/03-saving-opportunity-model.md` §4.
 **Depends on.** U-14, U-15, U-16, U-17. **Open:** N-07, N-08, N-10, N-11, A-18.
-**Sequencing.** Start with **4.8 expedite/freight premium** — it measures money actually spent, needs no assumed carrying rate, and is the most defensible category to prove the mechanism with. Then price variance (4.4), then excess stock (4.1).
+**Sequencing.** Start with **Mechanism 01, expedite/freight premium** — it measures money actually spent, needs no assumed carrying rate, and is the most defensible category to prove the mechanism with. Then **Mechanism 02, Procurement Price Opportunity**. Then **Mechanism 03 subtype A** (order policy) — the only quantity-side claim whose counterfactual sits entirely inside recorded data.
+**⚠ Dependency neither Part 2.1 nor Part 2.2 recorded:** Mechanism 02's price-break case and Mechanism 01's buffer-increase case both need an **incremental carrying cost** to net under D-014 rule 6, and that comes from **Mechanism 03's cost model**. Mechanism 03 is load-bearing for both even where it produces no Opportunity of its own.
 **Acceptance.**
 - Each detector **refuses to produce a number** under its stated failure conditions, returning `INSUFFICIENT_DATA`.
-- Dead stock does **not** claim stock value as saving (§4.3).
-- Order consolidation nets the carrying-cost offset (§4.5).
-- Safety-stock opportunities show the risk created, not only the capital released (§4.7).
-- Stockout avoidance produces a **risk flag with no currency figure** (§4.9) — production impact is out of scope.
+- Dead stock does **not** claim stock value as saving, and **disposal does not release capital** (§4.3, D-035).
+- **§4.2 is not a detector.** It is a detection signal feeding §4.1 and §4.3 (D-034).
+- Safety-stock opportunities produce a **prospective indication with no currency**; realization is retrospective (§4.7, D-037).
+- Stockout produces an **`EXPOSURE / RISK` with no currency figure** (§4.9, D-034) — production impact is out of scope.
+- **Inventory position paths are replayed from recorded receipt and issue events.** No `Q/2`, no average-inventory formula, no EOQ, no service-level model. Computing from PO quantity rather than receipts is a defect (`F-41`, D-039).
+- **No whole carrying rate is ever used**; carrying cost is assembled component-wise, and a missing applicable component yields `INSUFFICIENT_DATA` (D-035).
+- **The financing effect is claimed exactly once** — a level change or a policy change, never both (D-036).
+- **Contradiction detection runs over Mechanism 03's own outputs**, not only across mechanisms (D-038).
 
 ### U-18b · Aggregation and the headline figure `CORE`
 **Objective.** D-012 — the North-Star number, computed honestly.
@@ -213,8 +226,11 @@ No production, BoMs, routings, work centres, capacity, MRP, maintenance, CAPA, i
 | Blocker | Blocks |
 |---|---|
 | A-19 stack | Everything |
-| A-20 permissions | U-02, and therefore anything protected |
-| A-01 projection strategy | U-07 — the core unit |
+| A-20 permissions | U-02, and therefore anything protected. **Three concrete requirements now exist**: adjudication authority (DP-07), the three owner roles (D-011 as amended), configurable role assignment |
+| A-01 projection strategy | U-07 — the core unit. ⚠ **Stakes raised by D-039**: the saving engine replays position paths over long historical windows, so an async projection must support **historical replay**, not merely eventual consistency |
+| **F-31 ordering cost** | **Mechanism 03 subtype A entirely.** No default, by analogy with D-023 |
+| **F-41 partial receipts** | Subtype A's position path. **Without it the detector computes from PO quantity and produces fictional findings** |
+| **F-43 freight per shipment** | Subtype A's net for imported items. **The offset belongs to the unowned logistics domain (D-032)** |
 | N-03 consumption capture | U-09 — very hard to backfill |
 | N-04 catch-weight | U-04, U-07 — ledger-shaping |
 | N-01 finance contract | U-14, U-18 — all financial impact |

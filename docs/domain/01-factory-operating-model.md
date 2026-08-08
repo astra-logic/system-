@@ -54,15 +54,23 @@ Consequences to settle now, not later:
 
 The Bible asks, in `OPEN-09`/`OPEN-10`, what the authoritative source of inventory truth is. This is the answer that everything else hangs from.
 
-`PROPOSED` **Inventory truth is an append-only ledger of movements. Balances are derived projections, never authored values.**
+`LOCKED` 2026-08-08 (D-001, amended) **Inventory truth is an append-only ledger of movements. Balances are derived projections, never authored values.**
 
 Concretely:
 
 - A **Movement** is immutable. Once recorded it is never edited or deleted.
 - Every movement is **double-entry**: it has a source bucket and a destination bucket, and the quantity leaving one equals the quantity entering the other. Stock is conserved by construction.
-- Buckets include real locations *and* **virtual counterparties**: `Supplier`, `Customer`, `Production`, `Scrap`, `Adjustment/Inventory Loss`, `In Transit`, `Quality Hold`.
+- Buckets include real locations *and* **virtual counterparties**: `Supplier`, `Customer`, `Production`, `Scrap`, `Adjustment/Inventory Loss`, `In Transit`, `Quality Hold`, **`Opening Balance / Migration`**.
 - A correction is a **new reversing movement**, never a mutation of history.
 - **No orphan movements.** Every movement cites a source document and a reason code.
+
+**Added by the D-001 amendment (2026-08-08).**
+
+- **`Opening Balance / Migration` is the counterparty for stock existing at go-live or at data migration.** It is **never used for operational events** and is segregated from `Adjustment` so that count-accuracy analytics — the trust metric for the whole system — are not polluted at birth.
+- **Point-in-time reconstruction is a required capability.** The balance of any item at any past instant is derivable from the ledger. A maintained current balance alone does not satisfy this foundation, and every backtest in the saving engine (D-039) depends on it.
+- **A return is a movement (stock → `Supplier`), not a reversal.** A reversal asserts that a recorded event was wrong; a return asserts that goods physically went back. Conflating them corrupts both receipt history and supplier-performance evidence.
+- **Duplicate ingestion is rejected**, not corrected afterwards. See the natural key below.
+- F5 period locking governs where a backdated correction may be posted.
 
 Why this and not a mutable "quantity on hand" column:
 
@@ -90,6 +98,8 @@ The cost is real and should be stated honestly: **balances must be maintained as
 | Reason code | Mandatory for anything not driven by a document |
 | Actor | Human or system |
 | Cost effect | Value impact of this movement (see F8) |
+| **Source-system natural key** | **Added 2026-08-08 (D-001 amendment).** The identity of the originating record, used to **reject duplicate ingestion**. Without it, a re-imported spreadsheet — the most likely operational event in the first months (`P-03`) — is silently accepted twice, and append-only then guarantees the *preservation* of corruption rather than protection from it |
+| **F10 capture dimensions** | **Added 2026-08-08 (D-001 amendment).** Original amount · currency · FX rate · rate date · quantity · unit basis · UoM · period boundary — **as applicable to the event, never invented where absent** (D-028). Required because D-028 was already locked above this foundation |
 
 ---
 
@@ -120,19 +130,30 @@ Two rules that follow, and must not be quietly broken later:
 
 §38 lists data states. For those to be real rather than decorative, provenance must be a **property carried by every derived value**, not a label a designer remembers to add.
 
-Every non-raw number in the system travels as:
+**Amended 2026-08-08 (D-002, `LOCKED`): every value the system asserts carries the envelope — not only derived values.** A raw value carries basis `ACTUAL` (observed) or `USER_DEFINED` (asserted), so that contagion has a defined floor. Without that floor, an aggregate mixing raw with derived has no weakest basis to compute — and every mechanism aggregates raw with derived.
+
+Every value in the system travels as:
 
 ```
 value          the number itself
 unit           kg, hours, currency, %, days
-basis          ACTUAL | CALCULATED | FORECAST | ESTIMATED |
-               ASSUMED | USER_DEFINED | INSUFFICIENT_DATA
-as_of          the moment it was true
+basis          ACTUAL | CALCULATED | FORECAST | ESTIMATED | ASSUMED |
+               USER_DEFINED | INSUFFICIENT_DATA | STALE_DATA
+as_of          the EFFECTIVE time of the value, per F5.
+               Recorded time is carried separately.
 inputs         what it was computed from (traceable references)
 assumptions    explicit, named, and overridable
 confidence     with a stated definition, not a vibe
 limitations    what would make this wrong
+purpose        FINANCIAL RATES ONLY (D-014 rule 10 as amended) — what the rate
+               was constructed for, stated by its owner, STRUCTURED not free text.
+               A mechanism declares the purpose it requires; mismatch BLOCKS
+               currency quantification and raises an EVIDENCE GAP.
 ```
+
+> ⚠ **`as_of` is the effective time, not the recorded time.** F5 establishes two timestamps; the envelope carries one. **Reproducibility is the point of provenance**, and an ambiguous timestamp defeats it.
+
+> ⚠ **What provenance does not do.** D-002 establishes **what a number is.** It does **not** establish whether using that number in a given calculation is **appropriate**. A correctly-labelled, authoritative, finance-owned rate may still be the wrong instrument for a decision — which is the failure DP-15 found, and which D-023 as amended now governs. **D-002 prevents mislabelling, not misuse.**
 
 Three consequences the team must accept up front:
 
@@ -369,7 +390,9 @@ Non-negotiable per §30: **every planning output must show inputs, logic, assump
 
 `PROPOSED` A planning run is a **stored, reproducible snapshot** — same inputs, same result, forever. Users must be able to ask "why did it say that last Tuesday?" and get an answer. Non-reproducible planning cannot be audited or trusted.
 
-`OPEN-15` Which methodologies at first release — reorder point, min/max, MRP, or all? These are different engines wearing similar words, and the Bible's `OPEN-13`/`14`/`15` (methodologies, EOQ, safety stock) all live here. **EOQ in particular should be treated with suspicion**: its assumptions (stable demand, known ordering cost, no price breaks) rarely hold in a real factory, and presenting it as an optimum when its assumptions fail is a §56-10 violation.
+`OPEN-15` Which methodologies at first release — reorder point, min/max, MRP, or all? These are different engines wearing similar words, and the Bible's `OPEN-13`/`14`/`15` (methodologies, EOQ, safety stock) all live here. **Answered 2026-08-08:** reorder point / min–max only, no MRP (D-010), and **no EOQ** (D-040).
+
+**On EOQ — the suspicion recorded here was correct, and the reason is sharper than "its assumptions rarely hold."** EOQ requires exactly the two inputs this project forbids inventing — ordering cost (`F-31`) and holding cost (`F-08`) — so it is blocked before its assumptions are even tested. Its *no shortages* assumption is **structurally inconsistent with safety stock existing at all**. And it is a **prescriptive optimiser** where D-027 requires an event-level counterfactual: *"the optimum is 437 units"* is a model output, not evidence about what happened. It may at most propose a candidate quantity for evaluation by Mechanism 03's replay; **it may never produce a figure.**
 
 ---
 

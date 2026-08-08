@@ -18,14 +18,23 @@
 | 6 | [`docs/domain/03-saving-opportunity-model.md`](docs/domain/03-saving-opportunity-model.md) | The saving taxonomy, calculation rules, and the guard on the headline figure. |
 | 7 | [`docs/domain/04-mechanism-01-expedite-premium.md`](docs/domain/04-mechanism-01-expedite-premium.md) | **Mechanism 01 — Part 2.1 locked.** Expedited freight / emergency purchase premium. |
 | 8 | [`docs/domain/09-part-2.2-LOCK.md`](docs/domain/09-part-2.2-LOCK.md) | **Mechanism 02 — Part 2.2 LOCKED.** Procurement Price Opportunity. |
-| 8b | [`docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md`](docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md) | Workshop record — superseded by the lock, retained as history. |
-| 9 | [`docs/domain/06-orders-and-supply-movement-REQUIREMENT.md`](docs/domain/06-orders-and-supply-movement-REQUIREMENT.md) | Tracked requirement — **not designed, not a saving mechanism.** |
-| 9b | [`docs/domain/07-decision-report-W33-W36-W35.md`](docs/domain/07-decision-report-W33-W36-W35.md) | Decision report — W-33, W-36, W-35. |
-| 9c | [`docs/domain/08-decision-report-D025-amendment-W35-W45.md`](docs/domain/08-decision-report-D025-amendment-W35-W45.md) | **Proposed D-025 amendment — NOT APPLIED.** Plus W-35 and W-45 analysis. |
-| 10 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
-| 11 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
-| 12 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
-| 13 | [`context/`](context/) | The six-file working context system (Bible §52). |
+| 9 | [`docs/domain/17-part-2.3-LOCK.md`](docs/domain/17-part-2.3-LOCK.md) | **Mechanism 03 — Part 2.3 LOCKED.** Quantity & Inventory Economics. |
+| 10 | [`docs/domain/06-orders-and-supply-movement-REQUIREMENT.md`](docs/domain/06-orders-and-supply-movement-REQUIREMENT.md) | Tracked requirement — **not designed, not a saving mechanism.** |
+| 11 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
+| 12 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
+| 13 | [`docs/decisions/decision-register.md`](docs/decisions/decision-register.md) | Decisions with rationale, rejected alternatives, and costs. |
+| 14 | [`context/`](context/) | The six-file working context system (Bible §52). |
+
+### Working record — retained, superseded by the locks above
+
+| Document | What it is |
+|---|---|
+| [`05-mechanism-02-purchase-price-WORKSHOP.md`](docs/domain/05-mechanism-02-purchase-price-WORKSHOP.md) | Mechanism 02 workshop. Superseded by doc 09, retained as history. |
+| [`07-decision-report-W33-W36-W35.md`](docs/domain/07-decision-report-W33-W36-W35.md) · [`08-decision-report-D025-amendment-W35-W45.md`](docs/domain/08-decision-report-D025-amendment-W35-W45.md) | D-025 amendment reports. |
+| [`10-Q07-saving-model-reconciliation.md`](docs/domain/10-Q07-saving-model-reconciliation.md) · [`11-DP10-DP15-adversarial-decision-report.md`](docs/domain/11-DP10-DP15-adversarial-decision-report.md) · [`12-final-reconciliation-monetary-boundaries.md`](docs/domain/12-final-reconciliation-monetary-boundaries.md) | The DP-10 … DP-15 workshop, adversarial test and reconciliation. |
+| [`13-FINAL-READINESS-AUDIT.md`](docs/domain/13-FINAL-READINESS-AUDIT.md) · [`14-DECISION-CLOSURE-AND-BUILD-READINESS.md`](docs/domain/14-DECISION-CLOSURE-AND-BUILD-READINESS.md) | Readiness audit and closure pass. |
+| [`15-BLOCK1-foundation-governance-closure.md`](docs/domain/15-BLOCK1-foundation-governance-closure.md) | **Block 1** — D-001 / D-002 adversarial test. Amendments now applied. |
+| [`16-BLOCK2-monetary-boundaries.md`](docs/domain/16-BLOCK2-monetary-boundaries.md) | **Block 2** — monetary boundaries re-opened adversarially. Verdicts now locked. |
 
 ---
 
@@ -45,14 +54,17 @@ Single site. Mixed manufacturing. Primary user is the **inventory / warehouse ma
 |---|---|---|
 | 01 | Expedited freight / emergency purchase premium | **LOCKED** (Part 2.1) |
 | 02 | Procurement Price Opportunity | **LOCKED** (Part 2.2) |
+| 03 | Quantity & Inventory Economics — order policy · buffer policy · position correction · quantity–price coupling | **LOCKED** (Part 2.3) |
 
-Neither is buildable until its factory-data dependencies are answered. That is a data problem, not a design one.
+None is buildable until its factory-data dependencies are answered. That is a data problem, not a design one.
+
+Mechanism 03 also supplies the **inventory cost model** that Mechanisms 01 and 02 consume to net their incremental carrying cost — it is load-bearing for both even where it produces no opportunity of its own.
 
 ## Where the project actually is
 
-Phase 0 largely complete. Scope is settled, the domain model and build plan exist in draft, no code is written.
+**Domain design is complete and locked.** All three saving mechanisms are designed; the two foundations (D-001 ledger, D-002 provenance) are locked and amended; the monetary boundaries are closed. No code is written.
 
-**Implementation is blocked on six answers**, three of them on the critical path: the technology stack, the permission model, and the balance-projection strategy for the ledger. See `docs/open-questions.md`.
+**What remains before architecture is not a design question.** Three answers block the critical path — the technology stack, the permission model, and the balance-projection strategy for the ledger — and eight factory facts decide whether the saving engine produces numbers or only findings. See `docs/open-questions.md` and §G of the Part 2.3 lock.
 
 ## Why there is no code
 
@@ -82,7 +94,12 @@ docs/
 │   ├── 09-part-2.2-LOCK.md
 │   ├── 10-Q07-saving-model-reconciliation.md
 │   ├── 11-DP10-DP15-adversarial-decision-report.md
-│   └── 12-final-reconciliation-monetary-boundaries.md
+│   ├── 12-final-reconciliation-monetary-boundaries.md
+│   ├── 13-FINAL-READINESS-AUDIT.md
+│   ├── 14-DECISION-CLOSURE-AND-BUILD-READINESS.md
+│   ├── 15-BLOCK1-foundation-governance-closure.md
+│   ├── 16-BLOCK2-monetary-boundaries.md
+│   └── 17-part-2.3-LOCK.md
 └── decisions/
     └── decision-register.md
 
@@ -105,5 +122,8 @@ context/                         Bible §52 six-file system
 4. No feature exists because ERP software usually has it.
 5. The system never fakes certainty. If it does not know, it says so.
 6. Potential is never presented as realised, and the headline saving figure is never a single confident point.
-7. No constant is invented to make a calculation complete — no avoidability weights, no default carrying-cost rate, no minimum event count. A missing input yields `INSUFFICIENT_DATA`.
+7. No constant is invented to make a calculation complete — no avoidability weights, no default carrying-cost rate, no ordering cost, no service level, no minimum event count, no materiality threshold. A missing input yields `INSUFFICIENT_DATA`.
 8. Capture is irreversible, computation is reversible — so raw financial dimensions are preserved at event time, while calculation methods are deferred until the abstraction is validated.
+9. An authoritative number can still be the wrong instrument. A financial rate carries the purpose it was built for, and a mismatch blocks the claim rather than degrading it.
+10. Counterfactuals are replayed against recorded events, never computed from a formula. No EOQ, no service-level model, no average-inventory shortcut.
+11. Where a benefit is measurable and its risk is not, the number itself says so — and says that the omission is optimistic.

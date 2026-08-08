@@ -57,6 +57,8 @@ Distinct types. **`DEEPENS` is never counted as `CREATES`.** Both are **factual 
 
 The Exposure record is **not created until the intervention is actioned**; before that the prospective consequence is an attribute of the Opportunity's disclosure.
 
+> **Extended 2026-08-08 (D-031 second amendment).** A third type exists: **`MITIGATES`** — an Opportunity that **reduces** an existing exposure. Disclosure-only, **never netted**, no probability or severity score, partial mitigation stated qualitatively, verified only by supersession. It changes nothing in this mechanism's arithmetic; it exists because a risk-reducing Opportunity could otherwise show only its cost.
+
 ---
 
 ## 4. Quantification — the four preconditions
@@ -199,10 +201,12 @@ No detector, formula, schema or UI · no avoidability weights in any form · no 
 
 | ID | Carried |
 |---|---|
-| `Q-07` | Saving-model categories 4.1–4.7 still describe percentage-over-total calculations and must each be re-expressed under D-027. **Growing debt** — each new mechanism widens the gap |
+| ~~`Q-07`~~ | ~~Saving-model categories 4.1–4.7 still describe percentage-over-total calculations…~~ **`CLOSED` 2026-08-08** by Part 2.3. §4.1, §4.2, §4.3, §4.6, §4.7 and §4.9 re-expressed as intervention + counterfactual; superseded formulas retained as history |
 | `Q-08` | F10 decomposition **engine** deferred pending a second validated mechanism |
 | `W-01` … `W-08` | Workshop questions from the mechanism-02 design |
 | `W-09` … `W-14` | Evidence-model and exposure-materiality refinements |
 | `W-17`, `W-20`, `W-23`, `W-24`, `W-31`, `W-32` | Structural refinements |
 | `W-36`, `W-43`, `W-44` | Commitment-risk ownership, shipment consolidation, ordering-cost ownership |
-| **Future-domain gaps** | **Shipment consolidation** · **logistics-cost domain** — preserved, unowned, deliberately not built |
+| **Future-domain gaps** | **Shipment consolidation** · **logistics-cost domain** — preserved, unowned, deliberately not built. ⚠ **Escalated 2026-08-08:** the logistics gap now **blocks** Mechanism 03 subtype A's net for imported items (`B3-02`, `F-43`) |
+
+> **Dependency added 2026-08-08 by Part 2.3.** This mechanism's **price-break case** (D-030's *"quantity-driven price advantage may compose"*) requires an **incremental carrying cost** to net under D-014 rule 6 — and that comes from **Mechanism 03's component-wise cost model** (D-035), never from a single finance rate. **The price benefit applies to quantity *consumed*, never quantity *purchased*** (D-038); beyond the evidenced consumption horizon it is `INSUFFICIENT_DATA`. This dependency was not recorded when Part 2.2 was locked.

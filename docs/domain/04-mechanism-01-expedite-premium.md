@@ -299,6 +299,16 @@ Most interventions work by **holding more stock** — raising a reorder point, a
 
 This is the same discipline as D-014 rule 6 on order consolidation.
 
+### Added 2026-08-08 by Part 2.3 — where the incremental cost comes from, and the third relationship
+
+**The carrying cost this section requires is supplied by Mechanism 03's component-wise cost model** (`docs/domain/17-part-2.3-LOCK.md`, D-035). It is **never** a single finance rate: a whole rate contains `EXPOSURE` components that D-031 forbids netting, and components that generate no incremental cash flow. A missing applicable component yields `INSUFFICIENT_DATA`, not a partial figure.
+
+⚠ **A buffer increase to avoid expedites is a Mechanism 01 Opportunity, not a Mechanism 03 one.** The saving is the avoided premium — ours; the cost is the incremental carrying — Mechanism 03's model; the risk reduction is **`MITIGATES`** on the §4.9 stockout exposure (D-031 as amended).
+
+**This is the case that required `MITIGATES` to exist.** Without it, a reorder-point fix shows a cost and a quantified expedite reduction while its **main justification — less stockout risk — is invisible**, so a correct action looks purely bad. `MITIGATES` is disclosure-only: never netted, never valued, no severity score, and partial mitigation stated qualitatively.
+
+Per D-041, where the net figure carries an exposure that cannot be valued, **the number itself declares that omission and its optimistic direction.**
+
 ### The special case that makes this mechanism buildable `LOCKED`
 
 > **Lead-time master-data correction may reduce future expedites without requiring additional inventory.**

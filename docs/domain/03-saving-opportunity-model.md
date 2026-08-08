@@ -51,9 +51,16 @@ Replaces D-003's recommendation structure. Every opportunity carries:
 | **Recurring impact** | Annual cost reduction. Repeats yearly. |
 | Potential Annual Saving | Derived — see the aggregation rules in §5 |
 | Required action | The concrete next step |
-| Owner | The person accountable |
+| ~~Owner~~ | ~~The person accountable~~ — **split 2026-08-08 by the D-011 amendment** |
+| **Finding Owner** | Accountable for the finding **being addressed**. *"Whose problem is this?"* |
+| **Action Owner** | **Executes** the intervention. Often a different person — inventory detects excess, **purchasing** defers the order |
+| **Data Owner** | Accountable for **input data quality**. The natural owner of an `EVIDENCE GAP` |
 | Status | Per the lifecycle in §3 |
 | Outcome | What actually happened |
+
+**On the three owner fields (D-011 as amended).** One field held three accountabilities that do not collapse. They are **configurable**, and **one person may hold several** — distinct fields do not require distinct people, and **no organisational structure is invented by defining a field**. Where no suitable owner exists the finding is **unowned and visibly so**: an unowned finding is itself the signal that nobody is accountable for that class of problem.
+
+⚠ **The adjudicator is a reviewer, not an owner.** Approval of a currency claim belongs to an adjudicator independent of the underlying decision (DP-07). Collapsing that into Finding Owner silently loses the independence requirement. **Mechanism Owner** — accountability for the detector's own correctness — is internal product governance and is **not a field on a finding**.
 
 **The one-time / recurring split is the field that matters most, and the one most often collapsed.** Releasing €200,000 of working capital from excess stock is a one-time event. Reducing carrying cost by €18,000 per year is recurring. Presenting the first as an annual saving overstates the number by roughly an order of magnitude. They must be separate fields, separately aggregated, and separately displayed — never summed into one figure.
 
@@ -126,14 +133,20 @@ Minimum: **typed subject · affected dimensions · direction per dimension · ef
 
 ```
 OPPORTUNITY
-    ├── CREATES ──▶  EXPOSURE / RISK    introduces a new exposure
-    └── DEEPENS ──▶  EXPOSURE / RISK    worsens an existing exposure
+    ├── CREATES   ──▶  EXPOSURE / RISK    introduces a new exposure
+    ├── DEEPENS   ──▶  EXPOSURE / RISK    worsens an existing exposure
+    └── MITIGATES ──▶  EXPOSURE / RISK    reduces an existing exposure
+                                          (added 2026-08-08, disclosure-only)
 
-OPPORTUNITY      ──creates 0..n──▶ · ──deepens 0..n──▶  EXPOSURE / RISK
-EXPOSURE / RISK  ──has 0..1 creating · 0..n deepening Opportunities
+OPPORTUNITY      ──creates 0..n──▶ · ──deepens 0..n──▶ · ──mitigates 0..n──▶
+EXPOSURE / RISK  ──has 0..1 creating · 0..n deepening · 0..n mitigating
 ```
 
-`CREATES` and `DEEPENS` are **distinct types**. **`DEEPENS` is never counted as `CREATES`** for aggregation. `DEEPENS` is a **factual relationship, not a financial valuation** — **no probability, percentage, threshold or monetary value** is assigned to it, and it is never silently netted. An Opportunity that deepens an Exposure **must disclose it to the reviewer**.
+**`MITIGATES` (D-031 as amended 2026-08-08).** The exposure **must already exist** — that is what separates it from `CREATES`. It is **never netted** into Potential Annual Saving: mitigating an unvaluable exposure yields an unvaluable benefit, and netting would require valuing the exposure. **Partial mitigation is stated qualitatively only.** Verification is by **supersession** — a later observation at a lower level (D-025 principle 4). If the exposure ever becomes valuable, the mitigation acquires a defensible counterfactual and **becomes an Opportunity in its own right**, never a netted benefit on the mitigating Opportunity.
+
+*Why it was needed:* Mechanism 01's reorder-point fix shows a cost and an expedite reduction while its **stockout-risk reduction is invisible** — so a correct action looks purely bad. Supersession handles verification; it does not handle **disclosure at decision time**.
+
+`CREATES`, `DEEPENS` and `MITIGATES` are **distinct types**. **`DEEPENS` is never counted as `CREATES`** for aggregation. `DEEPENS` is a **factual relationship, not a financial valuation** — **no probability, percentage, threshold or monetary value** is assigned to it, and it is never silently netted. An Opportunity that deepens an Exposure **must disclose it to the reviewer**.
 
 The Exposure record is **not created until the intervention is actioned** (`W-47`); before that the prospective consequence is an attribute of the Opportunity's disclosure. Where several Opportunities affect one subject, **each carries its own record** and current exposure is a **derived view** (`W-48`).
 
@@ -183,19 +196,29 @@ Scoped to **Circle 1** (inventory, procurement, replenishment, consumption, supp
 
 Each category below states its inputs, its impact type, and — critically — **the conditions under which it must refuse to produce a number**.
 
-### 4.1 Excess stock → working capital release
-**Impact:** one-time (capital) + recurring (carrying cost avoided)
-**Inputs:** on-hand, consumption rate, lead time, target coverage policy, unit cost
-**Calculation:** `excess qty = on-hand − (target coverage × consumption rate)`; value at unit cost
-**Refuses when:** consumption history below the `A-12` threshold · cost reference stale · item flagged seasonal without a seasonal profile
+> **§4.1 – §4.9 were re-expressed 2026-08-08 under D-027**, paying down `Q-07`. Each is now stated as *intervention + testable counterfactual*, and the original formulas — every one of which applied a rate to a total — are recorded as superseded rather than deleted. **All quantity-side interventions now belong to Mechanism 03** (`docs/domain/17-part-2.3-LOCK.md`).
 
-### 4.2 Slow-moving stock
-**Impact:** recurring (carrying cost)
-**Refuses when:** movement history shorter than the aging window
+### 4.1 Excess stock → **position correction** *(rewritten; D-033)*
+**Not one category — six interventions:** cancel · delay · reduce order quantity · reduce reorder point · reduce safety stock · dispose. Each has a different counterfactual, different offsets and a different recurrence.
+**The unifying rule:** **one-time benefits come from changing a stock *level*; recurring benefits come from changing a *policy*.**
+**Impact:** one-time = **financing value of deferred outlay only**, over the deferral window. Recurring = carrying reduction, and only where a **policy** changed.
+**⚠ The principal is never a saving and is never called a "release."** You cannot un-buy stock. For excess, the outflow is **delayed, never avoided**.
+**⚠ Excess with no pending order produces no Opportunity at all** — there is nothing to defer. It is a **position**, reported as such (`B2-04`).
+**Refuses when:** no pending order · `F-39` expected price movement unavailable — *assuming zero is itself an invented assumption, and in a devaluing currency it is known to be wrong* · `F-22` cost of funds unavailable · `A-18` coverage policy undefined · cost reference stale.
+> *Superseded formula, retained as history:* `excess qty = on-hand − (target coverage × consumption rate)`, valued at unit cost. It presented the **principal** as a benefit, which reads magnitude as value.
 
-### 4.3 Dead / obsolete stock
-**Impact:** recurring (carrying cost avoided) + space recovered
-**⚠ Deliberate exclusion:** the *value of the stock itself is not a saving.* Writing off dead stock is loss recognition — money already spent. Counting it as saving would be one of the most misleading figures the system could produce. The saving is the avoided future carrying cost, nothing more.
+### 4.2 Slow-moving stock — **RETIRED AS A SAVING CATEGORY** *(D-034)*
+Four attempts to find an independent intervention; all four fail. Slow-but-appropriately-stocked has no intervention · slow-as-a-sourcing-signal is temporal consolidation · slow-as-a-KPI is analytics · **slow-relative-to-shelf-life is §4.3's disposal decision triggered earlier**, not an independent mechanism.
+**Preserved, not deleted:** a **detection signal** feeding §4.1 and §4.3 · a **trigger** advancing §4.3 for shelf-life items (`F-34`) · an **`EXPOSURE / RISK`** where no action is available.
+**Why retirement matters structurally:** its entire risk profile was borrowed from §4.1 and §4.3 — it would have claimed their money under a third name. Its turnover cut-off is also a threshold (`A-18`), tolerable for a signal and **not** tolerable for anything producing currency.
+
+### 4.3 Dead / obsolete stock → **disposal** *(rewritten; D-033 (f), D-035)*
+**Intervention:** dispose of stock with no movement since date `D` and no open requirement recorded.
+**⚠ Counterfactual weakness, stated rather than hidden:** *"will never be consumed"* is forward-looking; D-010 gives only observed consumption. The claim the system may make is the weaker, honest one.
+**Impact:** recovery value and disposal cost are **one-time** (`F-38`); carrying avoided is recurring — and per D-035 **possibly near zero**.
+**⚠ Deliberate exclusion, unchanged:** the *value of the stock itself is not a saving.* Writing off dead stock is loss recognition — money already spent.
+**⚠ Added by D-035:** **disposal does not release capital.** For dead stock capital is **lost, not tied**; scrapping converts a book asset into a book loss — an accounting event, not a cash event. Only recovery received and ongoing costs no longer incurred are cash effects.
+**Refuses when:** `F-38` disposal cost / recovery value unavailable · `F-33` (is space constrained?) unanswered, which decides whether the space component exists at all.
 
 ### 4.4 Purchase price variance
 **Impact:** recurring
@@ -219,18 +242,29 @@ Each category below states its inputs, its impact type, and — critically — *
 **Refuses when:** ordering cost is unknown
 **⚠** The carrying-cost offset is **mandatory**, not optional. Consolidating orders raises average stock. An un-netted figure is inflated by construction.
 
-### 4.6 MOQ optimisation
-**Impact:** one-time + recurring
-**Calculation:** excess forced by MOQ, valued and carried
-**Refuses when:** MOQ not recorded on the supplier's item terms
+### 4.6 MOQ — **reshaped, not retired** *(D-038 subtype D)*
+**⚠ As previously written it had no intervention.** *"Excess forced by MOQ, valued and carried"* computed a cost against an action that does not exist. If the MOQ cannot be changed, the carrying cost of the forced excess is **the price of doing business with that supplier** — an `OBSERVED COST` at most, never an Opportunity. This is the same defect that retired §4.2.
+**It becomes an Opportunity only where an alternative is evidenced:** a negotiated lower MOQ · an alternative supplier with a lower one (`F-20`) · a smaller order multiple (`F-44`).
+**Composes with Mechanism 02 in the opposite direction** — M02's price break argues for buying *more*.
+**Refuses when:** MOQ not recorded · no alternative evidenced · `F-08` carrying components unavailable.
 
-### 4.7 Reorder point / safety stock optimisation
-**Impact:** one-time (capital) + recurring (carrying)
-**Inputs:** consumption variability, lead-time variability, service-level target
-**Refuses when:** lead-time sample below `A-12` · service-level target undefined (`P-06`)
-**⚠** Reducing safety stock trades capital against stockout risk. **An opportunity that presents only the capital gain and hides the risk it creates is dishonest.** Both sides must be shown.
+### 4.7 Reorder point / safety stock → **buffer policy** *(rewritten; D-037, D-039)*
+**⚠ The reorder point decomposes**, and this changes who owns what:
+```
+reorder point  =  lead-time demand  +  safety stock
+                        ↑                    ↑
+              Mechanism 01's lever     this category's lever
+```
+The two act on **different components of the same parameter**, so they **compose** rather than automatically contradicting.
+**What may be claimed prospectively: nothing in currency.** A backtest supports *"on-hand never fell below `L`, and no recorded intervention explains that floor"* — **absence of evidence of insufficiency, not evidence of sufficiency.** *"`L` would have been sufficient"* requires ruling out production rescheduling and demand suppression, which are **structurally unobservable** in Release 1.
+**⚠ The floor is not neutral in either direction.** A missed reorder plus quiet demand produces a floor reached **by mistake and validated by luck**. Backtesting to it would enshrine the error.
+**Realization is retrospective:** reduce, wait twelve months, observe. The claim that cannot be made prospectively **can be verified retrospectively** (D-019, D-011, D-022 — no new machinery).
+**⚠ Evidence for *increasing* a buffer is strictly stronger than for reducing one** — a recorded expedite is a fact; an avoided stockout is a counterfactual over unobservable interventions. A buffer **increase** is a **Mechanism 01 Opportunity** consuming Mechanism 03's cost model, carrying `MITIGATES`.
+**⚠ Both sides must be shown**, and per D-041 **the net figure must itself declare that it excludes an unvalued risk** — proximity on the page is not enough.
+**Refuses when:** `F-01`/`F-06` expedite capture unavailable *(gates the level-B claim)* · `F-35` escalations, `F-36` overrides, `F-27` substitutes unavailable · any prospective currency claim, always.
+**No service-level model.** `N-11` is a **policy the factory states**, never a parameter we fit.
 
-> **4.1 – 4.7 note (2026-08-07):** the calculations below predate the Part 2.1 lock. None may compute a saving by weighting a category. Each must be re-expressed as *intervention + testable counterfactual* before it is specified, per D-017. Recorded as `Q-07`.
+> **`Q-07` is now paid down for §4.1, §4.2, §4.3, §4.6, §4.7 and §4.9** (2026-08-08). §4.4 was superseded by Mechanism 02 and §4.5 retired by D-032. The superseded formulas are retained above as history, not deleted.
 
 ### 4.8 Emergency purchasing / expedited freight premium
 **Impact:** recurring
@@ -239,10 +273,33 @@ Each category below states its inputs, its impact type, and — critically — *
 **✓ The most defensible category in the release** — it measures money actually spent, not money hypothetically saveable.
 **→ Fully designed in `docs/domain/04-mechanism-01-expedite-premium.md` (Part 2.1).** That document supersedes this summary for this category.
 
-### 4.9 Stockout avoidance
-**Impact:** avoided cost
-**Status in release 1: NOT QUANTIFIABLE.**
-Costing a stockout requires production interruption cost — lost capacity, idle labour, late delivery. Production is out of scope (D-007). The system may **flag stockout risk**, which is operationally valuable, but it may not attach a currency figure to it. Attaching one would require inventing a production-impact model the system has no data for.
+### 4.9 Stockout — **RECLASSIFIED as `EXPOSURE / RISK`** *(D-034)*
+**Not an Opportunity, and not a new class.** Every existing class was tested first: `OPPORTUNITY` fails (no counterfactual — *"you are at risk"* is a projection, not a foregone alternative) · `OBSERVED COST` fails (a past stockout has no attributable cost in Release 1) · `EVIDENCE GAP` fails (it is a claim about the factory, not about our data). **`EXPOSURE / RISK` fits** — forward-looking, `FORECAST`-derived, may carry mitigation.
+**Status in release 1: NOT QUANTIFIABLE**, and not merely unquantified. Costing a stockout requires production interruption cost; production is out of scope (D-007).
+**⚠ Exposure counts and expedite counts are not additive.** Mechanism 01 measures the premium paid **to avoid** a stockout; this measures the **risk of** one. Where an expedite occurred, the stockout did not happen — the exposure was mitigated before it was ever recorded and **leaves no trace**. Anyone reading the two figures together must be told they do not sum.
+**Even a mitigation cannot be valued.** Expediting has a knowable cost and an unvaluable benefit. That asymmetry is a human decision, not a system quantification.
+**Receives `DEEPENS`** from §4.1 and §4.7, and from Mechanism 03 subtype A — smaller, more frequent orders increase the number of replenishment cycles and therefore the **occasions of exposure**, even at an unchanged trough. **Direction only; never a probability.**
+
+### 4.10 Quantity & inventory economics — **Mechanism 03**
+`docs/domain/17-part-2.3-LOCK.md` is authoritative for every quantity-side intervention above. It supersedes §4.1, §4.3, §4.6 and §4.7 as the design of record, and it supplies the **inventory cost model** that Mechanisms 01 and 02 consume to net their incremental carrying cost under D-014 rule 6.
+
+---
+
+## 4a. The asymmetric-valuation rule *(D-041)*
+
+Every Opportunity presents three **separately-typed** components:
+
+```
+BENEFIT                measurable, evidenced
+CERTAIN COST / OFFSET  netted (D-014 rule 6)
+EXPOSURE / RISK        disclosed, never netted (D-031)
+```
+
+> **Where an exposure exists and cannot be valued, the net figure must itself declare that it excludes an unvalued risk — and that the exclusion is always in the optimistic direction.**
+
+Linking the exposure is not sufficient. A reader can see `benefit − cost = net` and take the net at face value while the linked risk sits elsewhere on the page. **The number itself must carry its own incompleteness.** This matters most in §4.1 and §4.7, where a quantified benefit always stands beside an **unvaluable** stockout exposure — without this rule the presentation is structurally biased toward cutting inventory.
+
+Same discipline as D-002's basis: **a number that carries what is wrong with it.**
 
 ---
 

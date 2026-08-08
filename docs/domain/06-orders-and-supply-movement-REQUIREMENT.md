@@ -54,6 +54,25 @@ Under Bible §50 and §56-03, enablers precede intelligence — so this being an
 
 **5. Nothing here is designed.** No entities, no states, no workflow, no screens. The bullet list above is the requirement as stated, not a model.
 
+## 2026-08-08 — classification re-tested against Mechanism 03, and unchanged
+
+**Still `ENABLER`. It produces no saving.** But Part 2.3 changed what depends on it, and the dependency is now sharper than "overlaps with existing capture."
+
+| Element | Consumed by Mechanism 03 | If absent |
+|---|---|---|
+| **Receipt · actual arrival** | **The inventory position path itself** | The mechanism cannot compute at all |
+| **Partial receipt** (`F-41`) | Subtype A's effective order quantity | ⚠ **The detector reads PO quantity instead, and recommends a change the factory has effectively already made. Fictional findings** |
+| Ordered date → receipt date | The trough, via lead time | The trough cannot be located |
+| Shipment | The freight-per-shipment offset (`F-43`) | Subtype A's net is `INSUFFICIENT_DATA` for imports |
+| Open orders and ETAs | The deferral counterfactual | ⚠ **No pending order means no Opportunity at all** (D-033) |
+| Expedite | Gates D-037's level-B claim | Safety-stock evidence stops one level lower |
+
+> ⚠ **Point 1 above was previously understated.** This requirement was recorded as *"not wholly additive."* That remains true of the *fields*, but **evidentially it is now load-bearing**: a partial-receipt gap does not degrade Mechanism 03's output, it **falsifies** it. That is a different class of dependency from the ones recorded in 2026-08-07.
+
+**The chain is still broken at *Actual Outcome*.** Procurement-side outcomes — price paid, freight paid, delivery timing, order counts, position path — are verifiable. Production-side outcomes are not (D-007). Subtype A's realization is entirely procurement-side, which is a further reason it is the defensible first slice.
+
+**Nothing here is designed.** No entities, no states, no workflow, no screens. This section records dependency, not model.
+
 ## Status of open items
 
 | | |

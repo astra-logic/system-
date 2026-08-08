@@ -25,6 +25,10 @@ Constraints the eventual stack must satisfy, derived from the domain model rathe
 
 `UNRESOLVED`. Shape is constrained by D-001: immutable movement log plus maintained balance projections. Whether projections are materialised synchronously or asynchronously is A-01.
 
+⚠ **A-01's stakes were raised 2026-08-08 by D-039.** The saving engine replays inventory position paths over long historical windows, so **point-in-time reconstruction is a required capability of D-001**, not an optional reporting nicety. An asynchronous projection must support **historical replay**, not merely eventual consistency — a maintained current balance alone fails U-07's acceptance.
+
+⚠ **Ingestion carries a hard requirement.** Every movement bears a **source-system natural key**, and duplicate keys are **refused at the door** (D-001 as amended). This is an import-architecture obligation, not a validation rule bolted on later — and the project's stated import path is Excel (`P-03`), where re-importing a corrected spreadsheet is the most likely first-months event.
+
 ## Auth and permissions
 
 `UNRESOLVED` (A-20). Bible §44 lists eleven candidate roles and states the permission model is an open architectural decision. Per Bible §50, **security precedes protected functionality** — this must be resolved before any protected feature is built, not after.
@@ -35,8 +39,8 @@ Constraints the eventual stack must satisfy, derived from the domain model rathe
 
 | # | Position | Rationale |
 |---|---|---|
-| D-001 | Inventory truth is an append-only double-entry movement ledger | Traceability and valuation become structural, not features |
-| D-002 | Provenance is a platform primitive on every derived value | Bible §38 is otherwise unenforceable |
+| D-001 `LOCKED` | Inventory truth is an append-only double-entry movement ledger, **with an opening-balance counterparty, a source-system natural key, and point-in-time reconstruction** | Traceability and valuation become structural, not features |
+| D-002 `LOCKED` | Provenance is a platform primitive on **every value the system asserts**, raw or derived; `as_of` is **effective** time | Bible §38 is otherwise unenforceable — but provenance prevents mislabelling, **not misuse** (D-023) |
 | D-003 | Recommendations have a lifecycle; impact claims are typed | Guards against the fake savings §47 forbids |
 | D-004 | All operational records are site-scoped from day one | Retrofitting is an expensive, history-corrupting migration |
 | D-007 | First release is the inventory + procurement + cost wedge | Breadth is the project's principal risk (challenge D1) |
