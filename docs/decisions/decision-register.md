@@ -1358,3 +1358,176 @@ The MVP carries instead:
 **One-time impacts are never annualised at all** (D-012, D-033) — they are level changes, and a level changes once.
 
 **Rejected.** *Scaling a partial window with a disclosure* — rule 12 forbids the silent version, and the disclosed version is the same arithmetic with a label. *Averaging across all available history* — a step-change in demand or price makes the average describe a period that no longer exists.
+
+---
+
+# Block 5 — MVP architecture — 2026-08-08
+
+Decisions D-047 … D-053 close the architectural questions that block implementation.
+Two were answered by the product owner; five are **derived from locked criteria**, not preference,
+and each records the derivation so it can be overturned on evidence rather than taste.
+
+**No economic mechanism is created, changed or reinterpreted by any decision in this block.**
+
+---
+
+## D-047 — Stack: TypeScript · Next.js · PostgreSQL
+
+**Status:** `LOCKED` 2026-08-08 (product owner) · **Area:** architecture · **Closes:** `A-19`
+
+**Decision.** PostgreSQL · TypeScript · Next.js (App Router, server-side calculation) · Drizzle for schema and migrations · `decimal.js` for all exact arithmetic · Vitest for tests.
+
+**Derived from the locked criteria, not from preference** — the criteria were fixed before the choice:
+
+| Locked requirement | What it demands | Why Postgres |
+|---|---|---|
+| D-001 double-entry ledger | **Atomic multi-row writes.** A movement that debits without crediting breaks stock conservation | Real ACID transactions |
+| D-009 decimal quantities · all money | **Exact decimals.** Binary floating point cannot represent 0.1 | `numeric` — arbitrary precision, exact |
+| D-001 as amended · D-039 | **Point-in-time reconstruction over long windows** | Efficient range scans on an append-only table; partial and covering indexes |
+| D-002 envelope on every value | Structured provenance travelling with each number | `jsonb` with generated columns where indexing is needed |
+| D-001 as amended | **Duplicate ingestion refused at the door** | A unique constraint on the source-system natural key. Enforced by the database, not by application discipline |
+| Scope: single site | **No distributed system.** No event bus, no microservices, no queue | One database, one process |
+
+**One language end to end** because the UI is React regardless, and a second toolchain for a single-site MVP is cost without benefit.
+
+⚠ **The known risk, and how it is contained.** JavaScript's `number` is IEEE-754 binary floating point. **`0.1 + 0.2 !== 0.3`.** A money or quantity value passing through a JS `number` is silently corrupted, and this project's entire premise is that its numbers are defensible.
+
+**Containment is structural, not disciplinary:**
+
+1. All money and quantity columns are Postgres `numeric`, **never** `double precision`.
+2. The driver returns `numeric` as **string**, never parsed to `number`.
+3. Money and quantity exist in code **only** as `Decimal` (`decimal.js`) inside branded types `Money` and `Qty`. The constructors reject a `number` input at runtime.
+4. A lint rule forbids arithmetic operators on those types — there is no `+` that could silently coerce.
+5. Property tests assert round-trip exactness through the database.
+
+**Rejected.** *Python · FastAPI · React* — native `Decimal` removes the float risk structurally rather than by discipline, which is genuinely better on that one axis; rejected because it costs two languages, two toolchains and two test suites for a single-site MVP, and the risk is containable by the five measures above. **Recorded as the strongest alternative**, and the reason to revisit is if the containment measures prove leaky in practice.
+
+**Cost.** The decimal discipline must hold in every new file forever. It is checked by lint and by tests, not by memory.
+
+---
+
+## D-048 — Catch-weight is required: movements carry two quantities
+
+**Status:** `LOCKED` 2026-08-08 (product owner) · **Area:** F2, F3, F6 · **Closes:** `N-04`, `A-05`
+
+**Decision.** Every movement carries **two quantities**:
+
+```
+nominal_qty  + nominal_uom    what was ordered / counted / transacted
+actual_qty   + actual_uom     what was physically weighed, where the item is catch-weight
+
+For a non-catch-weight item the two are the same quantity in the same UoM,
+and the ledger stores the nominal pair only. actual_* is NULL — and NULL means
+"not a catch-weight item", never "not yet weighed".
+```
+
+**Why it had to be decided before the ledger, not after.** Retrofitting a second quantity onto an existing ledger makes every historical row ambiguous: a single `quantity` column cannot be known retrospectively to have meant *units* or *weight*. That is not a migration, it is a loss of meaning — and it would break every backtest D-039 depends on.
+
+**The rule that keeps it honest** (D-028's constraint applied to quantity): **`actual_qty` is never invented.** For a catch-weight item awaiting weighing, the movement is **incomplete and cannot post** — it does not post with an estimated weight.
+
+**Which quantity is authoritative for what:**
+
+| Question | Quantity |
+|---|---|
+| Stock balance, coverage, position path | **`actual`** where the item is catch-weight, else `nominal` |
+| Order fulfilment, MOQ, order multiples | **`nominal`** — the supplier ships units |
+| Invoice reconciliation, cost per unit | **`actual`** — the supplier invoices weight |
+| Consumption / demand history | **`actual`** — the factory consumes material, not packages |
+
+⚠ **A consequence that must not be papered over:** a receipt can be complete on `nominal` and short on `actual`. The two discrepancy checks are **different questions with different owners** — a unit shortfall is a delivery failure, a weight shortfall may be a specification or moisture issue. They are reported separately.
+
+**Cost.** Every quantity path, conversion and test is doubled. Accepted deliberately: the alternative is a ledger that cannot describe the factory.
+
+---
+
+## D-049 — Balance projection is synchronous for the MVP
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F2 · **Closes:** `A-01` · **Derived from** D-001 as amended, D-039
+
+**Decision.** Balances are projected **in the same transaction as the movement**.
+
+**Derived, not preferred.** Block 4 sharpened this question: D-039's counterfactual replay requires **point-in-time reconstruction**, so the ledger is authoritative over any projection at every instant. An asynchronous projection introduces a window in which the projection and the ledger disagree — and a saving engine reading during that window computes a number from a state that never existed.
+
+At single-site volume, synchronous projection costs one indexed upsert per movement. **There is no scale problem to solve here**, and solving one that does not exist would be the over-engineering Phase 1 forbids.
+
+**Verification is structural.** `SELECT` of the projection and independent recomputation from history **must agree at any historical instant**, and this is a test, not a convention (U-07 acceptance).
+
+**Rejected.** *Asynchronous projection* — scales further, and buys nothing at one site while introducing a correctness window in the one place correctness is the product. **Revisit when a real volume measurement, not a guess, says otherwise.**
+
+---
+
+## D-050 — No reservation in the MVP; `Available` is defined without it
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F3 · **Closes** `A-02` **for the MVP only**
+
+**Decision.** The MVP creates **no reservations**, so hard-versus-soft does not arise.
+
+```
+Available = On hand − Quality hold
+```
+
+**Why the question dissolves rather than being answered.** F3 defines `Reserved` as *"on-hand stock committed to a specific demand."* The MVP has **no sales orders** (out of scope) and **no manufacturing orders** (D-007). **Nothing in the MVP can create a commitment**, so `Reserved` is structurally always zero.
+
+⚠ **`Reserved` remains in the vocabulary and in the schema, always zero, and is displayed as zero rather than hidden.** Removing it would make the F3 vocabulary incomplete and invite a later re-definition; showing it as zero states the capability limit plainly (§38).
+
+**`A-02` stays `OPEN`** and becomes answerable when the first commitment source exists. **This decision does not answer it — it removes it from the MVP's blocking set.**
+
+---
+
+## D-051 — MVP role model
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F1, security · **Closes** `A-20` **for the MVP only**
+
+**Decision.** Five roles, derived from the accountabilities the domain already established — **no role is invented**:
+
+| Role | Exists because |
+|---|---|
+| `WAREHOUSE_OPERATOR` | Records movements, receipts and counts (D-007's primary user's team) |
+| `INVENTORY_MANAGER` | The primary user (D-007). Default **Finding Owner** |
+| `BUYER` | Raises and changes POs; classifies expedite root cause (D-018). Default **Action Owner** |
+| `ADJUDICATOR` | ⚠ **The one role the domain forces.** DP-07 requires currency quantification to be approved by someone **independent of the underlying decision** |
+| `ADMINISTRATOR` | Configuration, imports, role assignment. Default **Data Owner** |
+
+**The binding constraint, and it is the reason this decision exists:**
+
+> **A user may not adjudicate a currency claim arising from a decision they made.** Independence is checked against the **decision**, not against the role name — a buyer holding `ADJUDICATOR` may adjudicate other buyers' claims and not their own.
+
+Where no independent adjudicator exists, **self-adjudication is permitted with the conflict recorded as a factual condition affecting evidence strength** (Mechanism 02 §8) — permitted by rule 15 because it is a fact about the evidence, never an invented constant. **It is represented, never hidden.**
+
+**Roles are configurable and a person may hold several** — common in an SME (D-011 as amended). **No organisational structure is invented by defining a role.**
+
+**`A-20` stays `OPEN`** for the full permission model. This is the MVP subset.
+
+---
+
+## D-052 — Consumption carries an optional cost-centre dimension
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F2, C5 · **Defuses** `N-03`
+
+**Decision.** The issue-to-consumption movement carries a **nullable `cost_centre`** dimension from day one.
+
+**This preserves the decision rather than making it.** `N-03` is urgent only because it is *unbackfillable* — a consumption event recorded without a cost centre cannot have one added later, since nobody remembers where the material went. Carrying the dimension from the first movement means:
+
+- If the factory records cost centres, they are captured and nothing is lost.
+- If it does not, the column is `NULL` and **cost-centre analysis is stated as unavailable**, never estimated.
+- **The choice is later made by configuration, not by migration.**
+
+⚠ **`NULL` means "not captured", never "unassigned" or "general".** No default cost centre exists, and none may be invented — a default would silently attribute consumption to a place it did not go.
+
+**`N-03` moves from class A to class B.** The urgency was about irreversibility, and the irreversibility is removed.
+
+---
+
+## D-053 — `A-18` is not an MVP blocker — a correction to Block 4
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** classification · **Corrects** the Block 4 classification of `A-18`
+
+⚠ **Block 4 classified `A-18` (the excess ↔ dead boundary) as MUST RESOLVE BEFORE MVP**, on the grounds that D-035 gives excess and dead **different capital treatment** — capital *tied* versus capital *lost* — so an undefined boundary silently moves money between two economic claims.
+
+**That reasoning is sound and the classification was still wrong**, because it was applied to the wrong scope: **the boundary is only read by Mechanism 03, and Mechanism 03 is not in the MVP.** The MVP's single mechanism is Mechanism 01's lead-time-correction slice, which never classifies stock as excess or dead.
+
+**`A-18` moves to class C — deferred until Mechanism 03 is built.** It remains a **factory policy** that we may not choose (D-035).
+
+**Recorded as a decision rather than a silent edit** because it changes a published classification, and the project's rule is that inconsistencies are reported rather than quietly corrected.
+
+**The MVP-blocking decision set is therefore eight, not nine.**

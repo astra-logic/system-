@@ -135,3 +135,27 @@ context/                         Bible §52 six-file system
 9. An authoritative number can still be the wrong instrument. A financial rate carries the purpose it was built for, and a mismatch blocks the claim rather than degrading it.
 10. Counterfactuals are replayed against recorded events, never computed from a formula. No EOQ, no service-level model, no average-inventory shortcut.
 11. Where a benefit is measurable and its risk is not, the number itself says so — and says that the omission is optimistic.
+
+---
+
+## Running it
+
+```bash
+npm install
+service postgresql start
+psql -c "CREATE USER app WITH PASSWORD 'app' SUPERUSER" -c "CREATE DATABASE mos OWNER app"
+npm run db:push      # apply schema
+npm run db:seed      # demo fixtures — every batch marked isDemo = true
+npm test             # 68 tests, incl. the adversarial financial suite
+npx tsx scripts/detect.ts   # run the engine from the CLI, no UI in the way
+npm run dev          # the app
+```
+
+**The MVP is Mechanism 01's lead-time-correction slice only.** Mechanisms 02 and 03
+are designed and locked but not built — one mechanism proves all eleven MVP
+capabilities and a second proves none of them again.
+
+⚠ **Against the demo fixtures the headline reads "Not yet calculable".** That is the
+system working: the gross premium is observed and shown, and the net is refused
+because whether the correction needs more inventory has not been established. An
+MVP that returns `INSUFFICIENT_DATA` with each gap named is a passing MVP.
