@@ -13,6 +13,7 @@ import { detectLeadTimeCorrection, observedPremiumSpend, type ExpediteEventInput
 import type { EvidenceGap, Opportunity } from "./findings";
 import { detectContradictions, type Contradiction } from "./signature";
 import { potentialAnnualSaving, type HeadlineFigure } from "./aggregate";
+import { persistRun, type PersistResult } from "./persist";
 
 export interface RunResult {
   readonly asOf: Date;
@@ -22,6 +23,30 @@ export interface RunResult {
   readonly headline: HeadlineFigure;
   readonly notes: readonly string[];
   readonly isDemo: boolean;
+}
+
+export interface PersistedRunResult extends RunResult {
+  readonly persistence: PersistResult;
+}
+
+/**
+ * Run detection AND make the result durable.
+ *
+ * The transient variant remains available for tests and for previewing a run,
+ * but the application path goes through here: a finding that does not survive
+ * the request cannot carry a lifecycle, a baseline or a decision.
+ */
+export async function runAndPersist(siteId: string, asOf: Date): Promise<PersistedRunResult> {
+  const r = await runDetection(siteId, asOf);
+  const persistence = await persistRun({
+    siteId,
+    asOf,
+    mechanism: "M01_EXPEDITE_PREMIUM_LEADTIME",
+    isDemo: r.isDemo,
+    opportunities: r.opportunities,
+    evidenceGaps: r.evidenceGaps,
+  });
+  return { ...r, persistence };
 }
 
 export async function loadFxPolicy(reportingCurrency: string): Promise<FxPolicy> {

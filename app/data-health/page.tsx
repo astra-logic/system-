@@ -5,8 +5,9 @@
  * over untrustworthy stock data produces confident nonsense.
  */
 import { sql } from "../../lib/db/client";
-import { firstSiteId, runDetection } from "../../lib/engine/run";
-import { verifyProjection } from "../../lib/ledger/post";
+import { firstSiteId } from "../../lib/engine/run";
+import { currentEvidenceGaps } from "../../lib/engine/persist";
+import { verifyProjection } from "../../lib/ledger/verify";
 import { DemoBanner } from "../demo-banner";
 
 export const dynamic = "force-dynamic";
@@ -20,18 +21,16 @@ export default async function DataHealth() {
     SELECT id, filename, kind, status, rows_total, rows_accepted, rows_rejected, is_demo, uploaded_at::text
     FROM import_batches ORDER BY uploaded_at DESC`;
 
-  const items = await sql<{ id: string; code: string }[]>`SELECT id, code FROM items ORDER BY code`;
-  const checks = await Promise.all(items.map(async (i) => ({ code: i.code, v: await verifyProjection(i.id, AS_OF) })));
-  const disagreements = checks.filter((c) => !c.v.agreed);
+  const verification = await verifyProjection();
 
   const [stale] = await sql<{ n: number }[]>`
     SELECT COUNT(*)::int AS n FROM cost_references WHERE as_of < now() - interval '180 days'`;
 
-  const r = await runDetection(siteId, AS_OF);
+  const gaps = await currentEvidenceGaps(siteId);
 
   return (
     <>
-      <DemoBanner isDemo={r.isDemo} />
+      <DemoBanner isDemo={batches.some((b) => b.is_demo)} />
       <h1>Data health</h1>
       <p className="sub">
         What the system knows, what it does not, and whether its own arithmetic reconciles.
@@ -42,14 +41,44 @@ export default async function DataHealth() {
         <dl className="kv">
           <dt>Balance reconciliation</dt>
           <dd>
-            {disagreements.length === 0 ? (
-              <span className="badge ok">all {checks.length} items reconcile</span>
+            {verification.agreed ? (
+              <span className="badge ok">all {verification.locationsChecked} (item, location) pairs reconcile</span>
             ) : (
-              <span className="badge bad">{disagreements.length} disagree</span>
+              <span className="badge bad">{verification.discrepancies.length} discrepancies</span>
             )}
             <div className="note">
-              Stored projections recomputed independently from full history. A disagreement is a
-              defect, not a rounding difference.
+              The projection is maintained by incremental upserts; this recomputes every
+              (item, location) balance by full aggregation over the movement history and compares
+              them. Different mechanism, different traversal — so a drifted, missing, duplicated or
+              misplaced row changes one side and not the other. A disagreement is a defect, not a
+              rounding difference.
+            </div>
+            {!verification.agreed && (
+              <table style={{ marginTop: 10 }}>
+                <thead><tr><th>Item</th><th>Location</th><th>Kind</th><th className="num">Projected</th><th className="num">From history</th><th className="num">Difference</th></tr></thead>
+                <tbody>
+                  {verification.discrepancies.map((x, i) => (
+                    <tr key={i}>
+                      <td>{x.itemCode}</td><td>{x.locationCode}</td>
+                      <td><span className="badge bad">{x.kind}</span></td>
+                      <td className="num">{x.projected.toFixed(3)}</td>
+                      <td className="num">{x.recomputed.toFixed(3)}</td>
+                      <td className="num">{x.difference.toFixed(3)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </dd>
+          <dt>Ledger well-formedness</dt>
+          <dd>
+            {verification.conservationHolds
+              ? <span className="badge ok">every movement has two distinct endpoints</span>
+              : <span className="badge bad">malformed movements found</span>}
+            <div className="note">
+              Reported separately, and deliberately: conservation says the ledger is well-formed. It
+              says nothing about whether the projection is right, and presenting it as though it did
+              was the defect the Block 6 audit found.
             </div>
           </dd>
           <dt>Cost reference freshness</dt>
@@ -92,19 +121,22 @@ export default async function DataHealth() {
       <h2>Evidence gaps</h2>
       <p className="sub">Data the factory does not record, and what each one blocks.</p>
       <div className="card">
-        {r.evidenceGaps.length === 0 && <p className="note" style={{ margin: 0 }}>None raised.</p>}
+        {gaps.length === 0 && <p className="note" style={{ margin: 0 }}>None recorded. Run detection to raise them.</p>}
         <table>
           <tbody>
-            {r.evidenceGaps.map((g) => (
-              <tr key={g.id}>
-                <td style={{ width: 90 }}><span className="badge">{g.factoryDataRef}</span></td>
-                <td>
-                  {g.missingEvidence}
-                  <div className="note">{g.blocks}</div>
-                </td>
-                <td className="num">{g.observedSpend?.value ? `${g.observedSpend.value.toFixed(2)} ${g.observedSpend.unit}` : "—"}</td>
-              </tr>
-            ))}
+            {gaps.map((g) => {
+              const spend = g.observed_spend as Record<string, unknown> | null;
+              return (
+                <tr key={g.id}>
+                  <td style={{ width: 90 }}><span className="badge">{g.factory_data_ref}</span></td>
+                  <td>
+                    {g.missing_evidence}
+                    <div className="note">{g.blocks}</div>
+                  </td>
+                  <td className="num">{spend?.["value"] ? `${spend["value"]} ${spend["unit"]}` : "—"}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

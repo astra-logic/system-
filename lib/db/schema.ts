@@ -453,10 +453,43 @@ export const evidenceLadder = pgEnum("evidence_ladder", [
   "VERIFIED_REALIZATION",
 ]);
 
+/**
+ * A detection run. Recorded so a finding can be traced to the exact execution
+ * that produced it, and so "same inputs, same result, forever" is checkable
+ * rather than asserted. Nothing here is a new domain concept — it is the
+ * reproducible stored snapshot U-16 already requires, generalised.
+ */
+export const detectionRuns = pgTable("detection_runs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  siteId: uuid("site_id").notNull().references(() => sites.id),
+  /** The effective instant the run reasoned about. NOT the wall clock. */
+  asOf: timestamp("as_of", { withTimezone: true }).notNull(),
+  executedAt: timestamp("executed_at", { withTimezone: true }).notNull().defaultNow(),
+  mechanism: text("mechanism").notNull(),
+  /** Bible §47 / rule 16 — carried down to every finding the run produces. */
+  isDemo: boolean("is_demo").notNull().default(false),
+});
+
 export const opportunities = pgTable("opportunities", {
   id: uuid("id").primaryKey().defaultRandom(),
   siteId: uuid("site_id").notNull().references(() => sites.id),
   mechanism: text("mechanism").notNull(),
+
+  /* --- Added by Block 6, to make findings durable rather than transient. ----
+     None of these is a new domain concept:
+       runId          — U-16's reproducible stored snapshot
+       naturalKey     — the finding's identity across runs (mechanism + subject)
+       supersedesId   — D-025 principle 4: history is superseded, never mutated
+       supersededAt   — the current view is "where superseded_at is null", exactly
+                        as balances are a projection of the ledger (D-001)
+       isDemo         — Bible §47, carried from the run
+     A re-run NEVER updates a finding. It writes a new row and supersedes the
+     old one, so a figure once shown can always be reconstructed. */
+  runId: uuid("run_id").references(() => detectionRuns.id),
+  naturalKey: text("natural_key"),
+  supersedesId: uuid("supersedes_id"),
+  supersededAt: timestamp("superseded_at", { withTimezone: true }),
+  isDemo: boolean("is_demo").notNull().default(false),
   subjectItemId: uuid("subject_item_id").references(() => items.id),
   subjectSupplierId: uuid("subject_supplier_id").references(() => suppliers.id),
   title: text("title").notNull(),
@@ -532,6 +565,10 @@ export const exposures = pgTable("exposures", {
 export const evidenceGaps = pgTable("evidence_gaps", {
   id: uuid("id").primaryKey().defaultRandom(),
   siteId: uuid("site_id").notNull().references(() => sites.id),
+  runId: uuid("run_id").references(() => detectionRuns.id),
+  naturalKey: text("natural_key"),
+  supersededAt: timestamp("superseded_at", { withTimezone: true }),
+  isDemo: boolean("is_demo").notNull().default(false),
   missingEvidence: text("missing_evidence").notNull(),
   factoryDataRef: text("factory_data_ref"),
   blocks: text("blocks").notNull(),
@@ -540,6 +577,28 @@ export const evidenceGaps = pgTable("evidence_gaps", {
   dataOwner: text("data_owner"),
   raisedAt: timestamp("raised_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * Which recorded ledger movements and documents a finding rests on.
+ *
+ * Capability 11: every figure traces to the movements and documents that
+ * produced it. Without this the trace exists only in the envelope's `inputs`
+ * array, which is not queryable — you could not ask "what did we claim about
+ * this receipt?"
+ */
+export const opportunityEvidence = pgTable(
+  "opportunity_evidence",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    opportunityId: uuid("opportunity_id").notNull().references(() => opportunities.id),
+    /** 'movement' | 'expedite_event' | 'receipt' | 'po_line' | 'fx_rate' | 'financial_rate' */
+    kind: text("kind").notNull(),
+    ref: text("ref").notNull(),
+    basis: text("basis").notNull(),
+    asOf: timestamp("as_of", { withTimezone: true }).notNull(),
+  },
+  (t) => ({ idx: index("opp_evidence_idx").on(t.opportunityId) }),
+);
 
 /** D-031 as amended twice. Three DISTINCT types. None valued, none netted. */
 export const linkType = pgEnum("link_type", ["CREATES", "DEEPENS", "MITIGATES"]);
@@ -620,6 +679,14 @@ export const decisions = pgTable("decisions", {
    */
   adjudicatorIndependent: boolean("adjudicator_independent"),
   independenceNote: text("independence_note"),
+  /**
+   * Who the adjudicator was checked AGAINST. Recorded so the independence claim
+   * is auditable rather than asserted — a reviewer can see which parties were
+   * considered, and (per Q-13) which could not be checked because the factory
+   * does not record them.
+   */
+  checkedAgainst: text("checked_against").array(),
+  evidenceRefs: text("evidence_refs").array(),
 });
 
 /**

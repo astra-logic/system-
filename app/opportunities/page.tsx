@@ -1,141 +1,124 @@
 /**
- * OPPORTUNITIES — the reasoning made inspectable.
+ * OPPORTUNITIES — the persisted list.
  *
- * Every claim shows its intervention, its counterfactual, every gate with its
- * outcome, and — where currency is refused — exactly what was missing. A reader
- * who disagrees with the number can see the step they disagree with.
+ * Reads findings from the database rather than recomputing them, so what is
+ * shown is what was recorded, and it survives the request that produced it.
+ * Detection is triggered explicitly and writes a new run.
  */
-import { firstSiteId, runDetection } from "../../lib/engine/run";
+import { revalidatePath } from "next/cache";
+import { currentOpportunities } from "../../lib/engine/persist";
+import { evaluateContradictions, recordContradictions } from "../../lib/engine/contradiction-service";
+import { firstSiteId, runAndPersist } from "../../lib/engine/run";
+import { sql } from "../../lib/db/client";
 import { DemoBanner } from "../demo-banner";
 
 export const dynamic = "force-dynamic";
 const AS_OF = new Date("2027-01-01T00:00:00Z");
 
-const gateClass = (o: string) => (o === "PASS" ? "ok" : o === "FAIL" ? "bad" : "warn");
+async function detect(): Promise<void> {
+  "use server";
+  const siteId = await firstSiteId();
+  if (!siteId) return;
+  await runAndPersist(siteId, AS_OF);
+  const report = await evaluateContradictions(siteId);
+  await recordContradictions(report);
+  revalidatePath("/opportunities");
+  revalidatePath("/");
+}
 
 export default async function Opportunities() {
   const siteId = await firstSiteId();
   if (!siteId) return <h1>No data</h1>;
-  const r = await runDetection(siteId, AS_OF);
+
+  const [findings, contradictions] = await Promise.all([
+    currentOpportunities(siteId),
+    evaluateContradictions(siteId),
+  ]);
+  const [demo] = await sql<{ d: boolean }[]>`SELECT COALESCE(bool_or(is_demo), false) AS d FROM opportunities WHERE site_id = ${siteId}::uuid`;
+  const blocked = new Set(contradictions.blockedOpportunityIds);
 
   return (
     <>
-      <DemoBanner isDemo={r.isDemo} />
+      <DemoBanner isDemo={demo?.d ?? false} />
       <h1>Opportunities</h1>
       <p className="sub">
         Only findings of class <strong>Opportunity</strong> can contribute to Potential Annual Saving.
-        Observed costs and exposures appear elsewhere and are structurally incapable of entering it.
+        Observed costs and exposures are separate classes and are structurally incapable of entering it.
       </p>
 
-      {r.opportunities.length === 0 && (
+      <div className="card">
+        <form action={detect}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <button type="submit" style={{ padding: "9px 18px", borderRadius: 8, border: "1px solid var(--accent)", background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+              Run detection
+            </button>
+            <span className="note" style={{ margin: 0 }}>
+              Writes a new run as of {AS_OF.toISOString().slice(0, 10)}. An unchanged finding is not
+              rewritten; a changed one supersedes its predecessor rather than overwriting it.
+            </span>
+          </div>
+        </form>
+      </div>
+
+      {findings.length === 0 && (
         <div className="card">
           <p className="note" style={{ margin: 0 }}>
-            No opportunity has been detected. That is a result, not a failure — the mechanism refuses
-            to produce a finding it cannot evidence.
+            No finding has been recorded yet. Run detection above. A run that produces nothing is a
+            result, not a failure — the mechanism refuses to report what it cannot evidence.
           </p>
         </div>
       )}
 
-      {r.opportunities.map((o) => {
-        const netKnown = o.netImpact.value !== null;
-        const grossKnown = o.recurringImpact.value !== null;
-        return (
-          <div className="card" key={o.id} id={o.id}>
-            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-              <span className={`badge ${o.ladder === "OPPORTUNITY_DETECTED" ? "warn" : "ok"}`}>{o.ladder.replace(/_/g, " ")}</span>
-              <span className="badge">{o.lifecycle}</span>
-              <span className="badge">{o.mechanism}</span>
-            </div>
-            <h2 style={{ marginTop: 12 }}>{o.title}</h2>
-
-            <div className="figure">
-              {netKnown ? `${o.netImpact.value!.toFixed(2)}` : "Not calculable"}
-              {netKnown && <span className="cur">{o.netImpact.unit} net / yr</span>}
-            </div>
-            <div className="note">basis {o.netImpact.basis}</div>
-
-            {!netKnown && (
-              <ul className="reasons">
-                {o.netImpact.limitations.map((l, i) => <li key={i}>{l}</li>)}
-              </ul>
-            )}
-            {grossKnown && (
-              <p className="note">
-                Gross premium observed: <strong>{o.recurringImpact.value!.toFixed(2)} {o.recurringImpact.unit}</strong>
-                {" — an ACTUAL fact. It is not a saving until its offset is established."}
-              </p>
-            )}
-            {o.netExcludesUnvaluedRisk && (
-              <p className="note" style={{ color: "var(--warn)" }}>
-                ⚠ This figure excludes an exposure that cannot be valued, so it is optimistic by an
-                unquantified amount. The correction also <strong>reduces</strong> stockout exposure — disclosed,
-                never netted, because valuing it needs production data that is out of scope.
-              </p>
-            )}
-
-            <h3>The intervention</h3>
-            <p style={{ margin: "4px 0" }}>{o.statedIntervention}</p>
-            <h3>The counterfactual</h3>
-            <p className="note" style={{ margin: "4px 0" }}>{o.counterfactual}</p>
-
-            <h3>Evidence gates</h3>
-            <p className="note" style={{ margin: "0 0 6px" }}>
-              Pass, fail or unestablished. Never averaged, never a score — and unestablished is never a pass.
-            </p>
-            <div>
-              {o.gates.map((g) => (
-                <div className="gate" key={g.gate}>
-                  <span className={`badge ${gateClass(g.outcome)}`}>{g.outcome}</span>
-                  <span className="n">{g.gate}</span>
-                  <span className="note" style={{ margin: 0 }}>{g.detail}</span>
-                </div>
-              ))}
-            </div>
-
-            <h3>Accountability</h3>
-            <dl className="kv">
-              <dt>Finding owner</dt><dd>{o.findingOwner ?? <em>unowned — visibly so</em>}</dd>
-              <dt>Action owner</dt><dd>{o.actionOwner ?? <em>unowned — visibly so</em>}</dd>
-              <dt>Data owner</dt><dd>{o.dataOwner ?? <em>unowned — visibly so</em>}</dd>
-              <dt>Approval</dt>
-              <dd className="note">
-                A currency claim requires an adjudicator independent of the decision that produced it.
-              </dd>
-            </dl>
-
-            <h3>Intervention signature</h3>
-            <p className="note" style={{ margin: "0 0 6px" }}>
-              Declared so conflicts with other recommendations can be detected. An opportunity without
-              one cannot be presented.
-            </p>
-            <table>
-              <thead><tr><th>Dimension</th><th>Direction</th><th>Window</th></tr></thead>
-              <tbody>
-                {o.signature.effects.map((e, i) => (
-                  <tr key={i}>
-                    <td>{e.dimension}</td>
-                    <td>{e.direction}</td>
-                    <td>{e.windowFrom.toISOString().slice(0, 10)} → {e.windowTo.toISOString().slice(0, 10)}</td>
+      <div className="card scroll">
+        {findings.length > 0 && (
+          <table>
+            <thead>
+              <tr><th>Finding</th><th>Item</th><th>State</th><th>Ladder</th><th className="num">Net / yr</th><th>Flags</th></tr>
+            </thead>
+            <tbody>
+              {findings.map((f) => {
+                const net = f.netImpact as Record<string, unknown> | null;
+                const val = net?.["value"] as string | null;
+                return (
+                  <tr key={f.id}>
+                    <td><a href={`/opportunities/${f.id}`}>{f.title}</a></td>
+                    <td>{f.itemCode ?? "—"}</td>
+                    <td><span className={`badge ${f.lifecycle === "APPROVED" ? "ok" : f.lifecycle === "REJECTED" ? "bad" : ""}`}>{f.lifecycle}</span></td>
+                    <td className="note" style={{ margin: 0 }}>{f.ladder.replace(/_/g, " ")}</td>
+                    <td className="num">{val ? `${val} ${String(net?.["unit"] ?? "")}` : <span className="badge warn">not calculable</span>}</td>
+                    <td>
+                      {blocked.has(f.id) && <span className="badge bad">blocked</span>}{" "}
+                      {f.netExcludesUnvaluedRisk && <span className="badge warn">excludes unvalued risk</span>}{" "}
+                      {f.isDemo && <span className="badge warn">DEMO</span>}
+                    </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      })}
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
 
-      {r.contradictions.length > 0 && (
-        <>
-          <h2>Contradictions</h2>
-          <p className="sub">These recommendations cannot both be executed and must be resolved before action.</p>
-          {r.contradictions.map((c, i) => (
-            <div className="card" key={i}>
-              <span className="badge bad">CONTRADICTION</span>
-              <p style={{ margin: "10px 0 0" }}>{c.why}</p>
+      <h2>Contradiction control</h2>
+      <div className="card">
+        <p className="note" style={{ marginTop: 0 }}>{contradictions.note}</p>
+        {contradictions.contradictions.length === 0 ? (
+          <p className="note" style={{ margin: 0 }}>
+            No contradiction among the {contradictions.evaluated} finding(s) currently live.
+          </p>
+        ) : (
+          contradictions.contradictions.map((c, i) => (
+            <div key={i} style={{ marginTop: 12 }}>
+              <span className={`badge ${c.resolved ? "warn" : "bad"}`}>{c.resolved ? `RESOLVED — ${c.resolution}` : "UNRESOLVED"}</span>
+              <p style={{ margin: "8px 0 0" }}>
+                <a href={`/opportunities/${c.leftId}`}>{c.leftTitle}</a> vs{" "}
+                <a href={`/opportunities/${c.rightId}`}>{c.rightTitle}</a>
+              </p>
+              <p className="note" style={{ margin: "4px 0 0" }}>{c.why}</p>
             </div>
-          ))}
-        </>
-      )}
+          ))
+        )}
+      </div>
     </>
   );
 }

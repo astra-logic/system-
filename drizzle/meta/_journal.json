@@ -8,6 +8,13 @@
       "when": 1786298894769,
       "tag": "0000_abandoned_morbius",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786301187006,
+      "tag": "0001_thin_champions",
+      "breakpoints": true
     }
   ]
 }

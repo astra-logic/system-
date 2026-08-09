@@ -4,7 +4,7 @@ import { items, locations, sites, suppliers, users } from "../lib/db/schema";
 export async function resetDb() {
   await sql`
     TRUNCATE TABLE
-      audit_events, import_rows, import_batches, cost_references, fx_rates, financial_rates,
+      audit_events, opportunity_evidence, detection_runs, import_rows, import_batches, cost_references, fx_rates, financial_rates,
       outcomes, baselines, decisions, gate_results, contradictions, signature_dimensions,
       finding_links, evidence_gaps, exposures, observed_costs, opportunities,
       expedite_events, port_milestones, eta_forecasts, receipts, shipments,

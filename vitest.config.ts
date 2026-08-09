@@ -11,6 +11,10 @@ export default defineConfig({
     // not `instanceof` the driver's Date and falls through to the string path.
     // Forks run in real processes with shared globals. Not a code defect.
     pool: "forks",
+    // Test files share one database, so they must not run concurrently: one
+    // file's TRUNCATE would land mid-test in another. Sequential is correct
+    // here rather than a workaround — the alternative is a database per file.
+    fileParallelism: false,
     // Tests run against a SEPARATE database. Sharing one with the app meant the
     // suite's TRUNCATE silently wiped seeded data — a foot-gun, not a defect,
     // but the kind that makes people distrust the tests.

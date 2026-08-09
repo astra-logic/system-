@@ -163,6 +163,7 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | F-42 | Will suppliers **accept** smaller, more frequent orders — and is there a **minimum order value** as well as a minimum quantity? | Subtype A's intervention may be unavailable in practice |
 | **F-43** | **Does freight cost per shipment vary with order size, and is it borne by the factory?** | ⚠ Gates subtype A's net for imported items. **The offset belongs to the unowned logistics domain (D-032)** |
 | F-44 | Are **order multiples / pack sizes** recorded, distinct from MOQ? | `Q′` may not be freely chosen |
+| **F-45** | **Does the ERP record who raised and who approved each purchase order?** *(new, Block 6)* | ⚠ **DP-07's independence check cannot be fully verified without it** (`Q-13`). Gates full adjudicator independence for **Mechanism 02** |
 
 `F-33` … `F-40` were raised by the DP-10 … DP-15 audit and the readiness audit but were never carried into this register. **Corrected 2026-08-08.** `F-41` … `F-44` are new from Part 2.3.
 
@@ -178,6 +179,12 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | **Q-08** | **When does the F10 capture contract become a decomposition *engine*?** | **`DEFERRED` by D-028.** Requires at least a second mechanism to validate the abstraction. Not a blocker |
 | Q-06 | Does a lead-time correction create other costs not yet modelled? | Unknown; test during the vertical slice |
 | ~~Q-07~~ | Categories 4.1–4.7 of the saving model predate D-017 and still describe weighted/threshold calculations | **`CLOSED` 2026-08-08.** §4.1, §4.2, §4.3, §4.6, §4.7 and §4.9 re-expressed as *intervention + counterfactual* (D-033 … D-039). §4.4 superseded by Mechanism 02; §4.5 retired by D-032. Superseded formulas retained as history |
+
+### ⚠ Discovered during implementation — Block 6
+
+| ID | Decision to be taken | Status |
+|---|---|---|
+| **Q-13** | **Independence is checkable against the root-cause classifier, and NOT against the purchasing decision itself.** DP-07 requires a currency claim to be adjudicated by someone independent of *"the price decision"*. Implementing the check revealed that the system records **who classified an expedite's root cause** (`expedite_events.classified_by`) but **not who raised or approved the purchase order**. So independence can be established against the judgement the claim rests on, and not against the purchase itself. **Alternatives:** (a) capture PO author and approver — a real capture obligation, and `F-45` asks whether the factory's ERP even records them; (b) rule that for Mechanism 01 the classifier *is* the relevant party, since the classification is what makes the premium attributable; (c) accept partial verification and disclose it. **Recommended: (b) for Mechanism 01, with (a) added before Mechanism 02**, whose claim genuinely rests on a price decision. **Implemented as (c) meanwhile** — the check runs against the classifier and the UI states plainly which parties could not be checked. **Nothing is asserted that was not verified** | `OPEN` — does not block the MVP; **must be resolved before Mechanism 02** |
 
 ### Decisions authorised by Block 1 and not yet taken — none blocks architecture
 

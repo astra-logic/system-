@@ -6,7 +6,11 @@
  * because D-012 and D-041 both require the number to carry what is wrong with it.
  */
 import { sql } from "../lib/db/client";
-import { firstSiteId, runDetection } from "../lib/engine/run";
+import { firstSiteId } from "../lib/engine/run";
+import { currentEvidenceGaps, currentOpportunities } from "../lib/engine/persist";
+import { evaluateContradictions } from "../lib/engine/contradiction-service";
+import { potentialAnnualSaving } from "../lib/engine/aggregate";
+import { rehydrate } from "../lib/engine/rehydrate";
 import { DemoBanner } from "./demo-banner";
 
 export const dynamic = "force-dynamic";
@@ -25,8 +29,18 @@ export default async function Today() {
     );
   }
 
-  const r = await runDetection(siteId, AS_OF);
-  const h = r.headline;
+  // Read what was RECORDED, not a fresh in-memory computation. The headline a
+  // manager sees is the one that was persisted, and it survives a restart.
+  const stored = await currentOpportunities(siteId);
+  const gaps = await currentEvidenceGaps(siteId);
+  const contradictions = await evaluateContradictions(siteId);
+  const h = potentialAnnualSaving({ findings: stored.map(rehydrate), currency: "EGP", asOf: AS_OF });
+  const r = {
+    opportunities: stored,
+    evidenceGaps: gaps,
+    contradictions: contradictions.contradictions,
+    isDemo: stored.some((o) => o.isDemo),
+  };
 
   const [counts] = await sql<{ items: number; movements: number; open_orders: number; gaps: number }[]>`
     SELECT (SELECT COUNT(*)::int FROM items WHERE site_id = ${siteId}::uuid) AS items,
@@ -147,20 +161,19 @@ export default async function Today() {
                 </tr>
               </thead>
               <tbody>
-                {r.evidenceGaps.map((g) => (
-                  <tr key={g.id}>
-                    <td>
-                      <span className="badge">{g.factoryDataRef}</span>
-                    </td>
-                    <td>
-                      {g.missingEvidence}
-                      <div className="note">{g.blocks}</div>
-                    </td>
-                    <td className="num">
-                      {g.observedSpend?.value ? `${g.observedSpend.value.toFixed(2)} ${g.observedSpend.unit}` : "—"}
-                    </td>
-                  </tr>
-                ))}
+                {r.evidenceGaps.map((g) => {
+                  const spend = g.observed_spend as Record<string, unknown> | null;
+                  return (
+                    <tr key={g.id}>
+                      <td><span className="badge">{g.factory_data_ref}</span></td>
+                      <td>
+                        {g.missing_evidence}
+                        <div className="note">{g.blocks}</div>
+                      </td>
+                      <td className="num">{spend?.["value"] ? `${spend["value"]} ${spend["unit"]}` : "—"}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

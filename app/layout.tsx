@@ -12,6 +12,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <div className="inner">
             <strong>Manufacturing OS</strong>
             <a href="/">Today</a>
+            <a href="/import">Import</a>
             <a href="/data-health">Data health</a>
             <a href="/inventory">Inventory</a>
             <a href="/opportunities">Opportunities</a>
