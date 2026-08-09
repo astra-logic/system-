@@ -13,6 +13,7 @@ import { detectLeadTimeCorrection, observedPremiumSpend, type ExpediteEventInput
 import type { EvidenceGap, Opportunity } from "./findings";
 import { detectContradictions, type Contradiction } from "./signature";
 import { potentialAnnualSaving, type HeadlineFigure } from "./aggregate";
+import { computeOffset, type OffsetResult } from "./offset";
 import { persistRun, type PersistResult } from "./persist";
 
 export interface RunResult {
@@ -130,6 +131,42 @@ export async function runDetection(siteId: string, asOf: Date): Promise<RunResul
 
     if (expedites.length === 0) continue;
 
+    /**
+     * The offset, computed rather than assumed.
+     *
+     * ⚠ CORRECTION (Block 7). This was previously hardcoded `null` with a comment
+     * blaming `A-18` / `N-11`. That comment was wrong and is removed. `A-18` is
+     * the excess ↔ dead-stock boundary and is read only by Mechanism 03; nothing
+     * in Mechanism 01 consults it, and no factory fact was missing. The value was
+     * `null` because the computation did not exist.
+     *
+     * It now derives the incremental inventory from the OBSERVED POSITION PATH —
+     * the consumption the ledger records during the days of cover the master
+     * value was short by — values it at the imported cost reference, and prices
+     * it component-wise through `requireRate`. Where a component's factory fact
+     * is unanswered or its rate is unfit, the result is `INSUFFICIENT_DATA` with
+     * the reason named, never a partial figure.
+     */
+    const preflight = detectLeadTimeCorrection({
+      itemId: item.id, itemCode: item.code, masterLeadTimeDays: item.lead_time_days,
+      orders, expedites, fx, historyFrom, asOf,
+      requiresAdditionalInventory: null, incrementalCarryingCost: null,
+    });
+
+    // The corrected lead time is derived by the mechanism itself, from the
+    // observed maxima. The offset needs it, so a preflight pass supplies it.
+    const corrected = preflight.opportunity ? correctedLeadTimeFrom(preflight.opportunity.statedIntervention) : null;
+
+    let offset: OffsetResult | null = null;
+    if (corrected !== null && item.lead_time_days !== null) {
+      offset = await computeOffset({
+        siteId, itemId: item.id, itemCode: item.code,
+        masterLeadTimeDays: item.lead_time_days,
+        correctedLeadTimeDays: corrected,
+        windowFrom: historyFrom, asOf, currency,
+      });
+    }
+
     const result = detectLeadTimeCorrection({
       itemId: item.id,
       itemCode: item.code,
@@ -139,19 +176,27 @@ export async function runDetection(siteId: string, asOf: Date): Promise<RunResul
       fx,
       historyFrom,
       asOf,
-      /**
-       * ⚠ Not yet determinable from recorded data.
-       *
-       * Whether correcting a lead time requires holding more inventory depends on
-       * the factory's coverage policy, which is A-18 / N-11 and unanswered. The
-       * honest value is null — the gate then blocks the NET and says why, rather
-       * than assuming zero. Assuming zero would be the single most profitable
-       * assumption available here, which is exactly why it is refused.
-       */
-      requiresAdditionalInventory: null,
-      incrementalCarryingCost: null,
+      requiresAdditionalInventory: offset ? offset.requiresAdditionalInventory : null,
+      incrementalCarryingCost: offset ? offset.cost : null,
       owners: { finding: "inv", action: "buyer", data: "admin" },
     });
+
+    if (offset) {
+      notes.push(
+        `${item.code}: offset — ${offset.deltaDaysCover} additional days of cover; ` +
+          offset.deltaQuantity.coverage.join("; "),
+      );
+      for (const e of offset.exposuresDisclosed) {
+        notes.push(`${item.code}: ${e.component} is disclosed as an EXPOSURE, never netted — ${e.why}`);
+      }
+      if (offset.oneTimePositionChange.value !== null && !offset.oneTimePositionChange.value.isZero()) {
+        notes.push(
+          `${item.code}: one-time working-capital increase of ` +
+            `${offset.oneTimePositionChange.value.toFixed(2)} ${currency} — a POSITION CHANGE, ` +
+            `never annualised and never entered into Potential Annual Saving (D-033).`,
+        );
+      }
+    }
 
     if (result.opportunity) opportunities.push(result.opportunity);
     notes.push(...result.notes.map((n) => `${item.code}: ${n}`));
@@ -179,6 +224,16 @@ export async function runDetection(siteId: string, asOf: Date): Promise<RunResul
   const headline = potentialAnnualSaving({ findings: opportunities, currency, asOf });
 
   return { asOf, opportunities, evidenceGaps: gaps, contradictions, headline, notes, isDemo };
+}
+
+/**
+ * The mechanism states its own intervention as "…from M to at least N days".
+ * Parsing it back keeps the corrected value derived in ONE place — the detector's
+ * observed maximum — rather than recomputed here where the two could drift.
+ */
+function correctedLeadTimeFrom(statedIntervention: string): number | null {
+  const m = /at least (\d+) days/.exec(statedIntervention);
+  return m ? Number(m[1]) : null;
 }
 
 /** Convenience for the CLI and the UI. */

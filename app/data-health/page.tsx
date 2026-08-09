@@ -23,8 +23,15 @@ export default async function DataHealth() {
 
   const verification = await verifyProjection();
 
-  const [stale] = await sql<{ n: number }[]>`
-    SELECT COUNT(*)::int AS n FROM cost_references WHERE as_of < now() - interval '180 days'`;
+  /**
+   * ⚠ CORRECTED (Block 7). This previously counted references older than an
+   * INVENTED 180-day threshold. `N-09` — the staleness threshold — is unanswered,
+   * so the system may not decide where "current" ends. It states the AGE of the
+   * oldest reference and lets the reader judge, exactly as the offset does.
+   */
+  const [oldest] = await sql<{ age_days: number | null; as_of: string | null }[]>`
+    SELECT EXTRACT(DAY FROM (now() - MIN(as_of)))::int AS age_days, MIN(as_of)::text AS as_of
+    FROM cost_references`;
 
   const gaps = await currentEvidenceGaps(siteId);
 
@@ -83,12 +90,14 @@ export default async function DataHealth() {
           </dd>
           <dt>Cost reference freshness</dt>
           <dd>
-            {(stale?.n ?? 0) > 0
-              ? <span className="badge warn">{stale!.n} reference(s) over 180 days old</span>
-              : <span className="badge ok">current</span>}
+            {oldest?.age_days === null || oldest?.age_days === undefined
+              ? <span className="badge">no cost references imported</span>
+              : <span className="badge">oldest reference is {oldest.age_days} days old</span>}
             <div className="note">
-              A stale cost import makes every figure resting on it stale, and the system must say so
-              rather than presenting confident numbers over aged inputs.
+              ⚠ Stated, not classified. <code>N-09</code> — the point at which a cost reference
+              becomes stale — has not been answered, so the system reports the age and declines to
+              decide where &ldquo;current&rdquo; ends. Inventing that threshold would put an
+              undeclared constant underneath every financial figure that rests on imported cost.
             </div>
           </dd>
         </dl>

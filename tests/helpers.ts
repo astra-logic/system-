@@ -9,7 +9,7 @@ export async function resetDb() {
       finding_links, evidence_gaps, exposures, observed_costs, opportunities,
       expedite_events, port_milestones, eta_forecasts, receipts, shipments,
       po_line_changes, po_lines, purchase_orders, supplier_item_terms,
-      balances, movements, uom_conversions, items, locations, suppliers, users, sites
+      balances, movements, uom_conversions, factory_facts, items, locations, suppliers, users, sites
     RESTART IDENTITY CASCADE`;
 }
 

@@ -24,7 +24,7 @@
 import { type Money, type Qty, sumMoney, ZERO_MONEY } from "../../core/decimal";
 import { annualise, type DatedAmount } from "../../core/annualise";
 import { type CapturedAmount, type FxPolicy, normalise } from "../../core/fx";
-import { type Envelope, insufficient, value } from "../../core/provenance";
+import { type Envelope, insufficient, value, weakestBasis } from "../../core/provenance";
 import { coverageFact, eligibleForCurrency, fail, type GateResult, ladderFrom, pass, unestablished } from "../gates";
 import type { Opportunity } from "../findings";
 import { DIMENSION, type InterventionSignature } from "../signature";
@@ -364,15 +364,30 @@ export function detectLeadTimeCorrection(input: DetectInput): DetectResult {
       { coverage },
     );
   } else {
-    net = value(recurring.value.minus(incremental.value) as Money, currency, recurring.basis, input.asOf, {
-      inputs: [...recurring.inputs, ...incremental.inputs],
-      coverage: [...coverage, ...recurring.coverage],
-      limitations: [
-        ...recurring.limitations,
-        `Net of certain incremental cost only. Where an exposure exists and cannot be valued, this ` +
-          `figure EXCLUDES it and is therefore optimistic (D-041).`,
-      ],
-    });
+    /**
+     * ⚠ Contagion (D-002): the net carries the WEAKEST basis of its inputs.
+     *
+     * It previously carried the gross's basis alone, which let a net resting on
+     * a `USER_DEFINED` imported cost reference present itself as `CALCULATED`.
+     * The figure would have looked stronger than the weakest thing underneath it
+     * — exactly the basis laundering D-012 forbids.
+     */
+    net = value(
+      recurring.value.minus(incremental.value) as Money,
+      currency,
+      weakestBasis([recurring.basis, incremental.basis]),
+      input.asOf,
+      {
+        inputs: [...recurring.inputs, ...incremental.inputs],
+        coverage: [...coverage, ...recurring.coverage, ...incremental.coverage],
+        limitations: [
+          ...recurring.limitations,
+          ...incremental.limitations,
+          `Net of certain incremental cost only. Where an exposure exists and cannot be valued, this ` +
+            `figure EXCLUDES it and is therefore optimistic (D-041).`,
+        ],
+      },
+    );
   }
 
   if (proposedLeadTime === null || master === null) {

@@ -163,6 +163,8 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | F-42 | Will suppliers **accept** smaller, more frequent orders — and is there a **minimum order value** as well as a minimum quantity? | Subtype A's intervention may be unavailable in practice |
 | **F-43** | **Does freight cost per shipment vary with order size, and is it borne by the factory?** | ⚠ Gates subtype A's net for imported items. **The offset belongs to the unowned logistics domain (D-032)** |
 | F-44 | Are **order multiples / pack sizes** recorded, distinct from MOQ? | `Q′` may not be freely chosen |
+| **F-46** | **Is inventory insurance value-based and adjusting, or a fixed annual declared value?** *(new, Block 7)* | Decides whether the `INSURANCE` component of the carrying offset applies at all (D-035). Unanswered ⇒ the whole offset is `INSUFFICIENT_DATA` |
+| **F-47** | **Is warehouse handling labour marginal (overtime / per-move) or salaried below capacity?** *(new, Block 7)* | Not read by Mechanism 01 — throughput is unchanged — but required by Mechanism 03's order-frequency subtype (`Q-15`) |
 | **F-45** | **Does the ERP record who raised and who approved each purchase order?** *(new, Block 6)* | ⚠ **DP-07's independence check cannot be fully verified without it** (`Q-13`). Gates full adjudicator independence for **Mechanism 02** |
 
 `F-33` … `F-40` were raised by the DP-10 … DP-15 audit and the readiness audit but were never carried into this register. **Corrected 2026-08-08.** `F-41` … `F-44` are new from Part 2.3.
@@ -179,6 +181,13 @@ All eight Part 2.1 decision points are closed. **What remains is factual, not ju
 | **Q-08** | **When does the F10 capture contract become a decomposition *engine*?** | **`DEFERRED` by D-028.** Requires at least a second mechanism to validate the abstraction. Not a blocker |
 | Q-06 | Does a lead-time correction create other costs not yet modelled? | Unknown; test during the vertical slice |
 | ~~Q-07~~ | Categories 4.1–4.7 of the saving model predate D-017 and still describe weighted/threshold calculations | **`CLOSED` 2026-08-08.** §4.1, §4.2, §4.3, §4.6, §4.7 and §4.9 re-expressed as *intervention + counterfactual* (D-033 … D-039). §4.4 superseded by Mechanism 02; §4.5 retired by D-032. Superseded formulas retained as history |
+
+### ⚠ Discovered during implementation — Block 7
+
+| ID | Question | Status |
+|---|---|---|
+| **Q-14** | **Which observation window sizes the demand rate in the offset?** The offset's incremental quantity is `observed daily consumption × additional days of cover`. The rate could be drawn from all available history, or from the same twelve months D-046 uses for the gross. **Implemented as the twelve-month window**, because the two figures are subtracted from one another and must describe the same year — a rate from nineteen months netted against a twelve-month premium would be two periods wearing one number. **Derived from D-046 rather than chosen**, but recorded because it is a visible modelling choice | `OPEN` — recommendation: keep the twelve-month window |
+| **Q-15** | **Does a permanent increase in the inventory *level* change handling cost?** The offset excludes `HANDLING` on the grounds that this correction changes *when* an order is placed, not how many orders or issues occur, so throughput is unchanged and marginal handling is zero. That reasoning is decision-specific and holds for **this** intervention; it does **not** generalise to Mechanism 03's order-frequency subtype, where order count genuinely changes | `OPEN` — must be re-tested per mechanism, never inherited |
 
 ### ⚠ Discovered during implementation — Block 6
 

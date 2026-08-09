@@ -736,6 +736,36 @@ export const financialRates = pgTable("financial_rates", {
   basis: text("basis").notNull(),
 });
 
+/**
+ * Answers to the registered factory questions that are FACTS, not rates —
+ * "is warehouse space constrained?" (F-33), "do inventory taxes apply?" (F-40),
+ * "is handling labour marginal?".
+ *
+ * These exist because D-035 classifies a carrying component as APPLIES /
+ * NOT_VALID / UNKNOWN from exactly these facts, and UNKNOWN must block rather
+ * than default. Without somewhere to record an answer, the answer would have to
+ * be hardcoded — which is the invention the whole project forbids.
+ *
+ * An absent row means UNANSWERED. It never means "no".
+ */
+export const factoryFacts = pgTable(
+  "factory_facts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    siteId: uuid("site_id").notNull().references(() => sites.id),
+    /** The registered question this answers, e.g. "F-33". */
+    ref: text("ref").notNull(),
+    key: text("key").notNull(),
+    value: boolean("value").notNull(),
+    /** Who said so, and when. A fact without a source is an assumption. */
+    source: text("source").notNull(),
+    answeredBy: text("answered_by").notNull(),
+    answeredAt: timestamp("answered_at", { withTimezone: true }).notNull().defaultNow(),
+    isDemo: boolean("is_demo").notNull().default(false),
+  },
+  (t) => ({ uq: uniqueIndex("factory_facts_uq").on(t.siteId, t.key) }),
+);
+
 /** F-07: rate HISTORY, effective-dated. Not a scalar. */
 export const fxRates = pgTable(
   "fx_rates",

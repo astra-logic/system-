@@ -12,7 +12,7 @@
  */
 import { db, sql } from "../lib/db/client";
 import {
-  costReferences, etaForecasts, expediteEvents, financialRates, fxRates, importBatches,
+  costReferences, etaForecasts, expediteEvents, factoryFacts, financialRates, fxRates, importBatches,
   items, locations, poLines, portMilestones, purchaseOrders, receipts, shipments,
   sites, supplierItemTerms, suppliers, users,
 } from "../lib/db/schema";
@@ -28,7 +28,7 @@ async function reset() {
       signature_dimensions, finding_links, evidence_gaps, exposures, observed_costs,
       opportunities, expedite_events, port_milestones, eta_forecasts, receipts, shipments,
       po_line_changes, po_lines, purchase_orders, supplier_item_terms, balances, movements,
-      uom_conversions, items, locations, suppliers, users, sites RESTART IDENTITY CASCADE`;
+      uom_conversions, factory_facts, items, locations, suppliers, users, sites RESTART IDENTITY CASCADE`;
 }
 
 async function main() {
@@ -93,6 +93,30 @@ async function main() {
       effectiveFrom: D("2026-03-01"), effectiveTo: null, status: "ACTIVE",
       purpose: "COST_OF_FUNDS", basis: "USER_DEFINED",
     },
+    /* Component rates, each built FOR a marginal decision and named for the
+       component it prices. A generic "carrying rate" prices nothing, which is
+       why the valuation rate above can never be substituted for these. */
+    {
+      siteId, kind: "CARRYING_INSURANCE", rate: "0.004", unit: "ratio/yr",
+      source: "Insurance schedule, value-based cover (DEMO)", owner: "Finance",
+      effectiveFrom: D("2026-01-01"), effectiveTo: null, status: "ACTIVE",
+      purpose: "MARGINAL_DECISION", basis: "USER_DEFINED",
+    },
+  ]);
+
+  /* ---- Factory facts (F-33, F-40, …) — DEMO ANSWERS, structurally marked.
+         D-035 classifies each carrying component APPLIES / NOT_VALID / UNKNOWN
+         from exactly these. An absent row means UNANSWERED, never "no", so
+         without them the offset correctly refuses to compute. */
+  await db.insert(factoryFacts).values([
+    { siteId, ref: "F-33", key: "space_constrained", value: false,
+      source: "Plant manager interview (DEMO)", answeredBy: "admin", isDemo: true },
+    { siteId, ref: "F-08", key: "handling_is_marginal", value: false,
+      source: "Warehouse staffing review (DEMO)", answeredBy: "admin", isDemo: true },
+    { siteId, ref: "F-08", key: "insurance_is_value_based", value: true,
+      source: "Insurance schedule (DEMO)", answeredBy: "admin", isDemo: true },
+    { siteId, ref: "F-40", key: "inventory_tax_applies", value: false,
+      source: "Finance, Egypt jurisdiction (DEMO)", answeredBy: "admin", isDemo: true },
   ]);
 
   const sup = async (code: string, name: string, country: string) =>
