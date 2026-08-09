@@ -167,6 +167,8 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 - `REALIZED` is reachable only through observed measurement, never by assertion.
 - Rejections record a reason and are analysable by category.
 - **Three owner fields — Finding, Action, Data — not one.** Configurable; one person may hold several; an unowned finding is **visible, never hidden**. The adjudicator is a **reviewer**, modelled separately, and is never the Finding Owner. **Mechanism Owner is not a field on a finding.** (D-011 as amended)
+- **No `Confidence` field.** The object carries **evidence strength** (D-026) and **coverage facts stated plainly**. `A-03` is unanswered, and a required field with no formula would be synthesised — most plausibly by blending gate outcomes, which rule 15 and D-045 forbid.
+- **The baseline is a stored snapshot of inputs and method, not only an output**, and is recomputable later to the same result.
 - **`CREATES`, `DEEPENS` and `MITIGATES` are three distinct relationship types**, none of them valued and none of them netted. (D-031 as amended twice)
 - **A net figure carrying an unvalued exposure states so on the number itself**, and states that the exclusion is optimistic. (D-041)
 
@@ -192,11 +194,13 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 **Objective.** D-012 — the North-Star number, computed honestly.
 **Depends on.** U-18. **Open:** N-08, N-09.
 **Acceptance.**
-- Output is a **range**, not a point.
-- Recurring only in the annual figure; one-time capital release reported separately.
-- Overlapping opportunities deduplicated by subject, with the deduction shown.
+- Output is a **range**, and the range is an **evidence partition, not a confidence interval** (D-044): lower bound = findings whose every input is `ACTUAL`/`CALCULATED`; upper bound = that plus findings carrying an `ESTIMATED`/`ASSUMED` input, each disclosed. **No probability appears anywhere in it.**
+- Recurring only in the annual figure; one-time capital release reported separately, and **one-time impacts are never annualised**.
+- Overlapping opportunities deduplicated at the **economic-mechanism level**, with the deduction shown and attribution explainable (D-020). ~~*Superseded: "deduplicated by subject."*~~ **Subject-level deduplication understates** — one PO line can carry two independent effects.
 - Aggregate carries the **weakest** basis among its inputs; any stale cost makes it `STALE_DATA`.
-- Annualisation refuses below the minimum history window.
+- **Members that cannot be computed are excluded, not zeroed — and the exclusion is disclosed**: count, observed magnitude where known, and the statement that the total is a lower bound (D-043). Treating `INSUFFICIENT_DATA` as zero is a defect; so is letting one bad member make the whole aggregate uncomputable.
+- **Annualisation is the observed figure over a stated twelve-month window, never a scaled partial one** (D-046). Below twelve months there is no annual figure at all. The window used is shown.
+- Every cross-period figure is FX-normalised **at each amount's own effective date**, never at a single current rate (D-042).
 - The **realised-versus-identified ratio** is displayed alongside it.
 
 > **M3 reached.** Saving opportunities are discovered, quantified honestly, and falsifiable.
@@ -217,7 +221,45 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 
 ## What this plan does not include
 
-No production, BoMs, routings, work centres, capacity, MRP, maintenance, CAPA, inspection plans, multi-site, multi-currency, executive dashboard, or AI features. These are **out of the first release**, not hidden in it. Per §38 and D-002, absent capability is stated plainly rather than implied.
+No production, BoMs, routings, work centres, capacity, MRP, maintenance, CAPA, inspection plans, multi-site, **multi-currency *transacting***, executive dashboard, or AI features. These are **out of the first release**, not hidden in it. Per §38 and D-002, absent capability is stated plainly rather than implied.
+
+> ⚠ **Corrected 2026-08-08 — D-042.** This line previously read *"multi-currency"* unqualified and contradicted D-024. **Multi-currency transacting** — multi-currency ledgers, revaluation, currency translation — is out. **Multi-currency capture and FX normalisation are Tier 1 and in**: original amount, currency, FX rate and rate date on every financial event (D-028), normalised at each amount's **own effective date** for any cross-period comparison. Building single-currency from the old line would have made every imported-freight comparison wrong in an economy with EGP depreciation.
+
+---
+
+## THE MVP BUILD CONTRACT — frozen 2026-08-08 (Block 4)
+
+Full derivation: `docs/domain/18-BLOCK4-mvp-domain-freeze.md`.
+
+> **Build the ledger, the provenance primitive, and one mechanism — Mechanism 01's lead-time-correction slice — end to end, such that it can produce a defensible finding with correct provenance, gates, disclosure and audit, whether or not that finding carries currency.**
+
+### ⚠ The reframing this rests on
+
+`FACT` **Every mechanism's *currency* is gated by a factory fact that may not exist** — M01 by `F-01`, M02 by `F-12`/`F-13`, M03 by `F-31` and `F-08`'s components. **None of their *correctness* is.**
+
+> **An MVP that returns `INSUFFICIENT_DATA` for every opportunity, with each gap named and each observed spend shown, is a PASSING MVP.** It is not a broken one and must not be treated as one.
+
+This is the definition that removes the pressure to invent an input when the factory turns out not to record one — the most likely single route to a false financial result in this project.
+
+### Why Mechanism 01's lead-time slice, and only it
+
+Needs **no carrying-cost rate**, so `F-08` is not an MVP blocker · cause, intervention, counterfactual and verification **all inside our own data** · measures **money actually spent** · its capture (`F-01`, `F-06`) also gates D-037, so it unlocks the most downstream · realization is **entirely procurement-side**, and the operating chain is broken at *Actual Outcome*.
+
+⚠ **The offset gate is still built even though the offset is expected to be zero.** D-015 says the intervention *may* require no additional inventory. The MVP must **check**, and **refuse** where it does and the offset cannot be valued. Removing the check because the expected value is zero is exactly what D-014 rule 6 exists to prevent.
+
+### MVP units, in order
+
+`U-01` · `U-01b` · `U-02` · `U-03` · `U-04` · `U-05` · `U-06` · **`U-07`** · `U-09` · `U-11` · `U-12` · `U-13` *(including partial receipts)* · `U-15` · `U-17` · **`U-18` — one detector only** · `U-18b`.
+
+**Deferred from the MVP:** `U-08` lot/serial *(unless the pilot needs it)* · `U-10` counting · `U-14` cost reference · `U-16` reorder-point planning · `U-19` command centre · `U-20` finance feed. **Mechanisms 02 and 03 are not in the MVP** — not because they are unfinished, but because one mechanism proves all eleven capabilities and a second proves none of them again.
+
+### Acceptance — binary on five
+
+1. **No number exists without a provenance envelope.** Not one, not temporarily.
+2. **No invented constant exists anywhere in the codebase.** A missing input returns `INSUFFICIENT_DATA`.
+3. **Every figure traces to the movements and documents that produced it**, and every refusal **names what was missing**.
+4. **Balances equal the projection of history at any past instant**, verified by independent recomputation against a **historical** instant — not only against the present.
+5. **A duplicate ingestion is refused**, not accepted and corrected.
 
 ---
 

@@ -19,6 +19,7 @@
 | 7 | [`docs/domain/04-mechanism-01-expedite-premium.md`](docs/domain/04-mechanism-01-expedite-premium.md) | **Mechanism 01 — Part 2.1 locked.** Expedited freight / emergency purchase premium. |
 | 8 | [`docs/domain/09-part-2.2-LOCK.md`](docs/domain/09-part-2.2-LOCK.md) | **Mechanism 02 — Part 2.2 LOCKED.** Procurement Price Opportunity. |
 | 9 | [`docs/domain/17-part-2.3-LOCK.md`](docs/domain/17-part-2.3-LOCK.md) | **Mechanism 03 — Part 2.3 LOCKED.** Quantity & Inventory Economics. |
+| 9b | [`docs/domain/18-BLOCK4-mvp-domain-freeze.md`](docs/domain/18-BLOCK4-mvp-domain-freeze.md) | **THE MVP DOMAIN CONTRACT — FROZEN.** Everything classified, the build contract, the factory-data matrix, the final adversarial audit. |
 | 10 | [`docs/domain/06-orders-and-supply-movement-REQUIREMENT.md`](docs/domain/06-orders-and-supply-movement-REQUIREMENT.md) | Tracked requirement — **not designed, not a saving mechanism.** |
 | 11 | [`context/specs/00-build-plan.md`](context/specs/00-build-plan.md) | Units, stages, milestones, acceptance criteria. |
 | 12 | [`docs/open-questions.md`](docs/open-questions.md) | Everything undecided. Nothing here has been assumed elsewhere. |
@@ -62,9 +63,15 @@ Mechanism 03 also supplies the **inventory cost model** that Mechanisms 01 and 0
 
 ## Where the project actually is
 
-**Domain design is complete and locked.** All three saving mechanisms are designed; the two foundations (D-001 ledger, D-002 provenance) are locked and amended; the monetary boundaries are closed. No code is written.
+**The MVP domain contract is frozen.** All three saving mechanisms are designed and locked; both foundations (D-001 ledger, D-002 provenance) are locked; the monetary boundaries are closed; every unresolved item in the project is classified. No code is written.
 
-**What remains before architecture is not a design question.** Three answers block the critical path — the technology stack, the permission model, and the balance-projection strategy for the ledger — and eight factory facts decide whether the saving engine produces numbers or only findings. See `docs/open-questions.md` and §G of the Part 2.3 lock.
+**The build contract:**
+
+> Build the ledger, the provenance primitive, and one mechanism — Mechanism 01's lead-time-correction slice — end to end, such that it can produce a defensible finding with correct provenance, gates, disclosure and audit, **whether or not that finding carries currency.**
+
+**Nine decisions and twelve factory facts stand between this contract and a build. None of them is a design question.** The three on the critical path are the technology stack, the permission model, and the balance-projection strategy. See `docs/domain/18-BLOCK4-mvp-domain-freeze.md`.
+
+⚠ **An MVP that returns `INSUFFICIENT_DATA` for every opportunity, with each gap named, is a passing MVP.** Every mechanism's *currency* depends on a factory fact that may not exist; none of their *correctness* does. Defining the MVP any other way creates pressure to invent an input — the most likely route to a false financial result in this project.
 
 ## Why there is no code
 
@@ -99,7 +106,8 @@ docs/
 │   ├── 14-DECISION-CLOSURE-AND-BUILD-READINESS.md
 │   ├── 15-BLOCK1-foundation-governance-closure.md
 │   ├── 16-BLOCK2-monetary-boundaries.md
-│   └── 17-part-2.3-LOCK.md
+│   ├── 17-part-2.3-LOCK.md
+│   └── 18-BLOCK4-mvp-domain-freeze.md
 └── decisions/
     └── decision-register.md
 

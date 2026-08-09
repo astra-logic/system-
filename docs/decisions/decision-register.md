@@ -1205,3 +1205,156 @@ EXPOSURE / RISK        disclosed, never netted (D-031)
 **Rejected.** *Present the risk beside the number* — proximity is not a property of the number. *Suppress the number where risk is unvalued* — discards defensible benefit.
 
 **Hidden assumption surfaced.** That readers integrate adjacent information. **They read the number.**
+
+---
+
+# Block 4 — MVP domain freeze — 2026-08-08
+
+Decisions D-042 … D-046 close six specification gaps found by the Block 4 adversarial audit.
+**Each was found by asking what an engineering team could still misunderstand that would produce
+a false financial result.** Full analysis: `docs/domain/18-BLOCK4-mvp-domain-freeze.md`.
+
+None expands scope. Each prevents a specific, named failure.
+
+---
+
+## D-042 — Multi-currency transacting is out; multi-currency capture and FX normalisation are in
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F4, F8, all mechanisms · **Reconciles:** D-024 with the first-release scope · **Resolves:** `A-09`
+
+**The contradiction this closes.** `docs/domain/02-first-release-scope.md` §3 and the build plan both listed **multi-currency as out of scope**, while D-024 makes **FX normalisation a Tier-1 requirement** and D-028 requires currency, FX rate and rate date on every financial event. Both readings were supported by current text, and **the wrong one was stated in the document an engineer would read first.**
+
+**The false result it would have produced.** Freight invoiced in USD, recorded as an EGP figure at whatever rate applied that day, compared across a period containing an EGP devaluation. **A premium that is entirely currency movement presents as an operational deterioration** — the exact failure D-016 and D-024 exist to prevent, arriving through a scope document rather than through the saving engine.
+
+**Decision — a distinction, not a new capability.**
+
+```
+OUT of the first release   MULTI-CURRENCY TRANSACTING
+                           multi-currency ledgers · revaluation · currency
+                           translation · reporting in more than one currency
+
+IN, and Tier 1             MULTI-CURRENCY CAPTURE and FX NORMALISATION
+                           original amount + currency + FX rate + rate date
+                           on every financial event (already locked by D-028),
+                           normalised to a finance-owned policy rate for any
+                           cross-period comparison
+```
+
+**And the rule that would otherwise be got wrong.**
+
+> **Each historical amount is normalised using the rate effective at that amount's own effective date — never a single current rate applied across history.**
+
+Applying today's rate to history erases precisely the effect normalisation exists to isolate. This follows from D-002's amended `as_of` (effective time) and `F-07`'s effective-dating requirement, but neither states it as an arithmetic rule, and an engineer would reasonably choose the simpler wrong one.
+
+**Fallback where `F-07` is unavailable.** **No cross-period comparison at all** — single-period observed spend only. Never a current-rate shortcut, and never an assumed rate.
+
+**Rejected.** *Treat multi-currency as wholly out* — makes the saving engine wrong for an import-dependent Egyptian factory, which D-024 already rejected. *Treat it as wholly in* — reintroduces revaluation and currency translation, which is finance's under D-008 and the largest piece of scope this project removed.
+
+**Affected.** `02-first-release-scope.md` §3 · build plan exclusions · `A-09` · every cross-period figure.
+
+---
+
+## D-043 — Contagion applies to inputs; exclusion applies to set members, and exclusions are disclosed
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F4, F9, aggregation · **Extends:** D-002, D-012, D-041
+
+**The gap this closes.** D-002's contagion rule governs **the inputs of one value.** An aggregate over a **set of findings** is a different operation, and nothing in the project addressed it. Facing forty opportunities of which twelve return `INSUFFICIENT_DATA`, an engineer has two available moves and **both are wrong**:
+
+| | The move | The false result |
+|---|---|---|
+| (a) | Treat `INSUFFICIENT_DATA` as zero and sum the rest | A confidently-stated headline that **silently omits twelve opportunities.** It looks complete and is not |
+| (b) | Apply contagion literally — one bad member makes the aggregate `INSUFFICIENT_DATA` | The headline becomes **permanently uncomputable**, since some member always fails. The product has no North Star number, ever |
+
+**Decision.**
+
+> **Contagion applies to the inputs of a value. Exclusion applies to the members of a set — and an excluded member is disclosed, never silently dropped.**
+
+An aggregate over findings states, alongside the total: **the count of excluded members** · **their observed magnitude wherever any is known** · and **that the total is therefore a lower bound.**
+
+**Nothing is invented.** This is D-041's rule — *the number declares its own incompleteness* — applied to aggregation, and the direction is identical: **what is omitted is always favourable, so the total is always optimistic.**
+
+**Rejected.** *Silent exclusion with a footnote elsewhere on the page* — rejected for the same reason D-041 rejected it: proximity is not a property of the number, and readers read the number.
+
+---
+
+## D-044 — The headline range is an evidence partition, not a confidence interval
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F9 · **Completes:** D-012 · **Constrains:** `A-03`
+
+**The gap this closes.** D-012 locks *"expressed as a range, not a point."* **No construction was ever specified.** An engineer must produce two numbers, and every available move — ±20%, a confidence-derived interval, a standard deviation — **is an invented constant**, forbidden by D-014 rule 15 and D-017. This is the number the entire product is judged on.
+
+**Decision.**
+
+```
+LOWER BOUND   findings passing every gate whose every input is
+              ACTUAL or CALCULATED
+
+UPPER BOUND   the lower bound PLUS findings passing every gate that carry
+              an ESTIMATED or ASSUMED input, each disclosed individually
+
+BELOW BOTH    excluded members, per D-043 — count, observed magnitude,
+              and the statement that the total is a lower bound
+
+Neither bound is a confidence interval. Both are sums of real claims,
+partitioned by evidence class.
+```
+
+**Why this rather than a statistical interval.** It answers *"how much of this is solid?"* — the question a finance manager actually asks — rather than *"how uncertain is this number?"*, which cannot be answered without inventing a distribution. Both bounds are **defensible figures in their own right**, so the range survives an audit that a modelled interval would not.
+
+**It is a construction from locked material** — D-002's basis values and D-019's gates — not a new constant. **No probability appears anywhere in it.**
+
+**Rejected.** *A confidence-derived interval* — requires `A-03`, which is unanswered, and would embed an invented constant in the headline. *A single point with a caveat* — D-012 forbids it. *Best/worst case per opportunity* — requires per-opportunity uncertainty bounds, which is the same invention distributed.
+
+---
+
+## D-045 — The MVP carries no synthesised confidence score
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F9 · **Constrains:** `A-03` · **Amends:** D-011's object · **Uses:** D-026 unchanged
+
+**The gap this closes.** The Saving Opportunity object carries **`Confidence`**, described as *"per a defined rule (`A-03`), never a judgement call."* **`A-03` is unanswered.** D-014 rule 15 forbids category constants. An engineer facing a required field with no formula **will synthesise one** — most plausibly a weighted blend of gate outcomes, which is precisely the *"gates are never averaged and never become scores"* prohibition, arriving as a UI necessity rather than a design decision.
+
+**Decision — resolution by removal, not by invention.**
+
+> **No synthesised confidence score exists until `A-03` defines one.**
+
+The MVP carries instead:
+
+- **Evidence strength** (D-026) — already defined, already an attribute, already orthogonal to lifecycle
+- **Coverage facts, stated plainly** — *"root cause classified on 7 of 9 events" · "lead-time sample: 11 receipts over 14 months" · "cost reference age: 9 days"*
+
+**Why this is better and not merely safer.** A stated coverage fact is more useful to a finance manager than a synthesised score, and **it cannot be wrong** — it is an observation, not a model. A score compresses several independent facts into one number that then has to be explained, and the explanation is always the facts.
+
+**Cost.** The object has one fewer field and the UI cannot sort by confidence. That is the correct trade against embedding an invented constant in every opportunity the product ever produces.
+
+**When `A-03` is answered**, a confidence value may be introduced — computed from evidence and data coverage per rule 15, never from category constants.
+
+---
+
+## D-046 — Annualisation is a recurrence claim, never an extrapolation
+
+**Status:** `LOCKED` 2026-08-08 · **Area:** F9 · **Completes:** D-014 rules 11 and 12, D-019
+
+**The gap this closes.** Rules 11 and 12 set the **history bar** — twelve months usable, and never a silent confident annual number below it. **Neither says what the annual figure *is*.** With eighteen months an engineer must choose a window; with fourteen, `sum × (12 / months_observed)` is the obvious move, and it is **extrapolation wearing arithmetic's clothing.**
+
+**Decision.**
+
+> **Annualisation is a claim that the intervention prevents recurrence — not a claim that the past repeats, and never a scaling of a partial window.**
+
+```
+≥ 12 months usable history
+    The annual figure is the OBSERVED figure over a stated twelve-month
+    window, FX-normalised per D-042, with the window explicitly declared.
+    Where more than twelve months exist, the most recent twelve are used
+    unless the intervention's evidence spans longer — and which window
+    was used is SHOWN.
+
+< 12 months
+    NO annual figure. OPPORTUNITY DETECTED without currency (rule 12, D-019).
+    Never a scaled one, however disclosed.
+```
+
+**And a distinction that will otherwise be conflated:** rule 11's twelve months is a **history minimum**; D-022's twelve months is a **verification window**. **Two different twelves on two different clocks**, and an engineer meeting both in the same object will assume they are one.
+
+**One-time impacts are never annualised at all** (D-012, D-033) — they are level changes, and a level changes once.
+
+**Rejected.** *Scaling a partial window with a disclosure* — rule 12 forbids the silent version, and the disclosed version is the same arithmetic with a label. *Averaging across all available history* — a step-change in demand or price makes the average describe a period that no longer exists.

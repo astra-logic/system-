@@ -46,7 +46,24 @@ The primary user is the person responsible for stock being correct. The product'
 
 ## 3. Out of scope
 
-C10 Production · C12 Maintenance · full C11 Quality · MRP · capacity planning · BoMs · routings · work centres · multi-site · multi-currency (`OPEN`, see N-04) · AI features.
+C10 Production · C12 Maintenance · full C11 Quality · MRP · capacity planning · BoMs · routings · work centres · multi-site · **multi-currency *transacting*** (see the correction below) · AI features.
+
+> ### ⚠ Corrected 2026-08-08 — D-042. This line previously read *"multi-currency"* without qualification, and it contradicted a locked decision.
+>
+> ```
+> OUT   MULTI-CURRENCY TRANSACTING — multi-currency ledgers, revaluation,
+>       currency translation, reporting in more than one currency
+>
+> IN, and TIER 1
+>       MULTI-CURRENCY CAPTURE and FX NORMALISATION — original amount +
+>       currency + FX rate + rate date on every financial event (D-028),
+>       normalised to a finance-owned policy rate for any cross-period
+>       comparison (D-024)
+> ```
+>
+> **Why the unqualified line was dangerous.** The factory is Egyptian and import-dependent; freight and imported material are commonly USD- or EUR-denominated while reporting is EGP. An engineer building single-currency from this line would record a USD freight invoice as an EGP number at that day's rate. Compared across an EGP devaluation, **a premium that is entirely currency movement presents as an operational deterioration** — the exact failure D-016 and D-024 exist to prevent.
+>
+> **And the rule that would otherwise be got wrong:** each historical amount is normalised at **the rate effective on its own effective date**, never at a single current rate. Applying today's rate to history erases the effect normalisation exists to isolate.
 
 **BoMs are out, and this is load-bearing.** Without them there is no material requirements calculation, which is why planning is reorder-point based rather than MRP. That is a genuine capability limit and must be stated to users plainly rather than disguised.
 

@@ -28,13 +28,13 @@
 |---|---|---|---|
 | A-01 | Balances projected synchronously or asynchronously? | F2 | `OPEN` |
 | A-02 | Hard or soft reservation? | F3 | `OPEN` |
-| A-03 | How is confidence defined and computed? | F4 | `CONSTRAINED` — locked rule 15: from evidence/data coverage, never category constants. Exact formula still `OPEN` |
+| A-03 | How is confidence defined and computed? | F4 | **`DEFERRED SAFELY` 2026-08-08 → D-045.** Rule 15 constrains it; the formula is still `OPEN` — **so the MVP carries no synthesised confidence score at all.** It carries evidence strength (D-026) and **coverage facts stated plainly**. ⚠ A required field with no formula would have been synthesised by blending gate outcomes, which is the *"gates never become scores"* prohibition arriving as a UI necessity. **Not an MVP blocker; resolved by removal** |
 | A-04 | Who may close/reopen an accounting period? | F5 | `OPEN` |
 | A-05 | Are catch-weight items required? | F6 | `OPEN` — **likely yes** under mixed manufacturing (see N-04) |
 | A-06 | Is full lot genealogy required at first release? | F7 | `OPEN` — narrowed: no production means no input→output genealogy in release 1. Lot-level stock visibility only |
 | A-07 | Costing method(s) to support: standard, moving average, FIFO? | F8 | `CLOSED` — finance owns valuation (D-008). No costing engine here |
 | A-08 | Is standard cost per site or global? | F1/F8 | `CLOSED` — single site; cost is imported (D-008) |
-| A-09 | Multi-currency and FX at first release? | C1 | **`TIER 1` — escalated 2026-08-07 by D-024.** FX normalisation is mandatory for any cross-period financial comparison. Remaining work is the factory-data side (`F-07`) |
+| A-09 | Multi-currency and FX at first release? | C1 | **`CLOSED` 2026-08-08 → D-042.** ⚠ Three documents said multi-currency was **out of scope** while D-024 made FX normalisation **Tier 1** — and the wrong reading sat in the document an engineer reads first. **Resolved as a distinction:** multi-currency *transacting* (ledgers, revaluation, translation) is **out**; multi-currency *capture and FX normalisation* are **in and Tier 1**. Each amount normalises at **its own effective date**, never at a single current rate. Remaining work is factory-side (`F-07`) |
 | A-10 | Location hierarchy fixed-depth or arbitrary? | C2 | `OPEN` |
 | A-11 | Who owns item master data? | C3 | `OPEN` |
 | A-12 | Minimum sample size before a supplier metric is shown? | C4 | `OPEN` |
@@ -277,3 +277,49 @@ Workshopped in `10-Q07-saving-model-reconciliation.md`, adversarially tested in 
 | B-04 | Deployment scope | Single site, site-scoped records | D-004 |
 | B-06 | Valuation ownership | Finance owns it; we own quantity truth | D-008 |
 | N-08 | Annualisation minimum history | 12 months usable, preferred minimum | D-014 (locked rule 11) |
+
+---
+
+## BLOCK 4 — MVP classification, 2026-08-08
+
+Full analysis: `docs/domain/18-BLOCK4-mvp-domain-freeze.md`. **Every unresolved item in this register is now classified.** Nothing remains as "future work."
+
+**Test applied.** An item is `A — MUST RESOLVE BEFORE MVP` only if leaving it unresolved could produce a **false saving** · a **materially misleading recommendation** · **broken inventory or order truth** · a **provenance violation** · **double counting** · **contradictory recommendations** · or an **impossible MVP workflow.** Theoretical interest is not a criterion.
+
+### A — MUST RESOLVE BEFORE MVP
+
+| ID | Why it blocks — the specific failure |
+|---|---|
+| `A-19` stack | Nothing can be built. Criteria already fixed by F2: transactional integrity, exact decimals, fast projections |
+| `A-01` projection strategy | ⚠ **Not merely "shapes the write path."** D-039 needs point-in-time reconstruction over long windows; async without **historical replay** makes every saving backtest impossible |
+| `A-20` permission model | Currency claims need an adjudicator **independent of the underlying decision** (DP-07). Without roles, either a buyer approves their own saving or the workflow is impossible |
+| `A-02` reservation, hard or soft | Determines whether `Available` is truthful (F3). A wrong `Available` breaks inventory truth |
+| `A-18` excess ↔ dead boundary | ⚠ **Only this boundary blocks.** D-035 treats capital as *tied* for excess and *lost* for dead — an undefined boundary silently moves money between two different claims. **A factory policy; we may not choose it** |
+| `N-03` consumption granularity | Ledger-shaping and **unbackfillable** |
+| `N-04` catch-weight | Ledger-shaping. Retrofitting corrupts every historical quantity |
+| `F-06` how an expedite is recognised | ⚠ **The MVP's detection trigger.** No events, no mechanism |
+| `B-07` pilot factory | An MVP validated against no factory is unvalidated business logic (§47) |
+
+**Fixed in Block 4, not carried forward:** `A-09` currency contradiction → D-042 · aggregation of uncomputable members → D-043 · the headline range's construction → D-044 · `A-03` confidence → D-045 · annualisation method → D-046 · §4.4's live formula · *"dedupe by subject"* in two documents.
+
+### B — CAN RESOLVE DURING MVP BUILD
+
+`N-01` finance contract and `U-14` *(⚠ the MVP mechanism's currency comes from **procurement documents**, not the cost reference)* · `A-04` period close · `A-10` location depth · `A-11` item-master ownership · `A-12` supplier sample *(constrains a display, not a claim)* · `A-15` inspection policy · `N-05` handheld vs desk · `N-12` opportunity ownership *(configuration of existing fields)* · `N-13` intervention owner *(**answered in substance** by the D-011 amendment)* · `P-12` design system · `Q-01` quality rejection *(a list entry in D-018's categories)* · `Q-02` defensible counterfactual *(**needs real events — it is MVP work**)* · `Q-06` other costs of a lead-time correction *(D-015 nominated the slice to test exactly this)* · `W-24` which contradiction resolution applies when · `W-32` who adjudicates a contradiction *(folds into `A-20`)*.
+
+### C — CAN BE DEFERRED AFTER MVP
+
+`P-01`…`P-07`, `P-09`…`P-14` · `A-05` catch-weight UoM elaboration *(the **requirement** is `N-04`, class A)* · `A-06` lot genealogy · `N-02` outbound feed · `N-06` history depth · `N-09` staleness threshold · `N-11` service level *(**constrained**: a policy the factory states, never a model)* · `Q-08` decomposition engine *(now has its 2nd and 3rd mechanisms)* · `Q-09` document immutability *(required before **Mechanism 02**, not before MVP)* · `Q-10` in-transit ownership · `Q-11` source drift · `Q-12` basis semantics · `W-02`, `W-07`, `W-08`, `W-10`, `W-11`, `W-13`, `W-14` *(Mechanism 02 refinements)* · `W-43`, `W-44` · `B2-02`…`B2-04` · `B3-01`…`B3-03` · **promotion of D-004, D-006, D-010, D-012, D-013, D-015**.
+
+**Two that look blocking and are not.** `W-20` — does one unestablished comparability dimension block currency outright? A **Mechanism 02** question; the MVP has one mechanism and no comparability gates. `W-31` — is the signature dimension vocabulary locked or extensible? ⚠ **Part 2.3 answered it by demonstration** — Mechanism 03 added seven dimensions, so it must be extensible. Formalise at a fourth mechanism.
+
+> ⚠ **On the six `PROPOSED` decisions.** **D-012 is amended by three *locked* decisions while itself unlocked.** Their substance is used consistently everywhere, so none blocks the MVP — but the audit trail says a locked decision amends an unlocked one. **Ratification, not redesign.** Deferred only because it changes nothing an engineer would build.
+
+### D — RETIRED / NO LONGER NEEDED
+
+`P-08` → D-040 · `Q-03`, `Q-04`, `Q-05`, `Q-07` → closed · `N-07` ≡ `F-01` and `N-10` ≡ `F-08` → duplicates · `N-08` → rule 11 · `A-07`, `A-08`, `A-13`, `A-14`, `A-16`, `A-17` → D-008 / D-010 · `B-01`…`B-06` → answered · `M-01`…`M-08` → D-017…D-024 · `DP-01`…`DP-15` → closed · `W-01`, `W-03`…`W-06`, `W-09`, `W-12`, `W-17`, `W-23`, `W-25`, `W-26`, `W-33`, `W-35`, `W-36`, `W-45`…`W-49` → closed by the locks · §4.2 · §4.5 · D-003 · D-005 · D-016 · **avoidability weights · minimum event counts · service-level models · EOQ** → rejected outright.
+
+### E — BLOCKED BY FACTORY EVIDENCE
+
+`F-01` … `F-44`. **Only four gate the MVP** — `F-06` detection · `F-41` correctness · `F-01` currency only · `F-07` currency only — plus `F-09` as a claim gate. The readiness matrix with source, evidence class, provenance and **fallback if missing** is Part E of file 18.
+
+⚠ **Seven register items will be created by the product itself** — root-cause classification, expedite flags going forward, override history, escalation records, decision rationale, realization measurements, adjudication records. **Do not ask the factory for these.** Ask only whether they *could* be captured.

@@ -46,7 +46,9 @@ Replaces D-003's recommendation structure. Every opportunity carries:
 | Data freshness | Age of the oldest input. Drives `STALE_DATA`. |
 | Calculation | The transparent working, per §5 of the core mission |
 | Assumptions | Named, explicit, overridable |
-| Confidence | Per a defined rule (`A-03`), never a judgement call |
+| ~~Confidence~~ | ~~Per a defined rule (`A-03`), never a judgement call~~ — ⚠ **removed from the MVP 2026-08-08 by D-045.** `A-03` is unanswered and rule 15 forbids category constants, so a required field with no formula would be **synthesised** — most plausibly by blending gate outcomes, which is exactly the *"gates are never averaged and never become scores"* prohibition arriving as a UI necessity |
+| **Evidence strength** | `EARLY` / `STRONG` per D-026. An attribute, never a lifecycle state |
+| **Coverage facts** | Stated plainly, not compressed into a score: *"root cause classified on 7 of 9 events" · "lead-time sample: 11 receipts over 14 months" · "cost reference age: 9 days."* **An observation cannot be wrong; a score has to be explained, and the explanation is always the facts** |
 | **One-time impact** | Working capital released, cash freed. Happens once. |
 | **Recurring impact** | Annual cost reduction. Repeats yearly. |
 | Potential Annual Saving | Derived — see the aggregation rules in §5 |
@@ -220,11 +222,21 @@ Four attempts to find an independent intervention; all four fail. Slow-but-appro
 **⚠ Added by D-035:** **disposal does not release capital.** For dead stock capital is **lost, not tied**; scrapping converts a book asset into a book loss — an accounting event, not a cash event. Only recovery received and ongoing costs no longer incurred are cash effects.
 **Refuses when:** `F-38` disposal cost / recovery value unavailable · `F-33` (is space constrained?) unanswered, which decides whether the space component exists at all.
 
-### 4.4 Purchase price variance
-**Impact:** recurring
-**Inputs:** price history, alternative supplier prices, annual volume
-**Calculation:** `(current price − best comparable price) × annual volume`
-**Refuses when:** below `A-12` delivery sample · prices not genuinely comparable (differing MOQ, quality, terms, incoterms). **Comparability is the hard part, and a price difference that ignores it is not a saving.**
+### 4.4 Purchase price variance — **SUPERSEDED BY MECHANISM 02** *(D-030, Part 2.2 lock)*
+
+> ⚠ **This category's original formula was a rate applied to a total and is INVALID.** It is retained below, struck through, as history — never as a specification. `docs/domain/09-part-2.2-LOCK.md` is authoritative for this category.
+>
+> **Also renamed.** *"Purchase price variance"* now unambiguously means **Finance's accounting PPV**, which is not ours under D-008. Ours is **Procurement Price Opportunity**.
+
+**As locked:** an opportunity exists where the factory paid more for an **equivalent procurement outcome** than an **available or contractually achievable alternative at the relevant time**. Quantification is **event-level and counterfactual** (D-027), gated by evidence class → comparability → factual conditions, and **unestablished is never a pass**.
+
+#### Original entry (superseded — do not implement)
+
+~~**Inputs:** price history, alternative supplier prices, annual volume~~
+~~**Calculation:** `(current price − best comparable price) × annual volume`~~
+~~**Refuses when:** below `A-12` delivery sample · prices not genuinely comparable.~~
+
+**Why it is invalid.** A price difference multiplied by an annual total is **a rate applied to a total** — the precise error D-017 rejected and D-027 elevated to a standing principle. It assumes the alternative was available for the whole year, at that price, for that quantity, on equivalent terms. **Comparability is the hard part, and a price difference that ignores it is not a saving.**
 
 ### 4.5 Order consolidation — **RETIRED AND REDISTRIBUTED** (D-032)
 
@@ -307,7 +319,9 @@ Same discipline as D-002's basis: **a number that carries what is wrong with it.
 
 A single headline figure — *"Potential Annual Saving: €487,000"* — is the most seductive number this system can display, and the easiest to get catastrophically wrong. Four failure modes, each of which produces a number that is confidently, invisibly inflated:
 
-**1. Double counting.** Reducing excess stock of Material A and optimising its reorder point both release capital from the same stock. Summed naively, the same euro is claimed twice. **Rule:** opportunities are deduplicated by subject before aggregation; overlaps are netted and the deduction is shown.
+**1. Double counting.** Reducing excess stock of Material A and optimising its reorder point both lower average stock on the same material. Summed naively, the same money is claimed twice.
+
+**Rule (D-020 — corrected 2026-08-08).** Deduplication is performed at the **economic-mechanism level**, not by subject. ~~*Superseded: "deduplicated by subject before aggregation."*~~ **Subject-level deduplication is wrong and understates**: a single PO line can carry two genuinely independent effects — an air-freight premium fixed by planning, and a spot-price premium fixed by sourcing — and deduplicating by subject **discards one of them and misdirects the fix**. Genuinely independent effects may both be quantified; where one effect is a component or consequence of another, deduplicate. **Attribution must be explainable, never a silent filter.**
 
 **2. One-time treated as annual.** A €200,000 working-capital release is not €200,000 per year. **Rule:** one-time and recurring impacts are aggregated separately and displayed separately. "Potential Annual Saving" contains recurring impact only. Capital release is reported as its own figure, labelled as one-time.
 
