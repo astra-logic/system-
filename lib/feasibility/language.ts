@@ -19,7 +19,11 @@
  * A correct decision must be reachable at layer 2. Layer 4 is available in one
  * interaction and required for none.
  */
-import { formatQty } from "../core/decimal";
+/* Law 9: quantities reach the user through the ONE formatting boundary.
+   Before Block 13 this rendered "305.100 kg" and "197.000 EA" — true, and not
+   how a person writes a quantity. No feasibility RULE changes here; only the
+   precision the result is spoken at. */
+import { qty as fmtQty } from "../ui/format";
 import type { ComponentResult, FeasibilityAnswer, Verdict } from "./engine";
 
 /* -------------------------------------------------------------------------- */
@@ -143,7 +147,7 @@ export function missingLines(a: FeasibilityAnswer): MissingLine[] {
   return a.shortComponents.map((c) => ({
     code: c.code,
     name: c.name,
-    missing: c.gapVsAvailable ? `${formatQty(c.gapVsAvailable, c.stockUom, dpFor(c))} short` : "short",
+    missing: c.gapVsAvailable ? `${fmtQty(c.gapVsAvailable, c.stockUom, { whole: c.integerOnly })} short` : "short",
     action: actionFor(c),
     warnings: warningsFor(c),
   }));
@@ -158,8 +162,8 @@ export function actionFor(c: ComponentResult): string | null {
   }
 
   const packs =
-    r.nominalQty && r.nominalUom ? ` (about ${formatQty(r.nominalQty, r.nominalUom, 0)})` : "";
-  const qtyText = `${formatQty(r.orderQty, r.orderUom, dpFor(c))}${packs}`;
+    r.nominalQty && r.nominalUom ? ` (about ${fmtQty(r.nominalQty, r.nominalUom, { whole: true })})` : "";
+  const qtyText = `${fmtQty(r.orderQty, r.orderUom, { whole: c.integerOnly })}${packs}`;
 
   if (r.lateByDays !== null && r.lateByDays > 0) {
     return `Order ${qtyText} now — even so, the earliest it can arrive is ${fmtDate(r.earliestArrival)}, ${r.lateByDays} days after you need it.`;
@@ -190,7 +194,7 @@ export function warningsFor(c: ComponentResult): string[] {
 
   if (c.cappedByConsumption && c.monthlyConsumption) {
     w.push(
-      `You have enough of ${c.code} today, but it is used regularly — about ${formatQty(c.monthlyConsumption, c.stockUom, 0)} a month — so it may not still be there when you need it.`,
+      `You have enough of ${c.code} today, but it is used regularly — about ${fmtQty(c.monthlyConsumption, c.stockUom, { whole: true })} a month — so it may not still be there when you need it.`,
     );
   }
 
@@ -247,10 +251,10 @@ export function reason(a: FeasibilityAnswer): string {
 /** Layer 3, per material. */
 export function reasonFor(c: ComponentResult): string {
   if (c.cantSayReason) return c.cantSayReason;
-  const dp = dpFor(c);
-  const need = c.requirement.value ? formatQty(c.requirement.value, c.stockUom, dp) : "—";
-  const have = c.available ? formatQty(c.available, c.stockUom, dp) : "—";
-  const coming = c.incoming ? formatQty(c.incoming, c.stockUom, dp) : "—";
+  const w = { whole: c.integerOnly };
+  const need = fmtQty(c.requirement.value, c.stockUom, w);
+  const have = fmtQty(c.available, c.stockUom, w);
+  const coming = fmtQty(c.incoming, c.stockUom, w);
   const base = `You need ${need} of ${c.code}. You have ${have} on the shelf`;
   if (c.supply.length === 0) return `${base}, and nothing is on order.`;
   return `${base}, and ${coming} is on the way.`;

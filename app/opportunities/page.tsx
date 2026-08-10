@@ -10,6 +10,7 @@ import { currentOpportunities } from "../../lib/engine/persist";
 import { evaluateContradictions, recordContradictions } from "../../lib/engine/contradiction-service";
 import { firstSiteId, runAndPersist } from "../../lib/engine/run";
 import { sql } from "../../lib/db/client";
+import { money } from "../../lib/ui/format";
 import { DemoBanner } from "../demo-banner";
 
 export const dynamic = "force-dynamic";
@@ -85,7 +86,8 @@ export default async function Opportunities() {
                     <td>{f.itemCode ?? "—"}</td>
                     <td><span className={`badge ${f.lifecycle === "APPROVED" ? "ok" : f.lifecycle === "REJECTED" ? "bad" : ""}`}>{f.lifecycle}</span></td>
                     <td className="note" style={{ margin: 0 }}>{f.ladder.replace(/_/g, " ")}</td>
-                    <td className="num">{val ? `${val} ${String(net?.["unit"] ?? "")}` : <span className="badge warn">not calculable</span>}</td>
+                    {/* Law 9: rendered the raw stored string before Block 13. */}
+                    <td className="num">{val ? money(val, String(net?.["unit"] ?? "")) : <span className="badge warn">not calculable</span>}</td>
                     <td>
                       {blocked.has(f.id) && <span className="badge bad">blocked</span>}{" "}
                       {f.netExcludesUnvaluedRisk && <span className="badge warn">excludes unvalued risk</span>}{" "}

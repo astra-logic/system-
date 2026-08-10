@@ -11,6 +11,7 @@ import { currentEvidenceGaps, currentOpportunities } from "../lib/engine/persist
 import { evaluateContradictions } from "../lib/engine/contradiction-service";
 import { potentialAnnualSaving } from "../lib/engine/aggregate";
 import { rehydrate } from "../lib/engine/rehydrate";
+import { money, moneyExact } from "../lib/ui/format";
 import { DemoBanner } from "./demo-banner";
 
 export const dynamic = "force-dynamic";
@@ -48,12 +49,16 @@ export default async function Today() {
            (SELECT COUNT(*)::int FROM purchase_orders WHERE site_id = ${siteId}::uuid AND status = 'SENT') AS open_orders,
            0 AS gaps`;
 
+  /* Law 9: the ONE formatting boundary. These were inline .toFixed() calls.
+     The range is kept intact — D-044's evidence partition is unchanged — but it
+     is now rendered at the precision a person reads rather than at cash
+     precision on a seven-figure number. */
   const range =
     h.basis === "INSUFFICIENT_DATA"
       ? "Not yet calculable"
       : h.lower.equals(h.upper)
-        ? h.lower.toFixed(2)
-        : `${h.lower.toFixed(2)} – ${h.upper.toFixed(2)}`;
+        ? money(h.lower, "")
+        : `${money(h.lower, "")} – ${money(h.upper, "")}`;
 
   return (
     <>
@@ -105,7 +110,7 @@ export default async function Today() {
                   </td>
                   <td className="note" style={{ margin: 0 }}>{e.reason}</td>
                   <td className="num">
-                    {e.observedMagnitude ? `${e.observedMagnitude.toFixed(2)} ${h.currency}` : "—"}
+                    {e.observedMagnitude ? moneyExact(e.observedMagnitude, h.currency) : "—"}
                   </td>
                 </tr>
               ))}

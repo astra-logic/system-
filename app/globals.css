@@ -1,91 +1,558 @@
-/* Calm, clear, precise (core mission §10). Restrained semantic colour: colour
-   carries meaning here, it is not decoration. */
+/* ==========================================================================
+   PRODUCT DESIGN SYSTEM
+   Block 13. Governed by docs/domain/23-INTERFACE-CONTRACT.md.
+
+   THE RULE THAT SHAPES THIS FILE
+
+     Colour carries MEANING here; it is not decoration. The four states —
+     yes / at risk / no / can't say — are the product's core vocabulary, so
+     no other element is allowed to borrow their hues. The action colour is
+     deliberately a blue that sits nowhere near green, amber or red.
+
+     ⚪ CAN'T SAY IS NEUTRAL GREY, NOT A HUE. "No" and "I don't know" are
+     different instructions to a person, and an unknown that looks like an
+     error is the specific failure this product exists to avoid.
+
+   Restraint is the premium signal: cards carry a border, not a shadow;
+   two radii, not five; two shadows, reserved for things that genuinely float.
+
+   Every value below is a token. Components never hardcode.
+   ========================================================================== */
+
 :root {
-  --bg: #fbfbfd; --surface: #fff; --line: #e6e6ea; --ink: #1d1d1f; --muted: #6e6e73;
-  --accent: #0066cc; --warn: #9a6700; --warn-bg: #fff8e6; --bad: #b3261e; --bad-bg: #fdf2f1;
-  --ok: #1a7f4b; --ok-bg: #f0f9f4; --radius: 10px;
+  /* --- ground and surfaces ------------------------------------------------ */
+  --background: #f7f8fa;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-sunken: #f2f4f7;
+
+  /* --- text --------------------------------------------------------------- */
+  --text-primary: #12151a;
+  --text-secondary: #4a5361;
+  --text-muted: #78818f;
+  --text-on-primary: #ffffff;
+
+  /* --- lines -------------------------------------------------------------- */
+  --border: #e3e7ed;
+  --border-subtle: #eff1f5;
+  --border-strong: #cfd6df;
+
+  /* --- action ------------------------------------------------------------- */
+  --primary: #1b4d8f;
+  --primary-hover: #16406f;
+  --primary-soft: #eaf1f9;
+  --primary-line: #c3d6ea;
+  --focus: #2f7fd4;
+  --selected: #eef4fb;
+
+  /* --- STATUS. Semantic only. Never used for chrome. ---------------------- */
+  --success: #15734a;
+  --success-soft: #e8f4ed;
+  --success-line: #b8dcc8;
+
+  --warning: #8a5a00;
+  --warning-soft: #fdf3e0;
+  --warning-line: #ecd6a8;
+
+  --danger: #a32318;
+  --danger-soft: #fceceb;
+  --danger-line: #f0c5c1;
+
+  /* ⚪ Deliberately hueless. It must read as "not yet known", never as an
+     error and never as a pass. */
+  --unknown: #6b7482;
+  --unknown-soft: #f1f3f6;
+  --unknown-line: #dde1e8;
+
+  /* --- spacing. 4px base. -------------------------------------------------- */
+  --s1: 4px;   --s2: 8px;   --s3: 12px;  --s4: 16px;
+  --s5: 20px;  --s6: 24px;  --s7: 32px;  --s8: 40px;
+  --s9: 56px;  --s10: 72px;
+
+  /* --- radius. Two, plus a pill. ------------------------------------------ */
+  --radius-control: 6px;
+  --radius-surface: 10px;
+  --radius-pill: 999px;
+
+  /* --- elevation. Two, and both are rare. --------------------------------- */
+  --shadow-sm: 0 1px 2px rgba(16, 22, 32, .06), 0 1px 1px rgba(16, 22, 32, .04);
+  --shadow-md: 0 8px 24px rgba(16, 22, 32, .10), 0 2px 6px rgba(16, 22, 32, .06);
+
+  /* --- type --------------------------------------------------------------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --text-display: 34px;
+  --text-title: 26px;
+  --text-section: 17px;
+  --text-card: 15px;
+  --text-body: 15px;
+  --text-secondary-size: 14px;
+  --text-meta: 13px;
+  --text-micro: 11.5px;
+
+  /* --- motion. Short, and honoured only where it aids comprehension. ------ */
+  --ease: cubic-bezier(.2, 0, .2, 1);
+  --fast: 120ms;
+  --normal: 200ms;
+
+  /* --- layout ------------------------------------------------------------- */
+  --content-max: 1120px;
+  --nav-height: 56px;
 }
+
+/* Dark is designed, not inverted: contrast is re-checked and the status hues
+   are re-picked so they stay legible on a dark ground. */
 @media (prefers-color-scheme: dark) {
-  :root { --bg:#0b0b0d; --surface:#151517; --line:#2a2a2e; --ink:#f2f2f5; --muted:#9a9aa0;
-    --accent:#4da3ff; --warn:#e0b341; --warn-bg:#2a2312; --bad:#ff6b5e; --bad-bg:#2b1512;
-    --ok:#4ec98a; --ok-bg:#11241a; }
+  :root:not([data-theme="light"]) {
+    --background: #0e1116;
+    --surface: #161a21;
+    --surface-elevated: #1d222b;
+    --surface-sunken: #12161c;
+
+    --text-primary: #e8ebf0;
+    --text-secondary: #a2abb8;
+    --text-muted: #78828f;
+    --text-on-primary: #0e1116;
+
+    --border: #262c35;
+    --border-subtle: #1d222a;
+    --border-strong: #39414d;
+
+    --primary: #6ba6e8;
+    --primary-hover: #8bbcf0;
+    --primary-soft: #16222f;
+    --primary-line: #2a3f56;
+    --focus: #6ba6e8;
+    --selected: #182430;
+
+    --success: #4fc58c;
+    --success-soft: #10251b;
+    --success-line: #21432f;
+
+    --warning: #dfb040;
+    --warning-soft: #241f11;
+    --warning-line: #453619;
+
+    --danger: #ff7a6c;
+    --danger-soft: #2a1512;
+    --danger-line: #4a231e;
+
+    --unknown: #98a2ae;
+    --unknown-soft: #1a1f26;
+    --unknown-line: #2b323b;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .3);
+  }
 }
+
+:root[data-theme="dark"] {
+  --background: #0e1116;
+  --surface: #161a21;
+  --surface-elevated: #1d222b;
+  --surface-sunken: #12161c;
+  --text-primary: #e8ebf0;
+  --text-secondary: #a2abb8;
+  --text-muted: #78828f;
+  --text-on-primary: #0e1116;
+  --border: #262c35;
+  --border-subtle: #1d222a;
+  --border-strong: #39414d;
+  --primary: #6ba6e8;
+  --primary-hover: #8bbcf0;
+  --primary-soft: #16222f;
+  --primary-line: #2a3f56;
+  --focus: #6ba6e8;
+  --selected: #182430;
+  --success: #4fc58c;
+  --success-soft: #10251b;
+  --success-line: #21432f;
+  --warning: #dfb040;
+  --warning-soft: #241f11;
+  --warning-line: #453619;
+  --danger: #ff7a6c;
+  --danger-soft: #2a1512;
+  --danger-line: #4a231e;
+  --unknown: #98a2ae;
+  --unknown-soft: #1a1f26;
+  --unknown-line: #2b323b;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .3);
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
 * { box-sizing: border-box; }
-body { margin:0; background:var(--bg); color:var(--ink);
-  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; }
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
-.wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 80px; }
-nav.top { border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:5; }
-nav.top .inner { max-width:1080px; margin:0 auto; padding:14px 24px; display:flex; gap:22px; align-items:center; flex-wrap:wrap; }
-nav.top strong { letter-spacing:-.01em; margin-right:8px; }
-nav.top a { color:var(--muted); font-size:14px; }
-nav.top a:hover { color:var(--ink); text-decoration:none; }
-h1 { font-size:28px; letter-spacing:-.02em; margin:32px 0 6px; }
-h2 { font-size:18px; letter-spacing:-.01em; margin:34px 0 12px; }
-h3 { font-size:15px; margin:20px 0 8px; }
-p.sub { color:var(--muted); margin:0 0 24px; max-width:70ch; }
-.card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:20px; margin:14px 0; }
-.demo { background:var(--warn-bg); border:1px solid var(--warn); color:var(--warn);
-  border-radius:var(--radius); padding:12px 16px; margin:16px 0; font-weight:600; font-size:14px; }
-.figure { font-size:34px; letter-spacing:-.025em; font-variant-numeric: tabular-nums; margin:2px 0; }
-.figure .cur { font-size:18px; color:var(--muted); margin-left:6px; }
-.note { color:var(--muted); font-size:13.5px; margin:6px 0; max-width:80ch; }
-.badge { display:inline-block; font-size:11.5px; font-weight:600; letter-spacing:.03em;
-  padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); }
-.badge.ok { background:var(--ok-bg); color:var(--ok); border-color:transparent; }
-.badge.warn { background:var(--warn-bg); color:var(--warn); border-color:transparent; }
-.badge.bad { background:var(--bad-bg); color:var(--bad); border-color:transparent; }
-table { width:100%; border-collapse:collapse; font-size:14px; }
-th { text-align:left; font-weight:600; color:var(--muted); font-size:12px; letter-spacing:.04em;
-  text-transform:uppercase; padding:8px 10px; border-bottom:1px solid var(--line); }
-td { padding:10px; border-bottom:1px solid var(--line); vertical-align:top; }
-td.num, th.num { text-align:right; font-variant-numeric: tabular-nums; }
-.gate { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); font-size:13.5px; }
-.gate:last-child { border-bottom:0; }
-.gate .n { font-weight:600; min-width:210px; }
-.scroll { overflow-x:auto; }
-ul.reasons { margin:8px 0 0; padding-left:18px; color:var(--muted); font-size:13.5px; }
-ul.reasons li { margin:4px 0; }
-.kv { display:grid; grid-template-columns:190px 1fr; gap:6px 16px; font-size:14px; }
-.kv dt { color:var(--muted); }
-.kv dd { margin:0; }
 
-/* ---- Can I produce it? (Block 9) -----------------------------------------
-   The verdict carries meaning through colour, and the meaning is the same one
-   the engine computed — never a severity gradient, because there is no scale.
-   ⚪ CAN'T SAY is deliberately NEUTRAL, not red: "no" and "I don't know" are
-   different instructions to a person, and the interface must not merge them. */
-.ask { display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:16px; align-items:end; }
-@media (max-width:820px) { .ask { grid-template-columns:1fr; } }
-.ask label { display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
-.ask label span em { font-style:normal; opacity:.7; }
-.ask select, .ask input { font:inherit; color:var(--ink); background:var(--bg);
-  border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
-.ask select:focus, .ask input:focus { outline:2px solid var(--accent); outline-offset:1px; }
-.ask button { font:inherit; font-weight:600; color:#fff; background:var(--accent);
-  border:0; border-radius:8px; padding:11px 26px; cursor:pointer; }
-.ask button:hover { filter:brightness(1.08); }
+/* Focus is always visible. A factory user on a keyboard is a real user. */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-control);
+}
 
-.verdict-card { border-width:1px; }
-.verdict-card.yes { background:var(--ok-bg); border-color:var(--ok); }
-.verdict-card.at-risk { background:var(--warn-bg); border-color:var(--warn); }
-.verdict-card.no { background:var(--bad-bg); border-color:var(--bad); }
-.verdict-card.cant-say, .verdict-card.rejected { background:var(--surface); border-color:var(--line); }
-.verdict-head { display:flex; align-items:center; gap:12px; }
-.verdict-mark { font-size:30px; line-height:1; }
-.verdict-word { font-size:26px; font-weight:600; letter-spacing:-.02em; }
-.verdict-line { font-size:17px; margin:10px 0 0; max-width:66ch; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 
-ul.missing { list-style:none; margin:0; padding:0; }
-ul.missing > li { padding:14px 0; border-bottom:1px solid var(--line); }
-ul.missing > li:last-child { border-bottom:0; }
-.missing-row { display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; }
-.missing-name { color:var(--muted); flex:1; }
-.missing-qty { font-weight:600; font-variant-numeric:tabular-nums; }
-.action { margin-top:6px; font-size:14.5px; }
-.warn-line { margin-top:6px; font-size:13.5px; color:var(--warn); max-width:80ch; }
-details.card > summary { cursor:pointer; font-weight:600; }
-details.card > summary::marker { color:var(--muted); }
-.detail-block { border-top:1px solid var(--line); margin-top:18px; padding-top:14px; }
+/* ==========================================================================
+   APP SHELL
+   ========================================================================== */
+
+.wrap { max-width: var(--content-max); margin: 0 auto; padding: 0 var(--s6) var(--s10); }
+
+nav.top {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky; top: 0; z-index: 20;
+}
+nav.top .inner {
+  max-width: var(--content-max); margin: 0 auto;
+  padding: 0 var(--s6);
+  display: flex; gap: var(--s5); align-items: center;
+  min-height: var(--nav-height);
+}
+nav.top strong {
+  letter-spacing: -.015em; font-size: var(--text-card); font-weight: 650;
+  margin-right: var(--s2); white-space: nowrap;
+}
+
+/* Primary navigation — outcome-first. Five items, each a question the user asks. */
+.nav-primary { display: flex; gap: var(--s1); align-items: center; flex: 1; min-width: 0; }
+.nav-primary a {
+  color: var(--text-secondary); font-size: var(--text-secondary-size); font-weight: 500;
+  padding: var(--s2) var(--s3); border-radius: var(--radius-control);
+  white-space: nowrap; transition: color var(--fast) var(--ease), background var(--fast) var(--ease);
+}
+.nav-primary a:hover { color: var(--text-primary); background: var(--surface-sunken); text-decoration: none; }
+.nav-primary a[aria-current="page"] { color: var(--primary); background: var(--selected); font-weight: 600; }
+
+/* Secondary — set-up and diagnostics. Deliberately not peers of the five. */
+.nav-secondary { display: flex; gap: var(--s1); align-items: center; }
+.nav-secondary a {
+  color: var(--text-muted); font-size: var(--text-meta);
+  padding: var(--s2) var(--s3); border-radius: var(--radius-control); white-space: nowrap;
+}
+.nav-secondary a:hover { color: var(--text-primary); background: var(--surface-sunken); text-decoration: none; }
+
+/* ==========================================================================
+   TYPOGRAPHY
+   Numbers use tabular figures everywhere. In a data product, digits that do
+   not line up read as sloppiness before the reader can say why.
+   ========================================================================== */
+
+h1 {
+  font-size: var(--text-title); font-weight: 650; letter-spacing: -.022em;
+  margin: var(--s8) 0 var(--s2); text-wrap: balance;
+}
+h2 {
+  font-size: var(--text-section); font-weight: 650; letter-spacing: -.012em;
+  margin: var(--s7) 0 var(--s3);
+}
+h3 { font-size: var(--text-card); font-weight: 650; margin: var(--s5) 0 var(--s2); }
+
+p.sub { color: var(--text-secondary); margin: 0 0 var(--s6); max-width: 68ch; }
+.note { color: var(--text-muted); font-size: var(--text-meta); margin: var(--s2) 0; max-width: 80ch; }
+
+/* The most important number on a page must LOOK like it. */
+.figure {
+  font-size: var(--text-display); font-weight: 650; letter-spacing: -.028em;
+  font-variant-numeric: tabular-nums; line-height: 1.1; margin: var(--s1) 0;
+}
+.figure .cur { font-size: var(--text-section); color: var(--text-muted); margin-left: var(--s2); font-weight: 500; }
+
+.metric-label {
+  font-size: var(--text-micro); font-weight: 600; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: var(--s2);
+}
+
+/* ==========================================================================
+   SURFACES
+   Cards carry a border, not a shadow. Elevation is reserved for things that
+   genuinely float above the page.
+   ========================================================================== */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-surface);
+  padding: var(--s5);
+  margin: var(--s3) 0;
+}
+.card-elevated { background: var(--surface-elevated); box-shadow: var(--shadow-sm); }
+.card-quiet { background: transparent; border-color: var(--border-subtle); }
+
+/* ==========================================================================
+   STATUS — the four states, and the operational states beside them.
+   ========================================================================== */
+
+.badge {
+  display: inline-flex; align-items: center; gap: var(--s1);
+  font-size: var(--text-micro); font-weight: 600; letter-spacing: .03em;
+  padding: 3px var(--s2); border-radius: var(--radius-pill);
+  border: 1px solid var(--border); color: var(--text-muted);
+  white-space: nowrap;
+}
+.badge.ok      { background: var(--success-soft); color: var(--success); border-color: var(--success-line); }
+.badge.warn    { background: var(--warning-soft); color: var(--warning); border-color: var(--warning-line); }
+.badge.bad     { background: var(--danger-soft);  color: var(--danger);  border-color: var(--danger-line); }
+.badge.unknown { background: var(--unknown-soft); color: var(--unknown); border-color: var(--unknown-line); }
+.badge.info    { background: var(--primary-soft); color: var(--primary); border-color: var(--primary-line); }
+
+/* The status BLOCK — Layer 1. One mark, one word, one sentence. */
+.status-block {
+  border: 1px solid var(--border); border-radius: var(--radius-surface);
+  padding: var(--s5); margin: var(--s3) 0; background: var(--surface);
+}
+.status-block.yes      { background: var(--success-soft); border-color: var(--success-line); }
+.status-block.at-risk  { background: var(--warning-soft); border-color: var(--warning-line); }
+.status-block.no       { background: var(--danger-soft);  border-color: var(--danger-line); }
+/* ⚪ stays on the plain surface. It is not an alarm and must not look like one. */
+.status-block.cant-say { background: var(--surface); border-color: var(--border-strong); }
+
+.status-head { display: flex; align-items: center; gap: var(--s3); }
+.status-mark { font-size: 28px; line-height: 1; }
+.status-word { font-size: var(--text-title); font-weight: 650; letter-spacing: -.02em; }
+.status-line { font-size: var(--text-section); margin: var(--s3) 0 0; max-width: 66ch; line-height: 1.45; }
+
+/* ==========================================================================
+   RISK AND ACTION ROWS
+   A serious problem gets its own row. It is never buried in a table cell.
+   ========================================================================== */
+
+.risk-row {
+  display: grid; grid-template-columns: auto 1fr auto; gap: var(--s3) var(--s4);
+  align-items: start; padding: var(--s4) 0; border-bottom: 1px solid var(--border-subtle);
+}
+.risk-row:last-child { border-bottom: 0; }
+.risk-row .mark { font-size: 18px; line-height: 1.4; }
+.risk-row .subject { font-weight: 650; font-size: var(--text-card); }
+.risk-row .detail { color: var(--text-secondary); font-size: var(--text-secondary-size); margin-top: 2px; }
+.risk-row .consequence { color: var(--text-secondary); font-size: var(--text-secondary-size); margin-top: var(--s2); }
+.risk-row .action { margin-top: var(--s2); font-size: var(--text-secondary-size); font-weight: 550; }
+.risk-row .trailing { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.action { font-size: var(--text-secondary-size); }
+.warn-line {
+  margin-top: var(--s2); font-size: var(--text-meta); color: var(--warning);
+  max-width: 80ch; display: flex; gap: var(--s2); align-items: baseline;
+}
+.warn-line.neutral { color: var(--text-muted); }
+
+/* ==========================================================================
+   TABLES — used when the user genuinely compares rows on the same dimensions.
+   ========================================================================== */
+
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: var(--text-secondary-size); }
+th {
+  text-align: left; font-weight: 600; color: var(--text-muted);
+  font-size: var(--text-micro); letter-spacing: .06em; text-transform: uppercase;
+  padding: var(--s3) var(--s3); border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+td { padding: var(--s3); border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr.attention { background: var(--warning-soft); }
+tbody tr.critical  { background: var(--danger-soft); }
+
+/* ==========================================================================
+   CONTROLS
+   ========================================================================== */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  font: inherit; font-size: var(--text-secondary-size); font-weight: 600;
+  padding: var(--s3) var(--s5); border-radius: var(--radius-control);
+  border: 1px solid transparent; cursor: pointer; white-space: nowrap;
+  transition: background var(--fast) var(--ease), border-color var(--fast) var(--ease), color var(--fast) var(--ease);
+}
+.btn-primary { background: var(--primary); color: var(--text-on-primary); }
+.btn-primary:hover { background: var(--primary-hover); text-decoration: none; }
+.btn-secondary { background: var(--surface); color: var(--text-primary); border-color: var(--border-strong); }
+.btn-secondary:hover { background: var(--surface-sunken); text-decoration: none; }
+.btn-ghost { background: transparent; color: var(--primary); padding-inline: var(--s3); }
+.btn-ghost:hover { background: var(--primary-soft); text-decoration: none; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+
+label.field { display: flex; flex-direction: column; gap: var(--s2); }
+label.field > span { font-size: var(--text-meta); color: var(--text-secondary); font-weight: 500; }
+label.field > span em { font-style: normal; color: var(--text-muted); font-weight: 400; }
+
+input[type="text"], input[type="date"], input[type="number"], input[type="search"], select, textarea {
+  font: inherit; font-size: var(--text-body); color: var(--text-primary);
+  background: var(--surface); border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control); padding: var(--s3) var(--s3);
+  transition: border-color var(--fast) var(--ease);
+}
+input:hover, select:hover { border-color: var(--text-muted); }
+input[aria-invalid="true"] { border-color: var(--danger); }
+input[disabled], select[disabled] { background: var(--surface-sunken); color: var(--text-muted); cursor: not-allowed; }
+
+/* ==========================================================================
+   DISCLOSURE — Layers 3 and 4. Two levels, and no more.
+   ========================================================================== */
+
+details.disclosure { border-top: 1px solid var(--border-subtle); margin-top: var(--s4); padding-top: var(--s3); }
+details.disclosure > summary,
+details.card > summary {
+  cursor: pointer; font-size: var(--text-secondary-size); font-weight: 600;
+  color: var(--primary); list-style: none; display: inline-flex; align-items: center; gap: var(--s2);
+  padding: var(--s1) 0;
+}
+details > summary::-webkit-details-marker { display: none; }
+details.disclosure > summary::after,
+details.card > summary::after { content: "›"; transition: transform var(--fast) var(--ease); display: inline-block; }
+details[open].disclosure > summary::after,
+details[open].card > summary::after { transform: rotate(90deg); }
+.disclosure-body { padding-top: var(--s3); }
+
+/* ==========================================================================
+   STATES — loading, empty, error. None of these existed before Block 13.
+   ========================================================================== */
+
+.state {
+  border: 1px solid var(--border); border-radius: var(--radius-surface);
+  background: var(--surface); padding: var(--s7) var(--s5);
+  margin: var(--s3) 0; max-width: 62ch;
+}
+.state .state-title { font-size: var(--text-card); font-weight: 650; margin: 0 0 var(--s2); }
+.state .state-body { color: var(--text-secondary); font-size: var(--text-secondary-size); margin: 0 0 var(--s4); }
+.state .state-body:last-child { margin-bottom: 0; }
+.state.error { border-color: var(--border-strong); }
+
+/* A skeleton of the shape being loaded — never a bare spinner. */
+.skeleton { display: grid; gap: var(--s3); }
+.skeleton-bar {
+  height: 14px; border-radius: var(--radius-control);
+  background: linear-gradient(90deg, var(--surface-sunken) 25%, var(--border-subtle) 37%, var(--surface-sunken) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s var(--ease) infinite;
+}
+.skeleton-bar.w-40 { width: 40%; } .skeleton-bar.w-60 { width: 60%; }
+.skeleton-bar.w-80 { width: 80%; } .skeleton-bar.tall { height: 30px; }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* Demo marking is structural, unmissable and never dismissible. */
+.demo {
+  background: var(--warning-soft); border: 1px solid var(--warning-line); color: var(--warning);
+  border-radius: var(--radius-surface); padding: var(--s3) var(--s4); margin: var(--s4) 0;
+  font-weight: 600; font-size: var(--text-meta);
+}
+
+/* ==========================================================================
+   LEGACY CLASSES — carried forward so existing pages keep working while
+   Block 14 rebuilds them one at a time. Refined, not redefined.
+   ========================================================================== */
+
+.gate { display: flex; gap: var(--s3); padding: var(--s2) 0; border-bottom: 1px solid var(--border-subtle); font-size: var(--text-meta); }
+.gate:last-child { border-bottom: 0; }
+.gate .n { font-weight: 600; min-width: 210px; }
+
+ul.reasons { margin: var(--s2) 0 0; padding-left: var(--s5); color: var(--text-muted); font-size: var(--text-meta); }
+ul.reasons li { margin: var(--s1) 0; }
+
+.kv { display: grid; grid-template-columns: 190px 1fr; gap: var(--s2) var(--s4); font-size: var(--text-secondary-size); }
+.kv dt { color: var(--text-muted); }
+.kv dd { margin: 0; }
+
+.ask { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: var(--s4); align-items: end; }
+/* ⚠ Grid children default to their INTRINSIC content width, so a <select> whose
+   longest option is "FG-100 — Sealant compound, 20L pail (DEMO)" pushed itself
+   out of the card on a phone. min-width:0 lets them shrink; width:100% makes
+   them fill the track they were given. */
+.ask > label, .ask > * { min-width: 0; }
+.ask input, .ask select { width: 100%; }
+.ask label { display: flex; flex-direction: column; gap: var(--s2); font-size: var(--text-meta); color: var(--text-secondary); }
+.ask label span em { font-style: normal; opacity: .75; }
+.ask button {
+  font: inherit; font-size: var(--text-secondary-size); font-weight: 600;
+  color: var(--text-on-primary); background: var(--primary); border: 0;
+  border-radius: var(--radius-control); padding: var(--s3) var(--s6); cursor: pointer;
+  transition: background var(--fast) var(--ease);
+}
+.ask button:hover { background: var(--primary-hover); }
+
+.verdict-card { border-width: 1px; }
+.verdict-card.yes      { background: var(--success-soft); border-color: var(--success-line); }
+.verdict-card.at-risk  { background: var(--warning-soft); border-color: var(--warning-line); }
+.verdict-card.no       { background: var(--danger-soft);  border-color: var(--danger-line); }
+.verdict-card.cant-say,
+.verdict-card.rejected { background: var(--surface); border-color: var(--border-strong); }
+.verdict-head { display: flex; align-items: center; gap: var(--s3); }
+.verdict-mark { font-size: 28px; line-height: 1; }
+.verdict-word { font-size: var(--text-title); font-weight: 650; letter-spacing: -.02em; }
+.verdict-line { font-size: var(--text-section); margin: var(--s3) 0 0; max-width: 66ch; }
+
+ul.missing { list-style: none; margin: 0; padding: 0; }
+ul.missing > li { padding: var(--s4) 0; border-bottom: 1px solid var(--border-subtle); }
+ul.missing > li:last-child { border-bottom: 0; }
+.missing-row { display: flex; gap: var(--s3); align-items: baseline; flex-wrap: wrap; }
+.missing-name { color: var(--text-muted); flex: 1; }
+.missing-qty { font-weight: 650; font-variant-numeric: tabular-nums; }
+.detail-block { border-top: 1px solid var(--border-subtle); margin-top: var(--s5); padding-top: var(--s4); }
+
+/* ==========================================================================
+   RESPONSIVE
+   The warehouse operator on a phone in an aisle is a first-class user, not a
+   degradation. Nothing is REMOVED on a small screen — it is re-laid-out, and
+   detail moves behind the same disclosure the desktop already uses.
+   ========================================================================== */
+
+/* Tablet */
+@media (max-width: 900px) {
+  :root { --text-display: 30px; --text-title: 23px; }
+  .wrap { padding: 0 var(--s4) var(--s9); }
+  nav.top .inner { padding: 0 var(--s4); gap: var(--s3); flex-wrap: wrap; }
+  .ask { grid-template-columns: 1fr 1fr; }
+  .ask button { grid-column: 1 / -1; }
+  .kv { grid-template-columns: 150px 1fr; }
+  .gate .n { min-width: 150px; }
+}
+
+/* Mobile */
+@media (max-width: 620px) {
+  :root { --text-display: 27px; --text-title: 21px; --text-section: 16px; }
+  .wrap { padding: 0 var(--s4) var(--s8); }
+  .card { padding: var(--s4); border-radius: var(--radius-control); }
+
+  /* Wide content scrolls inside ITS OWN container so the page body never
+     scrolls sideways. Pages that predate Block 13 have tables not yet wrapped
+     in .scroll; this makes the card itself the scroll container until Block 14
+     rebuilds them, so a phone user never has to pan the whole page. */
+  .card { overflow-x: auto; }
+
+  /* Navigation becomes a horizontally scrollable rail rather than a menu the
+     user must open. One tap to any area, at the cost of a swipe. */
+  nav.top .inner { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  nav.top .inner::-webkit-scrollbar { display: none; }
+  .nav-primary, .nav-secondary { flex: 0 0 auto; }
+
+  .ask { grid-template-columns: 1fr; }
+  .kv { grid-template-columns: 1fr; gap: var(--s1); }
+  .kv dt { font-size: var(--text-meta); margin-top: var(--s2); }
+  .gate { flex-direction: column; gap: var(--s1); }
+  .gate .n { min-width: 0; }
+  .risk-row { grid-template-columns: auto 1fr; }
+  .risk-row .trailing { grid-column: 2; text-align: left; }
+  .status-word { font-size: var(--text-section); }
+  .status-mark, .verdict-mark { font-size: 24px; }
+}

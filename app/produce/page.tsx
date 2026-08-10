@@ -23,7 +23,7 @@ import { recordAnswer } from "../../lib/feasibility/audit";
 import {
   VERDICT_MARK, VERDICT_WORD, answerNotices, dpFor, fmtDate, headline, missingLines, reason, reasonFor, warningsFor,
 } from "../../lib/feasibility/language";
-import { formatQty } from "../../lib/core/decimal";
+import { qty as fmtQty } from "../../lib/ui/format";
 import { DemoBanner } from "../demo-banner";
 
 export const dynamic = "force-dynamic";
@@ -216,11 +216,11 @@ function Answer({ a }: { a: FeasibilityAnswer }) {
                       {VERDICT_MARK[c.verdict]} {VERDICT_WORD[c.verdict]}
                     </span>
                   </td>
-                  <td className="num">{c.requirement.value ? formatQty(c.requirement.value, c.stockUom, dpFor(c)) : "—"}</td>
-                  <td className="num">{c.available ? formatQty(c.available, c.stockUom, dpFor(c)) : "—"}</td>
-                  <td className="num">{c.qualityHold ? formatQty(c.qualityHold, c.stockUom, dpFor(c)) : "—"}</td>
-                  <td className="num">{c.incoming ? formatQty(c.incoming, c.stockUom, dpFor(c)) : "—"}</td>
-                  <td className="num">{c.shortfall ? formatQty(c.shortfall, c.stockUom, dpFor(c)) : "—"}</td>
+                  <td className="num">{c.requirement.value ? fmtQty(c.requirement.value, c.stockUom, { whole: c.integerOnly }) : "—"}</td>
+                  <td className="num">{c.available ? fmtQty(c.available, c.stockUom, { whole: c.integerOnly }) : "—"}</td>
+                  <td className="num">{c.qualityHold ? fmtQty(c.qualityHold, c.stockUom, { whole: c.integerOnly }) : "—"}</td>
+                  <td className="num">{c.incoming ? fmtQty(c.incoming, c.stockUom, { whole: c.integerOnly }) : "—"}</td>
+                  <td className="num">{c.shortfall ? fmtQty(c.shortfall, c.stockUom, { whole: c.integerOnly }) : "—"}</td>
                 </tr>
               ))}
             </tbody>
@@ -235,7 +235,7 @@ function Answer({ a }: { a: FeasibilityAnswer }) {
               <ul className="note">
                 {c.supply.map((s) => (
                   <li key={s.poLineId}>
-                    Order {s.poNumber}: {formatQty(s.openQty, s.uom)} still to come, expected{" "}
+                    Order {s.poNumber}: {fmtQty(s.openQty, s.uom)} still to come, expected{" "}
                     {fmtDate(s.expectedDate)}
                     {s.dateSource === "ETA" ? " (latest shipping update)" : s.dateSource === "PROMISED" ? " (supplier's promise)" : ""}
                     {s.overdue ? " — overdue" : ""}

@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "db:push": "tsx scripts/db-push.ts",
-    "db:seed": "tsx scripts/seed-demo.ts"
+    "db:seed": "tsx scripts/seed-demo.ts",
+    "scan:vocab": "tsx scripts/vocab-scan.ts"
   },
   "dependencies": {
     "decimal.js": "^10.4.3",

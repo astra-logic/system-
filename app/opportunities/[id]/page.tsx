@@ -16,6 +16,7 @@ import { evidenceFor, gatesFor, getOpportunity, signatureFor, versionHistory } f
 import { baselineFor, checkIndependence, decisionFor, reviewOpportunity } from "../../../lib/engine/review";
 import { evaluateContradictions } from "../../../lib/engine/contradiction-service";
 import { firstSiteId } from "../../../lib/engine/run";
+import { money, moneyExact } from "../../../lib/ui/format";
 import { DemoBanner } from "../../demo-banner";
 
 export const dynamic = "force-dynamic";
@@ -102,7 +103,9 @@ export default async function FindingDetail({ params }: { params: Promise<{ id: 
       <div className="card">
         <div className="badge">Net, recurring, per year</div>
         <div className="figure">
-          {net?.value ? net.value : "Not calculable"}
+          {/* Law 9: the ONE formatting boundary. This rendered the raw stored
+              string before Block 13 — 21 decimal places, to a factory manager. */}
+          {net?.value ? money(net.value, "") : "Not calculable"}
           {net?.value && <span className="cur">{net.unit}</span>}
         </div>
         <div className="note">basis {net?.basis}</div>
@@ -122,15 +125,14 @@ export default async function FindingDetail({ params }: { params: Promise<{ id: 
             <tr>
               <td>Gross premium observed</td>
               <td className="num">
-                {gross?.value ? `${gross.value} ${gross.unit}` : "—"}
+                {gross?.value ? moneyExact(gross.value, gross.unit) : "—"}
                 <div className="note" style={{ margin: 0 }}>an ACTUAL fact: this money was spent</div>
               </td>
             </tr>
             <tr>
               <td>Incremental cost (offset)</td>
               <td className="num">
-                {offset?.value ?? <span className="badge warn">UNESTABLISHED</span>}
-                {offset?.value && ` ${offset.unit}`}
+                {offset?.value ? moneyExact(offset.value, offset.unit) : <span className="badge warn">not established</span>}
                 <div className="note" style={{ margin: 0 }}>
                   {offset?.value ? "netted per rule 6" : "the net is refused until this is known"}
                 </div>
@@ -139,7 +141,7 @@ export default async function FindingDetail({ params }: { params: Promise<{ id: 
             <tr>
               <td>One-time impact</td>
               <td className="num">
-                {envelope(o.oneTimeImpact)?.value ?? "0"}
+                {moneyExact(envelope(o.oneTimeImpact)?.value ?? "0", "")}
                 <div className="note" style={{ margin: 0 }}>reported separately, never summed into the annual figure</div>
               </td>
             </tr>
@@ -318,7 +320,7 @@ export default async function FindingDetail({ params }: { params: Promise<{ id: 
                     <td>
                       {h.id === o.id ? <strong>this version</strong> : <a href={`/opportunities/${h.id}`}>{h.id.slice(0, 8)}</a>}
                     </td>
-                    <td>{envelope(h.netImpact)?.value ?? "—"}</td>
+                    <td className="num">{money(envelope(h.netImpact)?.value, "")}</td>
                     <td className="note" style={{ margin: 0 }}>{h.ladder.replace(/_/g, " ")}</td>
                     <td>{h.supersededAt ? <span className="badge">superseded</span> : <span className="badge ok">current</span>}</td>
                   </tr>
