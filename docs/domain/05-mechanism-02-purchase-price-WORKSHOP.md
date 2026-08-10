@@ -802,7 +802,7 @@ None new. Triggered by `F-12` / `F-13`.
 
 | Failure | Why the key breaks |
 |---|---|
-| **Substitutable items** | Buy more of A while B, a substitute, sits in excess. Different item keys, real contradiction. Substitution groups are **not modelled in release 1** (no BoM, no alternates) — an honest limit, not a solvable gap |
+| **Substitutable items** | Buy more of A while B, a substitute, sits in excess. Different item keys, real contradiction. Substitution groups are **not modelled in release 1** — an honest limit, not a solvable gap. ⚠ *Parenthetical corrected 2026-08-10 (D-054): it previously read "(no BoM, no alternates)". Product structure is now admitted for feasibility, but **alternates and substitutes remain unmodelled** (`F-27`, `F-53`), so the conclusion is unchanged* |
 | **Supplier-level opportunities** | *"Consolidate spend to supplier X"* vs *"reduce stock of item Y, which only X supplies."* The subject is a **supplier**, not an item |
 | **Period boundaries** | An intervention has a **duration of effect**, not a period label. Buying more in Q1 creates excess in Q2. Equal-period matching misses it entirely |
 | **Site** | Correct under D-004 today. With inter-site transfer later, over-stock at one site and shortage at another is a **transfer opportunity, not a contradiction** — naive netting across sites would be wrong |

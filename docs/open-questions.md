@@ -27,7 +27,7 @@
 | ID | Question | Area | Status |
 |---|---|---|---|
 | A-01 | Balances projected synchronously or asynchronously? | F2 | `OPEN` |
-| A-02 | Hard or soft reservation? | F3 | `OPEN` |
+| A-02 | Hard or soft reservation? | F3 | `OPEN` — **removed from the MVP blocking set 2026-08-08 by D-050**: nothing in the MVP can create a commitment, so `Reserved` is structurally zero. ⚠ **Re-verified 2026-08-10 (D-055):** Production Feasibility creates no commitment either, *because its answers are transient*. **If a feasibility answer were ever persisted as a plan, this question reopens as a class A blocker** |
 | A-03 | How is confidence defined and computed? | F4 | **`DEFERRED SAFELY` 2026-08-08 → D-045.** Rule 15 constrains it; the formula is still `OPEN` — **so the MVP carries no synthesised confidence score at all.** It carries evidence strength (D-026) and **coverage facts stated plainly**. ⚠ A required field with no formula would have been synthesised by blending gate outcomes, which is the *"gates never become scores"* prohibition arriving as a UI necessity. **Not an MVP blocker; resolved by removal** |
 | A-04 | Who may close/reopen an accounting period? | F5 | `OPEN` |
 | A-05 | Are catch-weight items required? | F6 | `OPEN` — **likely yes** under mixed manufacturing (see N-04) |
@@ -39,12 +39,12 @@
 | A-11 | Who owns item master data? | C3 | `OPEN` |
 | A-12 | Minimum sample size before a supplier metric is shown? | C4 | `OPEN` |
 | A-13 | Is there real sales-order demand, or forecast only? | C5 | `CLOSED` — demand is observed consumption (D-010) |
-| A-14 | Which planning methodologies at first release? | C6 | `CLOSED` — reorder point / min–max only. No MRP (D-010) |
+| A-14 | Which planning methodologies at first release? | C6 | **`REOPENED and RE-ANSWERED` 2026-08-10 → D-054.** Previously `CLOSED` — *"reorder point / min–max only. No MRP (D-010)"*. **Planning is still reorder point / min–max only, and MRP as a planning method is still out.** Added: **Production Feasibility**, a read-only answer to a stated quantity. It maintains no plan and regenerates nothing, so it is not a planning methodology — recorded here because the original wording would otherwise exclude it |
 | A-15 | Is incoming inspection mandatory, per-item, or per-supplier? | C8 | `OPEN` |
-| A-16 | Backflush or explicit material issue? | C10 | `DEFERRED` — production out of scope. Release 1 uses issue-to-consumption (D-010) |
+| A-16 | Backflush or explicit material issue? | C10 | **`DEFERRED`** — production execution out of scope. Release 1 uses issue-to-consumption (D-010). ⚠ **Status conflict resolved 2026-08-10 (Block 8 finding R-01):** Block 4's class D listed this as `RETIRED`, contradicting this line. **`DEFERRED` is correct** — the question becomes live when production execution is built, so it is not retired. D-054 does **not** make it live: feasibility consumes nothing |
 | A-17 | Are labour/machine/overhead rates available, or is material cost the only real component? | C13 | `DEFERRED` to finance (D-008); relevant to N-01 granularity |
 | A-18 | Thresholds defining aging, slow-moving, excess, dead stock, stockout risk | C9 | `OPEN` |
-| A-19 | Technology stack and deployment architecture | Bible §54.21–22 | `OPEN` |
+| A-19 | Technology stack and deployment architecture | Bible §54.21–22 | `OPEN` — **stack closed 2026-08-08 → D-047** (TypeScript · Next.js · PostgreSQL). **Deployment architecture remains open.** *(Annotation added 2026-08-10, Block 8 finding R-03; other closed items carried a pointer and this one did not)* |
 | A-20 | Permission and role model | Bible §54.20, §44 | `OPEN` — **first concrete requirement received 2026-08-07**: adjudication authority must be role-based and configurable, and independent of the price decision for currency claims (DP-07) |
 
 ---
@@ -288,7 +288,7 @@ Workshopped in `10-Q07-saving-model-reconciliation.md`, adversarially tested in 
 | ID | Question | Answer | Recorded in |
 |---|---|---|---|
 | B-01 | Primary user | Inventory / warehouse manager | D-007 |
-| B-02 | MVP boundary | Inventory + procurement + cost | D-007 |
+| B-02 | MVP boundary | **Re-answered 2026-08-10 → D-054.** Inventory + procurement + cost **+ Production Feasibility (read-only, one level of product structure)**. Previously *"Inventory + procurement + cost"* with *"no production… BoMs or MRP"* | D-007 as amended by D-054 |
 | B-03 | Manufacturing type | Mixed | D-009 |
 | B-04 | Deployment scope | Single site, site-scoped records | D-004 |
 | B-06 | Valuation ownership | Finance owns it; we own quantity truth | D-008 |
@@ -339,3 +339,56 @@ Full analysis: `docs/domain/18-BLOCK4-mvp-domain-freeze.md`. **Every unresolved 
 `F-01` … `F-44`. **Only four gate the MVP** — `F-06` detection · `F-41` correctness · `F-01` currency only · `F-07` currency only — plus `F-09` as a claim gate. The readiness matrix with source, evidence class, provenance and **fallback if missing** is Part E of file 18.
 
 ⚠ **Seven register items will be created by the product itself** — root-cause classification, expedite flags going forward, override history, escalation records, decision rationale, realization measurements, adjudication records. **Do not ask the factory for these.** Ask only whether they *could* be captured.
+
+---
+
+## BLOCK 8 — Production Feasibility, 2026-08-10
+
+Decisions D-054 … D-058 admit the capability. Analysis: `docs/domain/21-BLOCK8-PRODUCTION-FEASIBILITY-DOMAIN-LOCK.md`.
+Contract: `docs/domain/22-BLOCK8-DOMAIN-CONTRACT.md`.
+
+**Taken under product-owner authorisation of 2026-08-10**, which directed that unavailable factory
+facts be represented honestly with safe fallbacks rather than blocking progress. **Every fallback
+below is conservative, disclosed in the product, and invents nothing.**
+
+### New factory questions
+
+| ID | Question | Class | Fallback in force until answered |
+|---|---|---|---|
+| **F-48** | **Do product recipes exist in recorded form** — and is any component itself made rather than bought? Also: **what word does the factory use** for a recipe? | **BLOCKING for real data · NOT blocking for build** | **Absence is represented, never filled.** An item with no recorded structure returns **⚪ CAN'T SAY**. The MVP ships one **`DEMO` recipe** against the seeded demo product, **visibly marked `DEMO` in the product**, so the contract is demonstrable before factory data exists. **No demo structure is ever presented as factory data**, and no real item silently inherits one |
+| **F-49** | Does the recorded recipe quantity **include process loss / scrap**, or is it theoretical? | VALIDATION | The recorded quantity is used **exactly as recorded**. **No yield factor is applied or invented.** The answer states it used the recipe as recorded |
+| **F-50** | Are supplier lead times **calendar or working days** — and what is the factory's working week and holiday calendar? | VALIDATION | **Calendar days, convention stated on the answer.** No weekend or holiday adjustment. Becomes **configuration, not migration**, when answered |
+| **F-51** | Does the source system record **supplier acknowledgement**, distinct from "sent"? | VALIDATION | `SENT` counts as incoming and **the limit is disclosed**. One reason nothing un-received may produce 🟢 |
+| **F-52** | For catch-weight items, is there a **stated expected weight per purchase unit**? | VALIDATION | Shortfall is stated in the stock unit; **the pack count is left to the buyer.** `actual_qty` is never invented (D-048) |
+| **F-53** | Are any components **both made and bought** (make-or-buy)? | FUTURE | A component with its own recipe yields **⚪**, which is over-conservative if it is also purchased. Inferring make-or-buy from supplier terms would be a silent inference and is refused |
+
+**Also worth asking, and not a data request:** *"walk me through the last time you couldn't produce something on time — what happened, and what would have helped?"* It validates the capability's shape better than any structured question.
+
+### Reopened and re-answered
+
+| ID | Was | Now |
+|---|---|---|
+| **B-02** | `ANSWERED` → D-007, *"no production… BoMs or MRP"* | **Re-answered** → D-054. Inventory + procurement + cost **+ Production Feasibility** |
+| **A-14** | `CLOSED` — *"reorder point / min–max only. No MRP"* | **Re-answered** → D-054. **Planning is unchanged**; feasibility is not a planning methodology |
+
+### Register inconsistencies found by Block 8 — now resolved
+
+| # | Finding | Resolution |
+|---|---|---|
+| **R-01** | `A-16` carried two contradictory statuses — Tier 2 `DEFERRED`, Block 4 class D `RETIRED` | **`DEFERRED` is correct.** Annotated on the Tier 2 line |
+| **R-02** | Code standard 13 governed manufacturing orders, a domain D-007 excludes | **Rewritten** to govern product-structure versioning in a feasibility answer. Original preserved; returns when production execution is built |
+| **R-03** | `A-19` read `OPEN` with no pointer to D-047 | **Annotated.** Stack closed; deployment open |
+| **R-04** | `A-02` read `OPEN` with no pointer to D-050 | **Annotated**, with the ⚠ that D-055's transience rule is what holds D-050 up |
+| **R-05** | `20-PRODUCT-ARCHITECTURE-RECONCILIATION.md` overstated what Production Planning unblocks | **Withdrawn** for feasibility in `21-…§1.2 ⑦`. D-037's blind spots need production **execution**, not a question |
+
+### Block 8 classification of what remains
+
+**A — MUST RESOLVE BEFORE BLOCK 9:** *(none)* — all five decisions are locked and every unknown has a conservative fallback.
+
+**B — RESOLVE DURING BUILD:** `F-48` for real factory data *(the demo structure carries the contract until then)*.
+
+**C — DEFERRED:** `F-49` · `F-50` · `F-51` · `F-52` · `F-53` · multi-level explosion · MOQ and order multiples applied to a recommendation *(`F-42`, `F-44`)* · expired / shelf-life-constrained supply *(`F-34`)* · in-transit stock *(`Q-10`, gated on `F-15`)* · audit retention for answers · a `PRODUCTION_PLANNER` role *(D-058 — derivable only when production execution exists)*.
+
+**D — NOT NEEDED:** a confidence score for feasibility *(D-045 already forbids it)* · a planning-horizon concept *(meaningless for one question at a time)* · safety stock in the feasibility calculation *(never — D-057, §16)* · a yield-factor decision *(`F-49` is a data field, not a decision)*.
+
+**E — BLOCKED BY FACTORY EVIDENCE:** `F-48` **for real recipes only.** ⚠ **It does not block Block 9**, because the absence is represented as ⚪ and the demo structure exercises every path.

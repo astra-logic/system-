@@ -68,7 +68,9 @@
 
 **The North Star figure is displayed per D-012** — a range with its basis, one-time separated from recurring, overlap deduction shown, and the realised-versus-identified ratio beside it. A single confident point figure is prohibited. It will be audited by a finance manager, and it must survive that.
 
-**Absent capability is stated, not disguised.** No MRP, no production visibility, no BoMs in this release. Where a user might reasonably expect them, the interface says they do not exist rather than implying they might.
+**Absent capability is stated, not disguised.** No MRP **as a planning method**, no production visibility, no scheduling, no capacity in this release. Where a user might reasonably expect them, the interface says they do not exist rather than implying they might.
+
+> ⚠ **Corrected 2026-08-10 — D-054 (Block 8).** This line previously read *"No MRP, no production visibility, no BoMs in this release"* and would now instruct the interface to tell users a capability they can see does not exist. **Product structure (recipe) is in scope for Production Feasibility** — one level, read-only. What remains absent is MRP as a planning method: nothing maintains a plan, nothing regenerates when a date moves, and no forward demand is synthesised. **The user's word is "recipe", never "BoM"** — see `22-BLOCK8-DOMAIN-CONTRACT.md` §4.4 for the full banned-vocabulary list, which the interface must honour.
 
 ---
 

@@ -60,7 +60,7 @@
 10h-2. **A baseline is a stored snapshot of inputs and method, not only an output.** Captured at `APPROVED`, never reconstructed at `REALIZED`, and recomputable later to the same result. A stored number cannot be re-verified. (D-011, U-16's reproducibility rule generalised)
 11. **Every event carries effective time and recorded time.** (F5)
 12. **Quality hold stock is excluded from Available.** (F3)
-13. **A manufacturing order freezes its BoM and routing version at release.** (C10)
+13. **A feasibility answer records the product-structure version it used.** Structure is effective-dated; an answer recomputed later against a changed recipe must be explainable as a *different* answer, not a wrong one. (D-054, D-055) — ⚠ **Corrected 2026-08-10 (Block 8, finding R-02).** This rule previously read *"A manufacturing order freezes its BoM and routing version at release. (C10)"*, which governed a domain D-007 excludes: **no manufacturing order exists in scope.** The original rule is preserved here and returns unchanged when production execution is built.
 14. **Stock quantity words mean exactly what F3 says.** On hand ≠ available ≠ projected. Never used loosely, in code or UI.
 
 ## Naming

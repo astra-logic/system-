@@ -151,9 +151,11 @@ The one principle worth carrying forward: **a movement's cost signal is fixed wh
 
 ## D-007 — First release is the inventory + procurement + cost wedge, warehouse-first
 
-**Status:** `ACCEPTED` 2026-08-06 · **Area:** scope · **Answers:** B-01, B-02
+**Status:** `ACCEPTED` 2026-08-06 · **AMENDED 2026-08-10** by D-054 (Block 8) · **Area:** scope · **Answers:** B-01 · **Reopened:** `B-02`
 
-**Decision.** First release covers inventory truth, procurement, and cost consequence, for a single site, with the **inventory / warehouse manager** as primary user. Production, maintenance, full quality, BoMs, MRP and capacity are out. Detail in `docs/domain/02-first-release-scope.md`.
+**Decision — as originally written, preserved verbatim.** First release covers inventory truth, procurement, and cost consequence, for a single site, with the **inventory / warehouse manager** as primary user. Production, maintenance, full quality, BoMs, MRP and capacity are out. Detail in `docs/domain/02-first-release-scope.md`.
+
+> **⚠ Amended 2026-08-10 by D-054 — additive.** **Product structure (recipe)** — parent, component, quantity per, UoM, effective-from — **is admitted for the sole purpose of answering a stated feasibility question.** Production execution, maintenance, full quality, MRP **as a planning method**, and capacity remain out. Planning remains reorder-point, so the clause this exclusion was load-bearing *for* is unchanged. `B-02` is reopened and re-answered there.
 
 **Why.** Directly answers challenge D1: breadth is this project's principal risk. This wedge is the narrowest scope that still delivers the product's actual differentiator — operational truth connected to financial consequence — rather than a stock-tracking tool. Warehouse-first sequencing means the data foundation is earned by the person accountable for it before anything is built on top of it.
 
@@ -193,9 +195,13 @@ The one principle worth carrying forward: **a movement's cost signal is fixed wh
 
 ## D-010 — Demand is observed consumption; planning is reorder-point, not MRP
 
-**Status:** `PROPOSED` · **Area:** C5, C6 · **Follows from:** D-007
+**Status:** `LOCKED` 2026-08-10 · **AMENDED 2026-08-10** by D-054 (Block 8) · **Area:** C5, C6 · **Follows from:** D-007 · **Reopened:** `A-14`
 
-**Decision.** With production out of scope, material leaves stock via an **issue-to-consumption** movement carrying a reason code and (proposed) a consuming cost centre. The demand signal is historical consumption. Planning is reorder point / min–max plus projected availability. **No MRP.**
+> **Promoted from `PROPOSED` to `LOCKED` on 2026-08-10, with its amendment inside it.** D-054 amends this decision, and amending an unlocked decision leaves an audit trail nobody can follow. **Its substance is unchanged by promotion** — the text below is as originally written.
+
+**Decision — as originally written, preserved verbatim.** With production out of scope, material leaves stock via an **issue-to-consumption** movement carrying a reason code and (proposed) a consuming cost centre. The demand signal is historical consumption. Planning is reorder point / min–max plus projected availability. **No MRP.**
+
+> **⚠ Amended 2026-08-10 by D-054 — additive, and worded as a *reach* constraint.** Two demand channels are distinguished. The **planning demand signal** is unchanged: historical consumption, reorder point / min–max, still the only signal planning reads. A **feasibility input** — a quantity a human states in order to ask a question, basis `USER_DEFINED`, transient — is **not demand, not a forecast, not a plan.** The binding rule: **no calculation other than the answer that produced it may read a feasibility input or answer**, including reorder point, projected availability and every mechanism. This decision's rejection of *"synthesising demand from forecasts the factory has not made"* stands in full and is not weakened — a stated intent is not synthesised, is not a forecast, and is the factory's own.
 
 **Why.** MRP requires BoMs, which require production. Reorder-point planning on real consumption history is well-understood, honest, and sufficient for the buying decisions this release targets.
 
@@ -246,7 +252,9 @@ Operational management is reclassified as `ENABLER`. The saving engine is `CORE`
 
 ## D-012 — The headline saving figure is a range, deduplicated, split by impact type
 
-**Status:** `PROPOSED` · **Area:** F9 · **Depends on:** D-002, D-011
+**Status:** `LOCKED` 2026-08-10 (ratified) · **Area:** F9 · **Depends on:** D-002, D-011
+
+> **Ratified from `PROPOSED` to `LOCKED` on 2026-08-10.** ⚠ Block 4 recorded the inconsistency that **this decision was amended by three *locked* decisions (D-020, D-021, D-025) while itself unlocked**, and classified the fix as *"ratification, not redesign — deferred only because it changes nothing an engineer would build."* D-055 now depends on this decision's aggregate being a fixed target, so the ratification is taken. **No provision is added, removed or reworded.**
 
 **Decision.** The Potential Annual Saving figure must: be expressed as a **range**, not a point; carry the **weakest basis** among its inputs; **deduplicate overlapping opportunities** and show the deduction; report **recurring impact only** in the annual figure, with one-time capital release stated separately; and refuse to annualise below a minimum history window (`N-08`). Alongside it the system displays its own **realised-versus-identified ratio**.
 
@@ -679,7 +687,7 @@ Dimensions not preserved at event time cannot reliably be reconstructed later �
 
 ---
 
-## D-024 — amendment note (2026-08-07)
+### Amendment note to D-024 — 2026-08-07
 
 Following D-028, D-024 is read in two parts:
 
@@ -694,7 +702,7 @@ The four-way model (`operational + price/rate + FX + volume/mix`) remains the **
 
 ---
 
-## D-012 — amendment note (2026-08-07)
+### Amendment note to D-012 — 2026-08-07
 
 Cross-mechanism aggregation depends on **consistent capture** under F10. Inconsistent capture would reintroduce the basis-laundering D-012 forbids — aggregating figures whose FX and price treatment differ, producing a total that looks precise and is not. F10's capture contract is therefore a precondition of D-012's weakest-basis rule holding across mechanisms, not merely a convenience.
 
@@ -1476,7 +1484,9 @@ Available = On hand − Quality hold
 
 ## D-051 — MVP role model
 
-**Status:** `LOCKED` 2026-08-08 · **Area:** F1, security · **Closes** `A-20` **for the MVP only**
+**Status:** `LOCKED` 2026-08-08 · **EXTENDED 2026-08-10** by D-058 (Block 8) · **Area:** F1, security · **Closes** `A-20` **for the MVP only**
+
+> **⚠ Extended 2026-08-10 by D-058.** **No role is added.** Asking a Production Feasibility question is permitted to `INVENTORY_MANAGER`, `BUYER` and `ADMINISTRATOR` — the roles that already read inventory and supply — because a feasibility answer is read-only, creates no commitment, asserts no currency and enters no adjudication. **No `PRODUCTION_PLANNER` role is created**, since production execution is out of scope and this decision's own principle is that no role is invented without an established accountability.
 
 **Decision.** Five roles, derived from the accountabilities the domain already established — **no role is invented**:
 
@@ -1531,3 +1541,244 @@ Where no independent adjudicator exists, **self-adjudication is permitted with t
 **Recorded as a decision rather than a silent edit** because it changes a published classification, and the project's rule is that inconsistencies are reported rather than quietly corrected.
 
 **The MVP-blocking decision set is therefore eight, not nine.**
+
+---
+
+# Block 8 — Production Feasibility — 2026-08-10
+
+Decisions D-054 … D-058 admit the Production Feasibility capability and close the domain
+questions Block 8's adversarial analysis raised. Full analysis:
+`docs/domain/21-BLOCK8-PRODUCTION-FEASIBILITY-DOMAIN-LOCK.md`.
+Implementation contract: `docs/domain/22-BLOCK8-DOMAIN-CONTRACT.md`.
+
+**Taken under explicit product-owner authorisation of 2026-08-10**, which delegated the
+remaining Block 8 decisions and directed that unavailable factory facts be represented
+honestly with safe fallbacks rather than blocking progress.
+
+**No economic mechanism is created, changed or reinterpreted by any decision in this block.**
+**No financial figure changes.** The Potential Annual Saving headline is untouched.
+
+---
+
+## D-054 — Production Feasibility is a bounded, read-only capability
+
+**Status:** `LOCKED` 2026-08-10 · **Area:** scope, C6 · **Amends:** D-007, D-010 · **Reopens:** `B-02`, `A-14`
+
+**Decision.** The system admits **Production Feasibility**: a user states a production requirement, and the system answers whether the known material position can support it.
+
+**What is admitted.**
+
+```
+PRODUCT STRUCTURE (recipe)   parent item · component item · quantity per
+                             · UoM · effective-from.  NOTHING ELSE.
+
+FEASIBILITY INPUT            one quantity a human states in order to ask a
+                             question, with an OPTIONAL need-by date.
+
+READS                        current inventory · open supply · lead time
+                             · observed supply history · UoM conversions.
+```
+
+**One level of structure.** Where a component itself has a recipe, the system returns **⚪ CAN'T SAY** for the overall answer, names the component, and still shows every component it *could* evaluate. **A partial calculation is never presented as a complete answer.**
+
+**Excluded, and these exclusions do not move:** routings · work centres · capacity · scheduling · finite loading · work orders · WIP · backflush · shop-floor reporting · MRP regeneration · master production scheduling · pegging · time fences · lot-sizing engines · **BoM cost roll-up** · **persistent production plans** · automatic purchase-order creation · supplier selection · order splitting · alternate-material substitution.
+
+### Amendment to D-007 — additive
+
+> *Original, preserved verbatim:* **"Production, maintenance, full quality, BoMs, MRP and capacity are out."**
+
+```
+ADMIT product structure — parent, component, quantity per, UoM,
+      effective-from — for the SOLE purpose of answering a stated
+      feasibility question.
+
+UNCHANGED: production execution · maintenance · full quality · MRP as a
+      planning method · capacity. The exclusion list above stands.
+```
+
+**Why D-007's load-bearing clause survives.** `02-first-release-scope.md` grounded the BoM exclusion in a *consequence*: *"Without them there is no material requirements calculation, **which is why planning is reorder-point based rather than MRP.**"* That consequence is untouched — **planning remains reorder-point.** What is admitted is a question-answering structure, not a planning structure.
+
+### Amendment to D-010 — additive, and worded as a *reach* constraint
+
+> *Original, preserved verbatim:* **"The demand signal is historical consumption. Planning is reorder point / min–max plus projected availability. No MRP."** *Rejected: "synthesising demand from forecasts the factory has not made — fabrication, and forbidden by §47."*
+
+```
+PLANNING DEMAND SIGNAL   historical consumption; reorder point / min–max.
+                         UNCHANGED. Still the only signal planning reads.
+
+FEASIBILITY INPUT        a quantity a human states to ask a question.
+                         Basis USER_DEFINED. Transient.
+                         NOT demand. NOT a forecast. NOT a plan.
+```
+
+**The prohibition is on *reach*, not on existence.** D-010 forbids *synthesising* demand from *forecasts the factory has not made*. A manager stating an intent fails all three limbs — nothing is synthesised, it is not a forecast, and the factory made it. **What D-010 protects is what planning reads**, and the binding rule is therefore:
+
+> **No calculation other than the answer that produced it may read a feasibility input or answer.** This includes reorder point, projected availability, and every mechanism.
+
+**Why.** A factory client requires production planning, and D-007's own Cost clause recorded the gap as one that *"must be stated plainly rather than disguised."* This is the narrowest capability that closes it. The netting model is **not new** — `01-factory-operating-model.md` F3 already locks `Projected available at date t = Available + Incoming due ≤ t − Outgoing due ≤ t`.
+
+**D-030 does not apply.** D-030 keys mechanism boundaries on *"whether the counterfactual changes the quantity purchased."* A feasibility answer **has no counterfactual** — it compares to no baseline and asserts no alternative history. **Feasibility is not a saving mechanism and must never be routed through one.** Stated explicitly because D-030's text alone would not exclude it.
+
+**Rejected.** *Full L1 requirements planning* — needs a forward demand source, which is D-010's actual prohibition. *Multi-level explosion in v1* — the structure supports it; walking it without validated recipes produces confident depth over unverified data. *Refusing the capability* — leaves a stated client requirement unmet when the netting model is already locked.
+
+**Cost.** `B-02` and `A-14` reopen. Five documents restating the BoM exclusion must move together. One new structure to populate, and a factory that cannot supply recipes gets ⚪ rather than a product.
+
+---
+
+## D-055 — A feasibility answer is a question answered, not a finding recorded
+
+**Status:** `LOCKED` 2026-08-10 · **Area:** F9, saving model · **Uses:** D-025, D-050 unchanged · **Protects:** D-012
+
+**Decision.** A Production Feasibility Answer sits **outside the Finding hierarchy**, as `EVIDENCE GAP` does.
+
+```
+FINDING
+├── OPPORTUNITY          ← PAS-eligible
+├── OBSERVED COST
+└── EXPOSURE / RISK
+
+EVIDENCE GAP             ← outside the hierarchy (D-025)
+FEASIBILITY ANSWER       ← outside the hierarchy. NEW.
+```
+
+**Five binding rules.**
+
+1. **Never PAS-eligible.** No table, column or join permits it to reach D-012's aggregate.
+2. **Never demand.** Per D-054's reach constraint.
+3. **Never a counterfactual.** D-030 does not engage.
+4. **Never a commitment.** It creates no reservation, allocation or `Outgoing`.
+5. **It must not contradict the system's own advice.** Where the answer recommends ordering an item carrying an open `OPPORTUNITY`, that Opportunity is **displayed** beside the recommendation. **A read at answer time — no stored signature, no new relationship type, no duplicate finding.**
+
+**Why it cannot inflate the headline, on three independent grounds.** D-034 reclassified stockout as `EXPOSURE / RISK`, so an avoided stockout was never claimable. D-019's ladder requires an observed event to reach `OPPORTUNITY DETECTED`; a forward question observes none. D-046 permits an annual figure only from an observed twelve-month window. **A feasibility answer is structurally incapable of being annualised**, and therefore of contributing to PAS, even if someone tried.
+
+**Persistence — five things, not one.**
+
+| | Permitted | Form |
+|---|---|---|
+| The question asked | ✅ | Audit event, immutable |
+| The answer produced, with `as_of` | ✅ | Audit event, immutable snapshot |
+| As demand · as a plan · as a saved scenario | 🔴 **Forbidden** | See below |
+
+> **Structural test an engineer can apply without judgement: no calculation may join to the feasibility record.** It is written by the answer path and read only by a human reading an audit trail.
+
+**⚠ Why transience is load-bearing, and not a matter of taste.** **D-050** dissolves `A-02` — a Block 4 **class A, must-resolve-before-MVP** question — on the explicit premise that *"the MVP has no sales orders and no manufacturing orders, so **nothing can create a commitment**; `Reserved` is structurally always zero."* A persisted, refreshable feasibility plan **is** a commitment source. It would reopen `A-02` as a blocker and make `Available` untruthful — which D-050 identifies as breaking inventory truth. **D-050 stands only while feasibility answers stay transient.**
+
+**Answers are snapshots, never live.** An answer carries `as_of` and is **never updated in place**. Re-asking recomputes and produces a new answer; the previous is history. Mirrors D-001's append-only discipline, and prevents a saved answer changing beneath a user who has already acted on it.
+
+**Rejected.** *Modelling feasibility as an Opportunity* — every avoided shortage looks like a saving, and D-012 names this the easiest inflation to miss. *Ignoring the contradiction case* — structurally clean and produces a product that tells one user to order more and order less of the same material on the same day.
+
+---
+
+## D-056 — Supply timing: stated lead time governs; observation informs
+
+**Status:** `LOCKED` 2026-08-10 · **Area:** C6, C7 · **Uses:** D-002, D-017 unchanged · **Relates:** `F-09`
+
+**Decision.**
+
+```
+LEAD TIME FOR THE DATE
+    supplierItemTerms.leadTimeDays   where a supplier is identified
+    ELSE items.leadTimeDays
+    ELSE no date is produced, and the answer says why
+
+OBSERVED LEAD TIME
+    NEVER substituted into the calculation.
+    DISPLAYED as a count whenever observations exist and any exceeds
+    the value used:  "6 of the last 6 deliveries took longer (38-44 days)."
+
+EXPECTED ARRIVAL OF OPEN SUPPLY
+    the most recently observed statement of it, with source and basis named.
+    promisedDate and ETA disagree ⇒ BOTH shown, neither overrides.
+    no expected date at all ⇒ counts toward quantity, contributes 🟡,
+    disclosed. NEVER ⚪ for the whole request.
+
+NEED-BY DATE
+    OPTIONAL.
+    given   ⇒ verdict considers timing; recommendation carries a date.
+    absent  ⇒ verdict on quantity only; recommendation states the earliest
+              defensible arrival. A DEADLINE IS NEVER INVENTED.
+
+ORDER-BY DATE
+    need-by − lead time. Already past ⇒ 🔴, stating the gap in days.
+```
+
+**Why observation is displayed and never substituted.** An observed *history* is `ACTUAL`. A single number extracted from it to predict the future is a **chosen statistic** — mean, median, max, percentile — and choosing one is the category constant D-014 rule 15 and D-017 forbid. Mechanism 01 may legitimately use the observed **maximum** because its claim is a bounded counterfactual where the maximum is *forced* by the requirement to cover every observed case; a forward recommendation has no such forcing constraint, so any statistic would be ours. **A count of exceedances is categorical, and therefore permitted.**
+
+**Supplier confirmation is not claimed.** The PO lifecycle has no acknowledgement state, so `SENT` means *we sent it*, not *the supplier accepted it*. **The MVP counts `SENT` and discloses the limit** — *"this counts orders we've sent; we don't record whether the supplier confirmed them."* This is one reason nothing un-received may produce 🟢. Recorded as `F-51`.
+
+**Calendar — nothing is invented.** No Egyptian working week, no public or religious holidays, no factory shutdown, no supplier calendar is assumed.
+
+> **MVP convention: calendar days, stated on the answer.** No weekend or holiday adjustment. When `F-50` is answered the convention becomes **configuration, not migration.**
+
+**Why a date is still produced rather than withheld.** The imprecision is bounded, disclosed, and the user knows their own weekend. Withholding an actionable date to avoid a disclosed two-day imprecision helps nobody. **The stated convention is the disclosure**, per §38.
+
+**⚠ Correction to the Block 8 preparatory analysis.** It claimed the promised-date-versus-ETA choice decides 🟢 vs 🟡. **It does not.** Nothing un-received produces 🟢 under any date source, so the choice affects only 🟡 vs 🔴 and the printed date.
+
+**Rejected.** *Using observed lead time in the calculation* — requires choosing a statistic. *Withholding the date without a calendar* — over-caution that helps nobody. *Requiring a need-by date* — makes the simplest form of the question unanswerable.
+
+---
+
+## D-057 — The verdict is an evidence partition, not a coverage score
+
+**Status:** `LOCKED` 2026-08-10 · **Area:** C6, F4 · **Constructed from:** D-002, D-044 · **Constrained by:** D-014 rule 15, D-017
+
+**Decision.**
+
+```
+🔴 NO         A shortfall exists at the need-by date even when every open
+              supply is counted at its expected date. Deterministic.
+
+🟡 AT RISK    Sufficient only because supply not yet received is counted.
+
+🟢 YES        Sufficient from stock already on hand.
+              CAP — if the material shows consumption in the observed
+              history unrelated to this request, the verdict is 🟡 with
+              the reason stated. NEVER 🟢.
+
+⚪ CAN'T SAY  An input required to decide is absent: no recipe · a
+              component with its own recipe · UoM unconvertible ·
+              quantities not safely convertible.
+              ⚪ IS NEVER TURNED INTO 🔴.
+```
+
+**Aggregation precedence: 🔴 ▸ ⚪ ▸ 🟡 ▸ 🟢.** The overall verdict is the highest-precedence state present, and **per-component detail is shown regardless**.
+
+**🔴 outranks ⚪, and this is derived rather than chosen.** Component X's shortfall does not depend on component Y's missing recipe; resolving the unknown cannot remove the known blocker, and exploding a deeper recipe can only *add* requirements, never subtract them. **A known blocker is dispositive regardless of an unrelated unknown.**
+
+**⚪ outranks 🟡 and 🟢** because an unevaluated component could be a blocker, and 🟢 over an unevaluated component is a partial calculation presented as complete.
+
+**No percentage, threshold, score or probability appears anywhere in it.** This is **D-044's construction applied to feasibility instead of to money** — an evidence partition, built from D-002's basis values. D-045 records what happens otherwise: an engineer facing a required field with no formula synthesises one.
+
+**Why the 🟢 cap exists.** D-041 establishes that our exclusions run **optimistic**, and that a number must declare its own incompleteness. 🟢 computed from today's on-hand ignores that the material is consumed by everything else the factory makes, and **no reservation model exists to net it out** (D-050). The cap uses only observed `movements` data, invents nothing, and is conservative by construction.
+
+**Quantity rules.**
+
+- **Integer-only items round UP**, to the next whole unit, **exactly once, at the final net requirement.** Up, because a default must never create an under-supply. Once, because rounding at gross, after conversion and after netting compounds the overstatement across a recipe. **The user's own stated quantity is never rounded** — a fractional quantity of an integer-only finished good is **rejected as malformed input**, not silently adjusted.
+- **Catch-weight nets on `actual`**, per D-048 unchanged. The user is shown the operational purchasing quantity in the **nominal** unit **only where a factory-stated expected weight per unit exists** (`F-52`). Absent it, the shortfall is stated in the stock unit and the pack count is left to the buyer. **`actual_qty` is never invented** (D-048).
+- **Where quantities cannot be safely converted, the component is ⚪.** No global default conversion exists (F6).
+
+**Four states, not three, and the fourth is not optional.** *"No"* and *"I don't know"* are different instructions to a human being. A manager who sees 🔴 goes and buys material; if the truth was a missing recipe, they spent money for nothing. **Collapsing ⚪ into 🔴 is not simplification — it is the specific failure this product exists to avoid.**
+
+**Rejected.** *Percentage coverage with thresholds* — three invented constants in the product's most visible element. *Three states* — see above. *A confidence score* — forbidden by D-045.
+
+---
+
+## D-058 — Feasibility is asked by whoever may already read stock; no new role is created
+
+**Status:** `LOCKED` 2026-08-10 · **Area:** F1, security · **Extends** D-051 **for the MVP only** · **`A-20` stays `OPEN`**
+
+**The gap this closes.** D-051 locks five roles. **None of them is a production planner or manager**, so the capability Block 8 admits had no user in the locked role model — and an engineer building the entry point would have invented a permission rule.
+
+**Decision — resolution by derivation, not by inventing a role.**
+
+> **Asking a feasibility question requires no more authority than reading stock, because that is all it does.**
+>
+> Permitted to `INVENTORY_MANAGER`, `BUYER` and `ADMINISTRATOR` — the three roles that already read inventory and supply. `WAREHOUSE_OPERATOR` records movements rather than planning against them; `ADJUDICATOR` is a review role and gains nothing here.
+
+**Why no `PRODUCTION_PLANNER` role is created.** D-051's stated principle is that **no role is invented** — each exists because the domain already established the accountability. Production **execution** is out of scope (D-054), so no production accountability exists in the MVP to hang a role on. Creating one would invent an organisational structure the factory has not described, which D-051 explicitly forbids.
+
+**What makes this safe.** A feasibility answer is **read-only**, creates **no commitment** (D-055), asserts **no currency** and enters **no adjudication**. It therefore raises none of the independence concerns that forced the `ADJUDICATOR` role. The permission is exactly as sensitive as the data it reads, and no more.
+
+**When production execution arrives**, a planner role becomes derivable from a real accountability and should be added then. **`A-20` stays `OPEN`** for the full permission model; this is an extension of D-051's MVP subset, not a closure.
+
+**Rejected.** *Inventing `PRODUCTION_PLANNER` now* — a role with no accountability behind it, contradicting D-051's own principle. *Restricting to `INVENTORY_MANAGER` alone* — a buyer deciding what to order is precisely the person who needs the answer.

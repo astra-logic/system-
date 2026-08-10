@@ -46,7 +46,13 @@ The primary user is the person responsible for stock being correct. The product'
 
 ## 3. Out of scope
 
-C10 Production · C12 Maintenance · full C11 Quality · MRP · capacity planning · BoMs · routings · work centres · multi-site · **multi-currency *transacting*** (see the correction below) · AI features.
+C10 Production · C12 Maintenance · full C11 Quality · MRP · capacity planning · routings · work centres · multi-site · **multi-currency *transacting*** (see the correction below) · AI features.
+
+> ### ⚠ Corrected 2026-08-10 — D-054 (Block 8). **BoMs** were removed from this line.
+>
+> **Product structure (recipe)** — parent, component, quantity per, UoM, effective-from — is **in scope, for one purpose only:** answering a stated Production Feasibility question. See §3a.
+>
+> Everything else on this line is unchanged. **MRP as a planning method, capacity, routings and work centres remain out**, and planning remains reorder-point based.
 
 > ### ⚠ Corrected 2026-08-08 — D-042. This line previously read *"multi-currency"* without qualification, and it contradicted a locked decision.
 >
@@ -65,7 +71,26 @@ C10 Production · C12 Maintenance · full C11 Quality · MRP · capacity plannin
 >
 > **And the rule that would otherwise be got wrong:** each historical amount is normalised at **the rate effective on its own effective date**, never at a single current rate. Applying today's rate to history erases the effect normalisation exists to isolate.
 
-**BoMs are out, and this is load-bearing.** Without them there is no material requirements calculation, which is why planning is reorder-point based rather than MRP. That is a genuine capability limit and must be stated to users plainly rather than disguised.
+> ### ⚠ Superseded 2026-08-10 by D-054 (Block 8). Original text preserved below.
+>
+> **"BoMs are out, and this is load-bearing.** Without them there is no material requirements calculation, which is why planning is reorder-point based rather than MRP. That is a genuine capability limit and must be stated to users plainly rather than disguised."
+
+## 3a. Product structure — admitted for feasibility only
+
+**What changed, and what did not.** The clause above was load-bearing for a *consequence*: **planning is reorder-point rather than MRP.** That consequence is **unchanged.** Reorder point remains the only planning method, and historical consumption remains the only signal planning reads (D-010 as amended).
+
+What is admitted is a **question-answering** structure, not a planning structure:
+
+| In scope | Out, and staying out |
+|---|---|
+| Parent item · component item · quantity per · UoM · effective-from | Routings · work centres · capacity · scheduling |
+| **One level** of structure per answer | Multi-level explosion |
+| Read-only feasibility answers | Work orders · WIP · backflush · shop-floor reporting |
+| A transient, user-stated production quantity | MRP regeneration · master production scheduling · persistent plans |
+| — | **BoM cost roll-up** (D-008 gives valuation to finance) |
+| — | Automatic purchase orders · supplier selection · substitution |
+
+**The capability limit that remains, stated plainly:** the system answers *"can I make this with what I have and what is coming?"* It does **not** plan production, schedule it, or track it. Where a component has its own recipe, the answer is **⚪ CAN'T SAY**, naming the component — never a partial calculation presented as complete.
 
 ---
 
@@ -105,7 +130,7 @@ Procurement decisions need demand. Demand normally comes from production consumi
 - Planning is **reactive, not predictive**. Reorder point and min/max on consumption history — reasonable, well-understood, and honest.
 - **New items have no history and therefore no reliable reorder point.** `INSUFFICIENT_DATA` per D-002, not a fabricated default.
 - **A demand step-change is invisible until it has happened.** If the factory wins a large order, history-based planning under-orders. The product must not imply foresight it does not have.
-- **MRP is genuinely absent**, not deferred UI. Users who need requirements explosion need BoMs, which need production.
+- **MRP is genuinely absent**, not deferred UI. ⚠ **Refined 2026-08-10 by D-054:** *requirements explosion for a stated quantity* is now available through Production Feasibility (§3a). What remains absent is **MRP as a planning method** — no time-phased plan is maintained, nothing regenerates when a supply date moves, and no forward demand is synthesised. **Asking a question is not planning**, and the product must not imply otherwise.
 
 `NEW-03` Is consumption captured at item level only, or against a cost centre / department / line? The latter is more useful and only slightly more work at capture time — and it is nearly impossible to backfill later.
 

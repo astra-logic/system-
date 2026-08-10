@@ -73,7 +73,7 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 
 ### U-05 · Item master `ENABLER`
 **Objective.** Items for mixed manufacturing per D-009.
-**Boundary.** Identity, type, UoM, tracking policy, storage constraints, status lifecycle. **No BoM.**
+**Boundary.** Identity, type, UoM, tracking policy, storage constraints, status lifecycle. ⚠ **Amended 2026-08-10 by D-054:** product structure (recipe) is a **separate structure**, not an item-master field, and is read only by Production Feasibility. The item master itself still carries no structure.
 **Depends on.** U-03, U-04.
 **Acceptance.** A process material (kg, lot-tracked, fractional) and a discrete item (each, serial-tracked, integer-only) both behave correctly through the same paths. Item type carries behaviour — it is not a label. Integer-only is enforced as validation, not a separate code path.
 
@@ -221,7 +221,9 @@ M1 is a genuinely useful product by itself. If the project stopped there, the pi
 
 ## What this plan does not include
 
-No production, BoMs, routings, work centres, capacity, MRP, maintenance, CAPA, inspection plans, multi-site, **multi-currency *transacting***, executive dashboard, or AI features. These are **out of the first release**, not hidden in it. Per §38 and D-002, absent capability is stated plainly rather than implied.
+No production execution, routings, work centres, capacity, MRP **as a planning method**, maintenance, CAPA, inspection plans, multi-site, **multi-currency *transacting***, executive dashboard, or AI features. These are **out of the first release**, not hidden in it. Per §38 and D-002, absent capability is stated plainly rather than implied.
+
+> ⚠ **Corrected 2026-08-10 — D-054 (Block 8).** **BoMs** were removed from this line. **Product structure (recipe) is in scope for Production Feasibility only** — one level, read-only, no cost roll-up, no persistent plan, no regeneration. `02-first-release-scope.md` §3a holds the boundary in full.
 
 > ⚠ **Corrected 2026-08-08 — D-042.** This line previously read *"multi-currency"* unqualified and contradicted D-024. **Multi-currency transacting** — multi-currency ledgers, revaluation, currency translation — is out. **Multi-currency capture and FX normalisation are Tier 1 and in**: original amount, currency, FX rate and rate date on every financial event (D-028), normalised at each amount's **own effective date** for any cross-period comparison. Building single-currency from the old line would have made every imported-freight comparison wrong in an economy with EGP depreciation.
 
