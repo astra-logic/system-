@@ -14,7 +14,7 @@ import { db, sql } from "../lib/db/client";
 import {
   costReferences, etaForecasts, expediteEvents, factoryFacts, financialRates, fxRates, importBatches,
   items, locations, poLines, portMilestones, purchaseOrders, receipts, shipments,
-  sites, supplierItemTerms, suppliers, users,
+  sites, supplierItemTerms, suppliers, users, productStructures, uomConversions,
 } from "../lib/db/schema";
 import { qty } from "../lib/core/decimal";
 import { postMovement } from "../lib/ledger/post";
@@ -28,6 +28,7 @@ async function reset() {
       signature_dimensions, finding_links, evidence_gaps, exposures, observed_costs,
       opportunities, expedite_events, port_milestones, eta_forecasts, receipts, shipments,
       po_line_changes, po_lines, purchase_orders, supplier_item_terms, balances, movements,
+      feasibility_answers, product_structures,
       uom_conversions, factory_facts, items, locations, suppliers, users, sites RESTART IDENTITY CASCADE`;
 }
 
@@ -326,11 +327,86 @@ async function main() {
   ]);
   void lineOpen;
 
+  /* ======================================================================== */
+  /* BLOCK 9 — DEMO RECIPES. D-054, and §8 of the Block 8 contract.           */
+  /*                                                                          */
+  /* ⚠ These exist ONLY so the feasibility contract can be exercised before   */
+  /* factory recipes arrive (F-48 is unanswered; B-07 says the pilot factory  */
+  /* has no data yet). Every line carries isDemo = true, every parent name    */
+  /* carries "(DEMO)", and the product SAYS SO at the layer the user reads to */
+  /* act. Removing demo data leaves every real product at CAN'T SAY — the     */
+  /* honest state, not a degraded one.                                        */
+  /*                                                                          */
+  /* The two recipes are chosen to exercise every branch of the engine:       */
+  /*   FG-100  a normal component · a catch-weight one · one with no lead     */
+  /*           time · an integer-only one · one needing a unit conversion     */
+  /*   FG-200  contains FG-100, which has its own recipe -> CAN'T SAY         */
+  /* ======================================================================== */
+
+  const fg100 = await mkItem({
+    code: "FG-100", name: "Sealant compound, 20L pail (DEMO)",
+    kind: "DISCRETE_GOOD", stockUom: "EA", integerOnly: true,
+  });
+  const fg200 = await mkItem({
+    code: "FG-200", name: "Sealant kit, boxed (DEMO)",
+    kind: "DISCRETE_GOOD", stockUom: "EA", integerOnly: true,
+  });
+
+  /* F6: conversions are PER ITEM and versioned, never global. RM-005 is held
+     in kg and the recipe states grams, so the answer needs this row. RM-003 is
+     deliberately left WITHOUT one, to exercise the CAN'T SAY path. */
+  await db.insert(uomConversions).values([
+    { itemId: rm005, fromUom: "g", toUom: "kg", factor: "0.001", effectiveFrom: D("2026-01-01") },
+    { itemId: rm002, fromUom: "bag", toUom: "kg", factor: "25", effectiveFrom: D("2026-01-01") },
+  ]);
+
+  const recipe = (parentItemId: string, componentItemId: string, quantityPer: string, uom: string) => ({
+    siteId, parentItemId, componentItemId, quantityPer, uom,
+    effectiveFrom: D("2026-01-01"), isDemo: true,
+    sourceNaturalKey: `demo:${quantityPer}${uom}`,
+  });
+
+  await db.insert(productStructures).values([
+    /* FG-100 is fully computable, so the answer moves 🟢 → 🟡 → 🔴 purely with
+       the quantity asked for. That is the demonstration: same product, same
+       data, and the verdict changes because the EVIDENCE changes. */
+    recipe(fg100, rm001, "2.5", "kg"),   // plain kg -> kg; supplier terms say 30 days
+    recipe(fg100, rm002, "0.8", "kg"),   // catch-weight: bought by the bag, weighed in kg
+    recipe(fg100, rm005, "40", "g"),     // needs the g -> kg conversion above
+
+    /* FG-200 exercises both ways an answer can be UNANSWERABLE, which is the
+       state most systems fake: a component that is itself made in-house, and a
+       component whose unit cannot be converted. */
+    recipe(fg200, fg100, "1", "EA"),     // ⚠ FG-100 has its own recipe -> CAN'T SAY
+    recipe(fg200, cp001, "2", "EA"),     // integer-only, lead time 45
+    recipe(fg200, rm003, "0.15", "L"),   // ⚠ no L->kg conversion recorded -> CAN'T SAY
+  ]);
+
+  /* Open supply, so 🟡 AT RISK is reachable in the running product and not only
+     in the tests. These are SENT and unreceived — which is exactly the state
+     that can never produce 🟢, however much is on the way. */
+  const openSupply = async (itemId: string, number: string, quantity: string, promised: string) => {
+    const [po] = await db.insert(purchaseOrders).values({
+      siteId, number, supplierId: supA, status: "SENT",
+      orderedAt: D("2026-12-05"), currency: "EGP", paymentTermsDays: 60,
+    }).returning();
+    await db.insert(poLines).values({
+      poId: po!.id, lineNo: 1, itemId, orderedQty: quantity, uom: "kg",
+      unitPrice: "40", currency: "EGP", promisedDate: promised,
+    });
+  };
+  await openSupply(rm001, "PO-1009", "9000", "2027-02-15");
+  await openSupply(rm002, "PO-1010", "4000", "2027-02-18");
+  await openSupply(rm005, "PO-1011", "400", "2027-02-20");
+
   console.log("Demo fixtures seeded. Every batch is marked isDemo = true.");
   console.log("Scenarios: lead-time correction (4 events) · unclassified expedite · expedite with no");
   console.log("separable premium · partial receipts · catch-weight · serial-tracked discrete · quality");
   console.log("hold · excess position · low stock · missing lead time · missing incoterm and terms ·");
   console.log("EGP devaluation across the window · delayed shipment with a revised FORECAST ETA.");
+  console.log("Feasibility: FG-100 (3 materials, fully computable — ask 3,000 / 6,000 / 20,000 to");
+  console.log("  see YES / AT RISK / NO) and FG-200 (a made-in-house component and an unconvertible");
+  console.log("  unit — both CAN'T SAY). Three open orders make AT RISK reachable in the app.");
   await sql.end();
 }
 

@@ -12,8 +12,8 @@ import { revalidatePath } from "next/cache";
 import { sql } from "../../lib/db/client";
 import { firstSiteId } from "../../lib/engine/run";
 import { parseFile, readSheet, recordBatch } from "../../lib/import/ingest";
-import { ITEM_SPEC, MOVEMENT_SPEC } from "../../lib/import/specs";
-import { applyItems, applyMovements, recordOutcomes, type ApplyReport } from "../../lib/import/apply";
+import { ITEM_SPEC, MOVEMENT_SPEC, STRUCTURE_SPEC } from "../../lib/import/specs";
+import { applyItems, applyMovements, applyStructures, recordOutcomes, type ApplyReport } from "../../lib/import/apply";
 import { DemoBanner } from "../demo-banner";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +49,18 @@ async function handleUpload(formData: FormData): Promise<void> {
     });
     if (parsed.missingColumns.length === 0) {
       const report = await applyItems(parsed, { siteId });
+      await recordOutcomes(batchId, report);
+    }
+  } else if (kind === "STRUCTURES") {
+    const parsed = parseFile(header, rows, STRUCTURE_SPEC);
+    const { batchId } = await recordBatch(parsed, {
+      siteId, filename: file.name, kind, uploadedBy: "admin", isDemo,
+    });
+    if (parsed.missingColumns.length === 0) {
+      /* ⚠ `isDemo` is deliberately NOT passed through. An imported recipe is
+         always real (D-054, contract §8) — demo structure exists only in the
+         seed, so a demo recipe cannot reach a factory item by this route. */
+      const report = await applyStructures(parsed, { siteId });
       await recordOutcomes(batchId, report);
     }
   } else {
@@ -103,6 +115,7 @@ export default async function ImportPage() {
               <select name="kind" defaultValue="MOVEMENTS" style={selectStyle}>
                 <option value="MOVEMENTS">Stock movements</option>
                 <option value="ITEMS">Item master</option>
+                <option value="STRUCTURES">Product recipes</option>
               </select>
             </label>
 
@@ -137,6 +150,17 @@ export default async function ImportPage() {
             <p style={{ margin: "6px 0" }}>
               <strong>Item master:</strong> <code>code · name · kind · stock_uom</code>. Optional:{" "}
               <code>catch_weight · nominal_uom · lead_time_days</code>.
+            </p>
+            <p style={{ margin: "6px 0" }}>
+              <strong>Product recipes:</strong> <code>parent_code · component_code · quantity_per ·
+              uom · effective_from</code>. One row per material in a product, and{" "}
+              <code>quantity_per</code> is for <strong>one</strong> finished unit. Import your items
+              first — a recipe line pointing at an item that does not exist is refused rather than
+              skipped, because a silently missing material would make every answer wrong.
+            </p>
+            <p style={{ margin: "6px 0" }}>
+              To change a quantity, add a row with a later <code>effective_from</code>. The old one
+              stays as history, so an answer given last month can still be explained.
             </p>
             <p style={{ margin: "6px 0" }}>
               <strong>Dates must be ISO — <code>YYYY-MM-DD</code>.</strong> A date like{" "}

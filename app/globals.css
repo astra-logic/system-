@@ -51,3 +51,41 @@ ul.reasons li { margin:4px 0; }
 .kv { display:grid; grid-template-columns:190px 1fr; gap:6px 16px; font-size:14px; }
 .kv dt { color:var(--muted); }
 .kv dd { margin:0; }
+
+/* ---- Can I produce it? (Block 9) -----------------------------------------
+   The verdict carries meaning through colour, and the meaning is the same one
+   the engine computed — never a severity gradient, because there is no scale.
+   ⚪ CAN'T SAY is deliberately NEUTRAL, not red: "no" and "I don't know" are
+   different instructions to a person, and the interface must not merge them. */
+.ask { display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:16px; align-items:end; }
+@media (max-width:820px) { .ask { grid-template-columns:1fr; } }
+.ask label { display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
+.ask label span em { font-style:normal; opacity:.7; }
+.ask select, .ask input { font:inherit; color:var(--ink); background:var(--bg);
+  border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+.ask select:focus, .ask input:focus { outline:2px solid var(--accent); outline-offset:1px; }
+.ask button { font:inherit; font-weight:600; color:#fff; background:var(--accent);
+  border:0; border-radius:8px; padding:11px 26px; cursor:pointer; }
+.ask button:hover { filter:brightness(1.08); }
+
+.verdict-card { border-width:1px; }
+.verdict-card.yes { background:var(--ok-bg); border-color:var(--ok); }
+.verdict-card.at-risk { background:var(--warn-bg); border-color:var(--warn); }
+.verdict-card.no { background:var(--bad-bg); border-color:var(--bad); }
+.verdict-card.cant-say, .verdict-card.rejected { background:var(--surface); border-color:var(--line); }
+.verdict-head { display:flex; align-items:center; gap:12px; }
+.verdict-mark { font-size:30px; line-height:1; }
+.verdict-word { font-size:26px; font-weight:600; letter-spacing:-.02em; }
+.verdict-line { font-size:17px; margin:10px 0 0; max-width:66ch; }
+
+ul.missing { list-style:none; margin:0; padding:0; }
+ul.missing > li { padding:14px 0; border-bottom:1px solid var(--line); }
+ul.missing > li:last-child { border-bottom:0; }
+.missing-row { display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; }
+.missing-name { color:var(--muted); flex:1; }
+.missing-qty { font-weight:600; font-variant-numeric:tabular-nums; }
+.action { margin-top:6px; font-size:14.5px; }
+.warn-line { margin-top:6px; font-size:13.5px; color:var(--warn); max-width:80ch; }
+details.card > summary { cursor:pointer; font-weight:600; }
+details.card > summary::marker { color:var(--muted); }
+.detail-block { border-top:1px solid var(--line); margin-top:18px; padding-top:14px; }

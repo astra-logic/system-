@@ -177,3 +177,63 @@ export const RECEIPT_SPEC: ParseSpec<ReceiptRow> = {
     };
   },
 };
+
+/* ========================================================================== */
+/* BLOCK 9 — product structure (recipe). D-054.                              */
+/* ========================================================================== */
+
+export interface StructureRow {
+  parentCode: string;
+  componentCode: string;
+  quantityPer: Decimal;
+  uom: string;
+  effectiveFrom: Date;
+}
+
+/**
+ * The recipe import.
+ *
+ * ⚠ The column list IS the scope boundary (D-054). There is deliberately no
+ * scrap, yield, operation, routing, work-centre or cost column, and adding one
+ * is a scope change requiring a decision rather than a spreadsheet column.
+ *
+ * `quantity_per` is per ONE unit of the parent, because per-batch quantities
+ * require a batch size, and a batch size the factory has not stated is a factory
+ * fact we would be inventing (F-49 records the related scrap question).
+ */
+export const STRUCTURE_SPEC: ParseSpec<StructureRow> = {
+  kind: "STRUCTURES",
+  requiredColumns: [
+    { column: "parent_code", consequence: "Without the product being made, the line belongs to no recipe." },
+    { column: "component_code", consequence: "Without the material consumed, there is nothing to check stock for." },
+    { column: "quantity_per", consequence: "Without a quantity per unit, we cannot work out how much a production run needs — the whole answer depends on it." },
+    { column: "uom", consequence: "A quantity without a unit is not a quantity. We convert per item and never assume a unit." },
+    { column: "effective_from", consequence: "A recipe that changed is history, not a correction. Without the date, an old answer cannot be explained." },
+  ],
+  parseRow(raw, errors) {
+    const parentCode = requireText(raw, "parent_code", "The line belongs to no recipe.", errors);
+    const componentCode = requireText(raw, "component_code", "There is nothing to check stock for.", errors);
+    const quantityPer = requireDecimal(raw, "quantity_per", "How much a production run needs depends entirely on this.", errors, { positive: true });
+    const uom = requireText(raw, "uom", "A quantity without a unit is not a quantity.", errors);
+    const effectiveFrom = requireDate(raw, "effective_from", "An old answer cannot be explained without knowing which recipe version produced it.", errors);
+
+    if (!parentCode || !componentCode || !quantityPer || !uom || !effectiveFrom) return null;
+
+    /* A component that is its own parent is a recipe that consumes itself. It
+       would explode forever, and no factory means it — so it is rejected at the
+       door with a reason a person can act on, rather than producing a confusing
+       answer later. */
+    if (parentCode.trim().toUpperCase() === componentCode.trim().toUpperCase()) {
+      errors.push({
+        column: "component_code",
+        severity: "REJECT",
+        found: componentCode,
+        required: "a different item from the parent",
+        consequence: `"${parentCode}" is listed as a material inside its own recipe. A product cannot be made from itself.`,
+      });
+      return null;
+    }
+
+    return { parentCode, componentCode, quantityPer, uom, effectiveFrom };
+  },
+};

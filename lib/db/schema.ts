@@ -863,3 +863,106 @@ export const users = pgTable("users", {
   roles: role("roles").array().notNull(),
   active: boolean("active").notNull().default(true),
 });
+
+/* ========================================================================== */
+/* BLOCK 9 — PRODUCTION FEASIBILITY. D-054, D-055.                           */
+/*                                                                            */
+/* Two tables and no more. The capability READS everything else and WRITES    */
+/* only these. Neither is read by any calculation outside the feasibility     */
+/* path — see the note on feasibilityAnswers.                                 */
+/* ========================================================================== */
+
+/**
+ * Product structure — the "recipe". D-054, admitted by amending D-007.
+ *
+ * ⚠ THE BOUNDARY IS THE COLUMN LIST. No routing, no operation, no work centre,
+ * no scrap or yield factor, no cost, no phantom flag, no alternate. Adding any
+ * of those is a scope change requiring a decision, not a migration.
+ *
+ * The table is self-referential-capable — a component may be a parent elsewhere
+ * — because the shape is identical either way. Block 9 traverses ONE level and
+ * returns CANT_SAY when a component is itself a parent (D-054). The shape costs
+ * nothing now and avoids a migration later; no code walks the second level.
+ */
+export const productStructures = pgTable(
+  "product_structures",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    siteId: uuid("site_id").notNull().references(() => sites.id),
+    parentItemId: uuid("parent_item_id").notNull().references(() => items.id),
+    componentItemId: uuid("component_item_id").notNull().references(() => items.id),
+    /** Quantity of the component per ONE unit of the parent. Basis USER_DEFINED. */
+    quantityPer: numeric("quantity_per").notNull(),
+    /** The unit `quantity_per` is expressed in. Converted per item, versioned (F6). */
+    uom: text("uom").notNull(),
+    /** F5: effective-dated. A recipe that changed is history, not a correction. */
+    effectiveFrom: timestamp("effective_from", { withTimezone: true }).notNull(),
+    /**
+     * §8 of the Block 8 contract. DEMO structure is visibly marked and never
+     * attaches to an imported factory item. Removing demo data leaves every real
+     * item at CANT_SAY — the honest state, not a degraded one.
+     */
+    isDemo: boolean("is_demo").notNull().default(false),
+    sourceNaturalKey: text("source_natural_key"),
+  },
+  (t) => ({
+    uq: uniqueIndex("product_structures_uq").on(t.parentItemId, t.componentItemId, t.effectiveFrom),
+    parentIdx: index("product_structures_parent_idx").on(t.parentItemId),
+    componentIdx: index("product_structures_component_idx").on(t.componentItemId),
+  }),
+);
+
+/**
+ * The feasibility answer — AUDIT ONLY. D-055.
+ *
+ * ⚠⚠ BINDING STRUCTURAL RULE, and the reason this table is safe to exist:
+ *
+ *     NO CALCULATION MAY JOIN TO THIS TABLE.
+ *
+ * It is written by the answer path and read only by a human reading an audit
+ * trail. A single query outside the audit view that references it is a DEFECT,
+ * not a design choice — `tests/feasibility.test.ts` asserts this by inspection
+ * of the source tree.
+ *
+ * Why the rule carries so much weight: D-050 dissolves A-02 (hard vs soft
+ * reservation — a Block 4 class A blocker) on the explicit premise that
+ * "nothing in the MVP can create a commitment". A feasibility answer that any
+ * calculation could read would be the first commitment source in the system,
+ * reopening A-02 and making `Available` untruthful. D-050 stands only while
+ * these answers stay inert.
+ *
+ * It is therefore NOT demand, NOT a plan, NOT a scenario and NOT a forecast.
+ * It is a snapshot of a question and its answer, kept so that "why did we buy
+ * that?" is answerable six months later.
+ */
+export const feasibilityAnswers = pgTable(
+  "feasibility_answers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    siteId: uuid("site_id").notNull().references(() => sites.id),
+    /** D-058: one of the roles permitted to read stock. */
+    askedBy: text("asked_by").notNull(),
+    askedAt: timestamp("asked_at", { withTimezone: true }).notNull().defaultNow(),
+
+    productItemId: uuid("product_item_id").notNull().references(() => items.id),
+    /** What the user typed. Basis USER_DEFINED — the floor for everything derived. */
+    requestedQty: numeric("requested_qty").notNull(),
+    /** D-056: OPTIONAL. NULL means "not stated", never "today". */
+    needByDate: date("need_by_date"),
+
+    verdict: text("verdict").notNull(),
+    /** The full answer as rendered, so a past answer can be re-read exactly. */
+    answer: jsonb("answer").notNull(),
+    /**
+     * D-002: EFFECTIVE time of the position the answer was computed against.
+     * An answer is a SNAPSHOT and is never updated in place — re-asking writes
+     * a new row. A saved answer that changed beneath a user who had already
+     * acted on it would be worse than a stale one.
+     */
+    asOf: timestamp("as_of", { withTimezone: true }).notNull(),
+    /** Code standard 13 as corrected: which recipe version produced this. */
+    structureAsOf: timestamp("structure_as_of", { withTimezone: true }).notNull(),
+    isDemo: boolean("is_demo").notNull().default(false),
+  },
+  (t) => ({ askedIdx: index("feasibility_answers_asked_idx").on(t.askedAt) }),
+);

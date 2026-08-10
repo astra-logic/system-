@@ -14,11 +14,11 @@
  * directly.
  */
 import { db, sql } from "../db/client";
-import { items, locations } from "../db/schema";
-import { qty } from "../core/decimal";
+import { items, locations, productStructures } from "../db/schema";
+import { qty, toDb } from "../core/decimal";
 import { DuplicateIngestionError, LedgerError, postMovement } from "../ledger/post";
 import type { FileResult } from "./validate";
-import type { ItemRow, MovementRow } from "./specs";
+import type { ItemRow, MovementRow, StructureRow } from "./specs";
 
 export interface ApplyOutcome {
   readonly rowNumber: number;
@@ -211,4 +211,128 @@ export async function recordOutcomes(batchId: string, report: ApplyReport): Prom
     SET rows_accepted = ${report.applied}, rows_rejected = ${report.rejected + report.duplicates},
         status = ${report.rejected + report.duplicates === 0 ? "ACCEPTED" : report.applied === 0 ? "REJECTED" : "PARTIAL"}
     WHERE id = ${batchId}::uuid`;
+}
+
+/* ========================================================================== */
+/* BLOCK 9 — recipe import. D-054, and §8 of the Block 8 contract.           */
+/* ========================================================================== */
+
+/**
+ * Apply parsed recipe rows.
+ *
+ * ⚠ TWO RULES THAT ARE ENFORCED HERE RATHER THAN TRUSTED:
+ *
+ * 1. AN IMPORTED RECIPE IS NEVER DEMO. `isDemo` is hard-coded false on this
+ *    path — there is no option and no parameter. Demo structure exists only in
+ *    the seed, so a demo recipe cannot reach a real factory item by any route
+ *    through this function.
+ *
+ * 2. AN IMPORTED RECIPE MAY NOT ATTACH TO A DEMO ITEM. The reverse leak matters
+ *    just as much: real recipe lines hanging off seeded demo items would make a
+ *    demo product look like factory data. Demo items are recognised by the
+ *    convention the seed itself uses — the "(DEMO)" marker in the item name.
+ *
+ * A row naming an unknown item is REJECTED with the code that was not found,
+ * never silently skipped: silently discarding rows is how a factory ends up
+ * trusting a recipe that is missing a material.
+ */
+export async function applyStructures(
+  parsed: FileResult<StructureRow>,
+  opts: { siteId: string },
+): Promise<ApplyReport> {
+  const outcomes: ApplyOutcome[] = [];
+  const its = await db.select({ id: items.id, code: items.code, name: items.name }).from(items);
+  const byCode = new Map(its.map((i) => [i.code.trim().toUpperCase(), i]));
+
+  const existing = new Set(
+    (
+      await db
+        .select({
+          p: productStructures.parentItemId,
+          c: productStructures.componentItemId,
+          e: productStructures.effectiveFrom,
+        })
+        .from(productStructures)
+    ).map((r) => `${r.p}|${r.c}|${r.e.toISOString()}`),
+  );
+
+  for (const row of parsed.rows) {
+    if (!row.parsed || row.errors.some((e) => e.severity === "REJECT")) {
+      outcomes.push({
+        rowNumber: row.rowNumber,
+        outcome: "REJECTED",
+        detail: row.errors.map((e) => `${e.column}: ${e.consequence}`).join(" | ") || "row could not be parsed",
+      });
+      continue;
+    }
+    const r = row.parsed;
+    const parent = byCode.get(r.parentCode.trim().toUpperCase());
+    const component = byCode.get(r.componentCode.trim().toUpperCase());
+
+    if (!parent || !component) {
+      const missing = !parent ? r.parentCode : r.componentCode;
+      outcomes.push({
+        rowNumber: row.rowNumber,
+        outcome: "REJECTED",
+        detail:
+          `No item with the code "${missing}" exists yet. Import your items first, then the recipes — ` +
+          `a recipe line pointing at nothing would leave a material silently missing from every answer.`,
+      });
+      continue;
+    }
+
+    // Rule 2 — the reverse leak. Real data must not attach to seeded demo items.
+    if (parent.name.includes("(DEMO)") || component.name.includes("(DEMO)")) {
+      outcomes.push({
+        rowNumber: row.rowNumber,
+        outcome: "REJECTED",
+        detail:
+          `"${parent.name.includes("(DEMO)") ? parent.code : component.code}" is demonstration data. ` +
+          `Imported recipes are never attached to demo items, so that what you see for a real product is ` +
+          `always your factory's own data.`,
+      });
+      continue;
+    }
+
+    const key = `${parent.id}|${component.id}|${r.effectiveFrom.toISOString()}`;
+    if (existing.has(key)) {
+      outcomes.push({
+        rowNumber: row.rowNumber,
+        outcome: "DUPLICATE",
+        detail:
+          `${parent.code} already has a recipe line for ${component.code} effective ` +
+          `${r.effectiveFrom.toISOString().slice(0, 10)}, and it was NOT overwritten. To change a ` +
+          `quantity, add a line with a later effective date — the old one stays as history.`,
+      });
+      continue;
+    }
+
+    const [created] = await db
+      .insert(productStructures)
+      .values({
+        siteId: opts.siteId,
+        parentItemId: parent.id,
+        componentItemId: component.id,
+        quantityPer: toDb(qty(r.quantityPer)),
+        uom: r.uom,
+        effectiveFrom: r.effectiveFrom,
+        isDemo: false, // Rule 1 — not a parameter. An imported recipe is real.
+        sourceNaturalKey: `${parent.code}|${component.code}|${r.effectiveFrom.toISOString().slice(0, 10)}`,
+      })
+      .returning();
+    existing.add(key);
+    outcomes.push({
+      rowNumber: row.rowNumber,
+      outcome: "APPLIED",
+      detail: `${parent.code} uses ${r.quantityPer.toFixed()} ${r.uom} of ${component.code} per unit`,
+      producedId: created!.id,
+    });
+  }
+
+  return {
+    applied: outcomes.filter((o) => o.outcome === "APPLIED").length,
+    rejected: outcomes.filter((o) => o.outcome === "REJECTED").length,
+    duplicates: outcomes.filter((o) => o.outcome === "DUPLICATE").length,
+    outcomes,
+  };
 }
