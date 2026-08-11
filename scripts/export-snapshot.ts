@@ -43,7 +43,7 @@ import { basisWord, sentence, stateWord } from "../lib/ui/plain";
 const AS_OF = new Date("2027-01-01T00:00:00Z");
 
 /** The quantities a preview may be asked about. Every one is really computed. */
-const GRID = [500, 1000, 2000, 3000, 5000, 6000, 8000, 10000, 15000, 20000, 30000, 50000];
+const GRID = [100, 250, 500, 1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 15000, 20000, 30000, 50000];
 
 async function main() {
   const siteId = await firstSiteId();
