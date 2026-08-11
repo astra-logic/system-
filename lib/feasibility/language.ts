@@ -119,8 +119,38 @@ export function headline(a: FeasibilityAnswer): string {
   }
 }
 
+/**
+ * How many deliveries the ANSWER ACTUALLY DEPENDS ON.
+ *
+ * ⚠ THE DEFECT THIS FIXES
+ *
+ *   This counted every purchase order across every component, including
+ *   components with ample stock and no shortfall at all. Asked whether 50 units
+ *   could be made — needing 125 kg of a material with 10,370 kg on the shelf —
+ *   the product answered "You can make this only if 3 deliveries arrive as
+ *   expected." That is false. The answer depends on no delivery whatsoever.
+ *
+ *   It reached Layer 1, which is the one sentence a manager reads and acts on,
+ *   and it would have sent someone chasing three suppliers for nothing.
+ *
+ * ⚠ WHY THE VERDICT ITSELF WAS RIGHT
+ *
+ *   Those components are AT_RISK for a different and legitimate reason: there
+ *   is enough today, but the material is regularly consumed and no reservation
+ *   model exists to net out what else will take it. That is `cappedByConsumption`,
+ *   and the headline already has the correct sentence for it — the count simply
+ *   had to stop claiming the other one.
+ *
+ *   So a delivery counts only where sufficiency genuinely rests on it. A
+ *   component that is merely capped by its own consumption is excluded, and a
+ *   component that is fine was never relevant.
+ */
 const countDeliveries = (a: FeasibilityAnswer): number =>
-  new Set(a.components.flatMap((c) => c.supply.map((s) => s.poNumber))).size;
+  new Set(
+    a.components
+      .filter((c) => (c.verdict === "AT_RISK" && !c.cappedByConsumption) || c.verdict === "NO")
+      .flatMap((c) => c.supply.map((s) => s.poNumber)),
+  ).size;
 
 /* -------------------------------------------------------------------------- */
 /* Layer 2 — what's missing, and what to do.                                  */

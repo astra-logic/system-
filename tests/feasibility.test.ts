@@ -744,6 +744,33 @@ describe("the promised journey", () => {
     for (const s of allUserFacingStrings(a)) expect(vocabularyViolations(s)).toEqual([]);
   });
 
+  it("never claims the answer depends on deliveries it does not depend on", async () => {
+    /* ⚠ REGRESSION. Layer 1 counted every purchase order across every component,
+       including components with ample stock and no shortfall. A request needing
+       125 kg of a material with 10,370 kg on the shelf was answered "You can make
+       this only if 3 deliveries arrive as expected" — false, and it would send a
+       manager chasing three suppliers for nothing.
+
+       The verdict is legitimately AT_RISK: enough today, but the material is
+       regularly consumed and nothing reserves it. That has its own sentence. */
+    const rm = await makeItem(ctx.siteId, { code: "PLENTY", stockUom: "kg", leadTimeDays: 20 });
+    const fg = await product({ code: "PROD-Y", name: "Product Y" });
+    await recipe(fg, rm, "2.5", "kg");
+    await stock(rm, "10000");
+    await openPo(rm, { number: "PO-IRRELEVANT", qty: "9000", promised: "2027-02-15" });
+    // Regular use, which is what makes the component capped rather than YES.
+    await consume(rm, "400");
+
+    const a = await checkFeasibility({ productItemId: fg, quantity: qty("50"), needBy: null, asOf: AT });
+
+    expect(a.verdict).toBe("AT_RISK");
+    expect(a.components[0]!.cappedByConsumption).toBe(true);
+    expect(a.components[0]!.shortfall!.isZero()).toBe(true);
+    // The sentence must be the consumption one, and must not mention deliveries.
+    expect(headline(a)).not.toMatch(/deliver/i);
+    expect(headline(a)).toMatch(/used regularly/);
+  });
+
   it("no feasibility figure is ever presented as observed fact", async () => {
     const rm = await makeItem(ctx.siteId, { code: "RM-1", stockUom: "kg" });
     const fg = await product();
