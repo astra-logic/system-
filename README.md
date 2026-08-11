@@ -1,8 +1,49 @@
 # Manufacturing & Inventory Operating System
 
-> **Status: Planning. No application code exists, by design.**
+> **Status: Running application.** Seven screens over a locked domain engine.
 >
 > A manufacturing operating system that turns factory data into clear operational decisions, measurable financial outcomes, and controlled execution.
+
+---
+
+## Running it
+
+Needs **Node 20+** and **PostgreSQL 16**.
+
+```bash
+# 1 — a database and a role matching .env
+createdb mos
+psql -d mos -c "CREATE ROLE app LOGIN PASSWORD 'app'; GRANT ALL ON DATABASE mos TO app;"
+psql -d mos -c "GRANT ALL ON SCHEMA public TO app;"
+
+# 2 — dependencies, tables, demo corpus
+npm install
+npm run db:push          # applies migrations once each; safe to re-run
+npm run db:seed          # ⚠ TRUNCATES every table, then loads the demo factory
+
+# 3 — go
+npm run dev              # http://localhost:3000
+```
+
+`npm run db:seed` is **destructive** — it empties every table before loading fixtures. Re-run it to
+get back to a known state; never run it against data you want to keep.
+
+Everything the seed creates is marked `isDemo` at the data layer, so the demo disclosure on every
+screen is structural rather than a badge someone remembered to render.
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server on :3000 |
+| `npm test` | The full suite — 217 tests |
+| `npm run typecheck` | Types only |
+| `npm run build` | Production build |
+| `npm run scan:vocab` | Renders every route and fails on internal vocabulary reaching a user. Needs a server running — `BASE=http://localhost:3000 npm run scan:vocab` |
+
+### Where to start once it's up
+
+`/` answers *what needs my attention today*. `/produce` is the reference screen — pick a product,
+enter a quantity, and read the answer. `/settings` is where the system tells you what it does not
+yet know about your factory.
 
 ---
 
