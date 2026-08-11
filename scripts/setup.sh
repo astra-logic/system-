@@ -98,6 +98,17 @@ if ! "${PSQL[@]}" -tAc "SELECT 1 FROM pg_database WHERE datname='${DB}_test'" | 
   ok "Created test database '${DB}_test'"
 fi
 
+# --- local configuration ----------------------------------------------------
+# `.env` is deliberately NOT in the repository — the day a real database
+# password goes in it, a committed file puts that password on GitHub. So it is
+# written here instead, and only when it is missing.
+if [ -f .env ]; then
+  ok ".env already present, left alone"
+else
+  printf 'DATABASE_URL=postgres://%s:%s@localhost:5432/%s\n' "$ROLE" "$PASS" "$DB" > .env
+  ok "Wrote .env"
+fi
+
 # --- the app ----------------------------------------------------------------
 say "Installing dependencies"
 npm install --silent

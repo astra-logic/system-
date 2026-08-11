@@ -2,3 +2,6 @@ node_modules/
 .next/
 *.tsbuildinfo
 .env.local
+
+# Local secrets. Never committed — see .env.example for the shape.
+.env
