@@ -8,22 +8,32 @@
 
 ## Running it
 
-Needs **Node 20+** and **PostgreSQL 16**.
+Needs **Node 20+** and **PostgreSQL 16** installed and running. Then:
 
 ```bash
-# 1 — a database and a role matching .env
-createdb mos
-psql -d mos -c "CREATE ROLE app LOGIN PASSWORD 'app'; GRANT ALL ON DATABASE mos TO app;"
-psql -d mos -c "GRANT ALL ON SCHEMA public TO app;"
-
-# 2 — dependencies, tables, demo corpus
-npm install
-npm run db:push          # applies migrations once each; safe to re-run
-npm run db:seed          # ⚠ TRUNCATES every table, then loads the demo factory
-
-# 3 — go
-npm run dev              # http://localhost:3000
+npm run setup     # database, role, tables, demo factory
+npm run dev       # http://localhost:3000
 ```
+
+`setup` checks your versions, creates the `mos` database and the `app` role, applies the
+migrations, and offers to load the demo factory. It is safe to re-run — an existing role or
+database is left alone, and migrations already applied are skipped.
+
+<details>
+<summary>Doing it by hand instead</summary>
+
+```bash
+createdb mos
+psql -d postgres -c "CREATE ROLE app LOGIN PASSWORD 'app'"
+psql -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE mos TO app"
+psql -d mos      -c "GRANT ALL ON SCHEMA public TO app"   # Postgres 15+ needs this explicitly
+createdb mos_test && psql -d mos_test -c "GRANT ALL ON SCHEMA public TO app"
+
+npm install
+npm run db:push
+npm run db:seed
+```
+</details>
 
 `npm run db:seed` is **destructive** — it empties every table before loading fixtures. Re-run it to
 get back to a known state; never run it against data you want to keep.
