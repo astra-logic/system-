@@ -10,6 +10,7 @@
  * exercise the engine, not to describe that factory. No number here is a claim
  * about any real business.
  */
+import { eq } from "drizzle-orm";
 import { db, sql } from "../lib/db/client";
 import {
   costReferences, etaForecasts, expediteEvents, factoryFacts, financialRates, fxRates, importBatches,
@@ -325,7 +326,10 @@ async function main() {
     { shipmentId: shipOpen, milestone: "ARRIVED_PORT", occurredAt: D("2026-12-27"), location: "Alexandria (DEMO)" },
     { shipmentId: shipOpen, milestone: "CUSTOMS_HELD", occurredAt: D("2026-12-28"), location: "Alexandria (DEMO)" },
   ]);
-  void lineOpen;
+  /* Link the in-transit shipment to its order line, so the customs hold and the
+     revised arrival date are reachable from the order. Before Block 14 the only
+     path ran through a receipt, which does not exist until something arrives. */
+  await db.update(poLines).set({ shipmentId: shipOpen }).where(eq(poLines.id, lineOpen));
 
   /* ======================================================================== */
   /* BLOCK 9 — DEMO RECIPES. D-054, and §8 of the Block 8 contract.           */

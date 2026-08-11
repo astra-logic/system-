@@ -301,6 +301,19 @@ export const poLines = pgTable(
      */
     expedited: boolean("expedited").notNull().default(false),
     freightMode: text("freight_mode"),
+    /**
+     * The shipment this line is travelling on. Added in Block 14.
+     *
+     * ⚠ WHY THIS COLUMN HAD TO EXIST. `shipment_id` was already on receipts,
+     * ETA forecasts, port milestones and expedite events — but NOT on the order
+     * line. So the only path from an order to its shipment ran through a
+     * RECEIPT, which exists only once something has arrived.
+     *
+     * That made the customs hold and the revised arrival date structurally
+     * unreachable for exactly the orders where they matter most: the ones still
+     * in transit. Nullable and additive; nothing else changes.
+     */
+    shipmentId: uuid("shipment_id").references(() => shipments.id),
   },
   (t) => ({ uq: uniqueIndex("po_lines_uq").on(t.poId, t.lineNo) }),
 );

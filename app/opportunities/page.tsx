@@ -1,16 +1,28 @@
 /**
- * OPPORTUNITIES — the persisted list.
+ * SAVINGS — "Where am I losing money, and what should I do about it?"
  *
- * Reads findings from the database rather than recomputing them, so what is
- * shown is what was recorded, and it survives the request that produced it.
- * Detection is triggered explicitly and writes a new run.
+ * ⚠ THIS PAGE SHOWS ONE SAVING, AND THAT IS THE POINT.
+ *
+ *   The engine found exactly one thing it could evidence. A page that dressed
+ *   that up with charts, trend lines and a scorecard would be lying about how
+ *   much the system knows. One real saving, stated plainly, with the money and
+ *   the reasoning attached, is worth more than a gallery.
+ *
+ * The yearly figure is a RANGE, and the range is not a confidence interval — it
+ * is a split by where the numbers came from. The lower bound is what rests on
+ * measured records; the upper adds what rests on figures entered by hand. That
+ * distinction is stated in words on the page, because a number a manager cannot
+ * source is a number they will not act on.
  */
 import { revalidatePath } from "next/cache";
 import { currentOpportunities } from "../../lib/engine/persist";
+import { potentialAnnualSaving } from "../../lib/engine/aggregate";
+import { rehydrate } from "../../lib/engine/rehydrate";
 import { evaluateContradictions, recordContradictions } from "../../lib/engine/contradiction-service";
 import { firstSiteId, runAndPersist } from "../../lib/engine/run";
 import { sql } from "../../lib/db/client";
-import { money } from "../../lib/ui/format";
+import { money, date as fmtDate } from "../../lib/ui/format";
+import { stateWord, countsTowardYear } from "../../lib/ui/plain";
 import { DemoBanner } from "../demo-banner";
 
 export const dynamic = "force-dynamic";
@@ -27,100 +39,178 @@ async function detect(): Promise<void> {
   revalidatePath("/");
 }
 
-export default async function Opportunities() {
+export default async function Savings() {
   const siteId = await firstSiteId();
-  if (!siteId) return <h1>No data</h1>;
+  if (!siteId) {
+    return (
+      <>
+        <h1>Savings</h1>
+        <div className="state">
+          <p className="state-title">Nothing to look at yet</p>
+          <p className="state-body">
+            Once your orders, deliveries and stock movements are in, we&apos;ll look for money you
+            could stop losing.
+          </p>
+          <a className="btn btn-secondary" href="/import">Import your data</a>
+        </div>
+      </>
+    );
+  }
 
-  const [findings, contradictions] = await Promise.all([
+  const [savings, clashes] = await Promise.all([
     currentOpportunities(siteId),
     evaluateContradictions(siteId),
   ]);
   const [demo] = await sql<{ d: boolean }[]>`SELECT COALESCE(bool_or(is_demo), false) AS d FROM opportunities WHERE site_id = ${siteId}::uuid`;
-  const blocked = new Set(contradictions.blockedOpportunityIds);
+  const blocked = new Set(clashes.blockedOpportunityIds);
+
+  const head = potentialAnnualSaving({
+    findings: savings.map((f) => rehydrate(f as never)),
+    currency: "EGP",
+    asOf: AS_OF,
+  });
+
+  const waiting = savings.filter((s) => s.lifecycle === "POTENTIAL");
+  const decided = savings.filter((s) => s.lifecycle !== "POTENTIAL");
 
   return (
     <>
       <DemoBanner isDemo={demo?.d ?? false} />
-      <h1>Opportunities</h1>
+      <h1>Savings</h1>
       <p className="sub">
-        Only findings of class <strong>Opportunity</strong> can contribute to Potential Annual Saving.
-        Observed costs and exposures are separate classes and are structurally incapable of entering it.
+        Money you are losing that we can point at a record for. Nothing here is a forecast —
+        every figure is something that already happened.
       </p>
 
-      <div className="card">
-        <form action={detect}>
-          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <button type="submit" style={{ padding: "9px 18px", borderRadius: 8, border: "1px solid var(--accent)", background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
-              Run detection
-            </button>
-            <span className="note" style={{ margin: 0 }}>
-              Writes a new run as of {AS_OF.toISOString().slice(0, 10)}. An unchanged finding is not
-              rewritten; a changed one supersedes its predecessor rather than overwriting it.
-            </span>
-          </div>
-        </form>
-      </div>
-
-      {findings.length === 0 && (
-        <div className="card">
-          <p className="note" style={{ margin: 0 }}>
-            No finding has been recorded yet. Run detection above. A run that produces nothing is a
-            result, not a failure — the mechanism refuses to report what it cannot evidence.
+      {savings.length === 0 ? (
+        <div className="state">
+          <p className="state-title">We haven&apos;t found anything yet</p>
+          <p className="state-body">
+            That is a result, not a failure — we only report what we can show you the records for.
+            Check again once more orders and deliveries have gone through.
           </p>
+          <form action={detect}><button className="btn btn-secondary" type="submit">Check again</button></form>
         </div>
-      )}
-
-      <div className="card scroll">
-        {findings.length > 0 && (
-          <table>
-            <thead>
-              <tr><th>Finding</th><th>Item</th><th>State</th><th>Ladder</th><th className="num">Net / yr</th><th>Flags</th></tr>
-            </thead>
-            <tbody>
-              {findings.map((f) => {
-                const net = f.netImpact as Record<string, unknown> | null;
-                const val = net?.["value"] as string | null;
-                return (
-                  <tr key={f.id}>
-                    <td><a href={`/opportunities/${f.id}`}>{f.title}</a></td>
-                    <td>{f.itemCode ?? "—"}</td>
-                    <td><span className={`badge ${f.lifecycle === "APPROVED" ? "ok" : f.lifecycle === "REJECTED" ? "bad" : ""}`}>{f.lifecycle}</span></td>
-                    <td className="note" style={{ margin: 0 }}>{f.ladder.replace(/_/g, " ")}</td>
-                    {/* Law 9: rendered the raw stored string before Block 13. */}
-                    <td className="num">{val ? money(val, String(net?.["unit"] ?? "")) : <span className="badge warn">not calculable</span>}</td>
-                    <td>
-                      {blocked.has(f.id) && <span className="badge bad">blocked</span>}{" "}
-                      {f.netExcludesUnvaluedRisk && <span className="badge warn">excludes unvalued risk</span>}{" "}
-                      {f.isDemo && <span className="badge warn">DEMO</span>}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      <h2>Contradiction control</h2>
-      <div className="card">
-        <p className="note" style={{ marginTop: 0 }}>{contradictions.note}</p>
-        {contradictions.contradictions.length === 0 ? (
-          <p className="note" style={{ margin: 0 }}>
-            No contradiction among the {contradictions.evaluated} finding(s) currently live.
-          </p>
-        ) : (
-          contradictions.contradictions.map((c, i) => (
-            <div key={i} style={{ marginTop: 12 }}>
-              <span className={`badge ${c.resolved ? "warn" : "bad"}`}>{c.resolved ? `RESOLVED — ${c.resolution}` : "UNRESOLVED"}</span>
-              <p style={{ margin: "8px 0 0" }}>
-                <a href={`/opportunities/${c.leftId}`}>{c.leftTitle}</a> vs{" "}
-                <a href={`/opportunities/${c.rightId}`}>{c.rightTitle}</a>
-              </p>
-              <p className="note" style={{ margin: "4px 0 0" }}>{c.why}</p>
+      ) : (
+        <>
+          {/* ------------------------------------------------------- LAYER 1 */}
+          <section className="section">
+            <div className="metric-strip">
+              <div className="metric">
+                <span className="mvalue">
+                  {head.basis === "INSUFFICIENT_DATA" ? "Not yet" : money(head.upper, "EGP")}
+                </span>
+                <span className="mlabel">You could save this each year</span>
+              </div>
             </div>
-          ))
+            {head.basis !== "INSUFFICIENT_DATA" && (
+              <p className="note" style={{ maxWidth: "64ch" }}>
+                {head.lower.isZero()
+                  ? "None of this rests on measured records yet — it rests on figures entered by hand. That does not make it wrong, but you should check those figures before acting."
+                  : `${money(head.lower, "EGP")} of it rests on measured records; the rest rests on figures entered by hand.`}
+              </p>
+            )}
+          </section>
+
+          {/* ------------------------------------------------------- LAYER 2 */}
+          {waiting.length > 0 && (
+            <section className="section">
+              <h2>Waiting for your decision</h2>
+              <div className="rows">
+                {waiting.map((s) => <SavingRow key={s.id} s={s} blocked={blocked.has(s.id)} />)}
+              </div>
+            </section>
+          )}
+
+          {decided.length > 0 && (
+            <section className="section">
+              <h2>Already decided</h2>
+              <div className="rows tight">
+                {decided.map((s) => <SavingRow key={s.id} s={s} blocked={blocked.has(s.id)} />)}
+              </div>
+            </section>
+          )}
+
+          {/* Only shown when it happens. A permanently empty panel explaining a
+              control nobody triggered is furniture, not information. */}
+          {clashes.contradictions.length > 0 && (
+            <section className="section">
+              <h2>These cancel each other out</h2>
+              <p className="section-note">
+                You cannot act on both of these — one pushes a number up and the other pushes the
+                same number down. Showing either on its own would hide that.
+              </p>
+              <div className="rows">
+                {clashes.contradictions.map((c, i) => (
+                  <div className="row nomark" key={i}>
+                    <div className="rmain">
+                      <div className="rtitle">
+                        <a href={`/opportunities/${c.leftId}`}>{c.leftTitle}</a>
+                        {" vs "}
+                        <a href={`/opportunities/${c.rightId}`}>{c.rightTitle}</a>
+                      </div>
+                      <div className="rsub">{c.why}</div>
+                    </div>
+                    <div className="rtrail">{c.resolved ? "settled" : "needs a decision"}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section className="section">
+            <form action={detect}>
+              <button className="btn btn-secondary" type="submit">Check again</button>
+            </form>
+            <p className="note">
+              Looks at everything recorded up to {fmtDate(AS_OF)}. If nothing has changed, nothing is
+              rewritten; if a figure has moved, the old one is kept beside the new one so you can see
+              what changed.
+            </p>
+          </section>
+        </>
+      )}
+    </>
+  );
+}
+
+type Saving = Awaited<ReturnType<typeof currentOpportunities>>[number];
+
+function SavingRow({ s, blocked }: { s: Saving; blocked: boolean }) {
+  const net = s.netImpact as Record<string, unknown> | null;
+  const value = (net?.["value"] as string | null) ?? null;
+  const counts = countsTowardYear(s.ladder);
+
+  return (
+    <div className="row nomark" id={s.id}>
+      <div className="rmain">
+        <div className="rtitle">
+          <a href={`/opportunities/${s.id}`}>{s.title}</a>
+          {s.itemCode && <span className="rcode">{s.itemCode}</span>}
+        </div>
+        <div className="rsub">
+          {stateWord(s.lifecycle)}
+          {!counts && <> · not solid enough to count towards the yearly figure yet</>}
+        </div>
+        {blocked && (
+          <div className="rwarn">
+            ⚠ This clashes with another recommendation. Settle that before acting on either.
+          </div>
+        )}
+        {s.netExcludesUnvaluedRisk && (
+          <div className="rnote">
+            The figure leaves out a risk we cannot put a price on, so the real benefit is larger than
+            the number shown — by how much, we can&apos;t say.
+          </div>
         )}
       </div>
-    </>
+
+      <div className="rtrail strong">
+        {value ? money(value, String(net?.["unit"] ?? "EGP")) : <span className="rtrail-sub">no figure yet</span>}
+        {value && <span className="rtrail-sub">a year</span>}
+      </div>
+
+      <div className="rdo"><a href={`/opportunities/${s.id}`}>See what this rests on</a></div>
+    </div>
   );
 }

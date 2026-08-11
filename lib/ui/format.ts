@@ -101,6 +101,32 @@ export function qty(v: Numeric, uom: string, opts: { whole?: boolean } = {}): st
   return `${group(trimmed)} ${uom}`;
 }
 
+/**
+ * An ESTIMATED quantity — one the prose around it already hedges.
+ *
+ * ⚠ "Used about 323.166 kg a month" is a sentence at war with itself. The figure
+ * is a division of a total by a window; three decimals assert a precision the
+ * observation cannot carry, and printing them tells the reader the hedge is
+ * decoration. An approximation therefore carries three significant figures at
+ * most, and fewer as the magnitude falls.
+ *
+ * Use this wherever the copy says "about", "roughly", or "around". Use `qty`
+ * for a counted balance, which is exact and deserves to look it.
+ */
+export function approx(v: Numeric, uom: string): string {
+  const d = toDecimal(v);
+  if (d === null) return "—";
+  if (d.isZero()) return `0 ${uom}`;
+  const a = d.abs();
+
+  if (a.greaterThanOrEqualTo(1_000)) {
+    return `${group(d.toSignificantDigits(3, Decimal.ROUND_HALF_EVEN).toFixed(0))} ${uom}`;
+  }
+  if (a.greaterThanOrEqualTo(10)) return `${group(d.toFixed(0, Decimal.ROUND_HALF_EVEN))} ${uom}`;
+  if (a.greaterThanOrEqualTo(1)) return `${d.toFixed(1, Decimal.ROUND_HALF_EVEN)} ${uom}`;
+  return `${d.toSignificantDigits(1, Decimal.ROUND_HALF_EVEN).toFixed()} ${uom}`;
+}
+
 /** A quantity with its full recorded precision, for Layer 4 only. */
 export function qtyExact(v: Numeric, uom: string): string {
   const d = toDecimal(v);

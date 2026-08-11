@@ -82,14 +82,17 @@
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
-  --text-display: 34px;
-  --text-title: 26px;
-  --text-section: 17px;
-  --text-card: 15px;
-  --text-body: 15px;
-  --text-secondary-size: 14px;
-  --text-meta: 13px;
-  --text-micro: 11.5px;
+  /* Six roles, and no more. Hierarchy is done with scale and weight, not
+     with colour or borders. */
+  --text-display: 40px;   /* the page's answer */
+  --text-title: 27px;     /* page title */
+  --text-headline: 19px;  /* an important result or section */
+  --text-body: 15.5px;    /* explanation */
+  --text-secondary-size: 14.5px;
+  --text-meta: 13.5px;    /* metadata */
+  --text-micro: 12px;     /* labels, used sparingly */
+  --text-section: var(--text-headline);
+  --text-card: 15.5px;
 
   /* --- motion. Short, and honoured only where it aids comprehension. ------ */
   --ease: cubic-bezier(.2, 0, .2, 1);
@@ -98,7 +101,11 @@
 
   /* --- layout ------------------------------------------------------------- */
   --content-max: 1120px;
-  --nav-height: 56px;
+  --nav-height: 52px;
+  /* 44px is the smallest comfortable touch target for a finger; a factory
+     user on an iPad is a first-class case, not an afterthought. */
+  --control-height: 44px;
+  --tabbar-height: 56px;
 }
 
 /* Dark is designed, not inverted: contrast is re-checked and the status hues
@@ -452,10 +459,12 @@ details[open].card > summary::after { transform: rotate(90deg); }
 @keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
 /* Demo marking is structural, unmissable and never dismissible. */
+/* Demo marking must be unmissable and must not dominate. A slim strip with a
+   status rule reads at a glance without becoming the loudest thing on screen. */
 .demo {
-  background: var(--warning-soft); border: 1px solid var(--warning-line); color: var(--warning);
-  border-radius: var(--radius-surface); padding: var(--s3) var(--s4); margin: var(--s4) 0;
-  font-weight: 600; font-size: var(--text-meta);
+  color: var(--warning); font-size: var(--text-meta); font-weight: 500;
+  border-left: 3px solid var(--warning); background: var(--warning-soft);
+  padding: var(--s2) var(--s4); margin: var(--s5) 0 0; border-radius: 0 6px 6px 0;
 }
 
 /* ==========================================================================
@@ -555,4 +564,262 @@ ul.missing > li:last-child { border-bottom: 0; }
   .risk-row .trailing { grid-column: 2; text-align: left; }
   .status-word { font-size: var(--text-section); }
   .status-mark, .verdict-mark { font-size: 24px; }
+}
+
+/* ==========================================================================
+   BLOCK 14 — LESS DASHBOARD, MORE OPERATING SYSTEM
+   ==========================================================================
+
+   THE RULE: a bordered rounded rectangle is not free. Every box costs the eye
+   a boundary to parse, so a box must earn its place by marking a real
+   conceptual edge. Where a heading and a divider communicate the same grouping,
+   they win.
+
+   What replaced cards here:
+     .section      a flat group. A heading, some content, generous space.
+     .rows         a list with hairline dividers. The workhorse.
+     .answer       the one surface that IS allowed a tint — because the tint
+                   carries the status, which is meaning, not decoration.
+   ========================================================================== */
+
+/* --- flat section ---------------------------------------------------------- */
+.section { margin: var(--s8) 0 0; }
+.section:first-of-type { margin-top: var(--s7); }
+.section > h2 {
+  font-size: var(--text-headline); font-weight: 600; letter-spacing: -.014em;
+  margin: 0 0 var(--s3); color: var(--text-primary);
+}
+.section > .section-note { color: var(--text-muted); font-size: var(--text-meta); margin: -6px 0 var(--s4); max-width: 72ch; }
+
+/* --- list rows ------------------------------------------------------------- */
+.rows { display: flex; flex-direction: column; }
+.rows > * { padding: var(--s4) 0; border-bottom: 1px solid var(--border-subtle); }
+.rows > *:last-child { border-bottom: 0; }
+.rows.tight > * { padding: var(--s3) 0; }
+
+/* One row: a status mark, the subject and its facts, a trailing figure. */
+.row { display: grid; grid-template-columns: 22px 1fr auto; gap: var(--s1) var(--s3); align-items: baseline; }
+/* Not every list needs a marker column. A bullet that carries no meaning is
+   noise, so rows without a status mark simply start at the edge. */
+.row.nomark { grid-template-columns: 1fr auto; }
+.row.nomark .rdo, .row.nomark .rnote, .row.nomark .rwarn { grid-column: 1 / -1; }
+.row .rmark { font-size: 15px; line-height: 1.5; }
+.row .rmain { min-width: 0; }
+.row .rtitle { font-weight: 600; font-size: var(--text-body); letter-spacing: -.006em; }
+.row .rtitle .rcode { color: var(--text-muted); font-weight: 400; margin-left: var(--s2); font-size: var(--text-meta); }
+.row .rsub { color: var(--text-secondary); font-size: var(--text-secondary-size); margin-top: 2px; }
+.row .rtrail { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; font-size: var(--text-body); }
+.row .rtrail.strong { font-weight: 600; }
+.row .rtrail .rtrail-sub { display: block; color: var(--text-muted); font-size: var(--text-meta); font-weight: 400; }
+/* What to do about this row. Reads as a sentence, not a button. */
+.row .rdo { grid-column: 2 / -1; margin-top: var(--s2); font-size: var(--text-secondary-size); color: var(--text-primary); }
+.row .rnote { grid-column: 2 / -1; margin-top: var(--s1); font-size: var(--text-meta); color: var(--text-muted); }
+.row .rwarn { grid-column: 2 / -1; margin-top: var(--s2); font-size: var(--text-meta); color: var(--warning); }
+
+/* --- the answer surface ---------------------------------------------------- */
+/* The only element permitted a status tint, because here the tint IS the
+   information. Everything else in the product stays on the plain ground. */
+.answer { padding: var(--s6) 0 var(--s5); border-bottom: 1px solid var(--border); margin-bottom: var(--s2); }
+.answer .amark { font-size: 30px; line-height: 1; }
+.answer .aword {
+  font-size: var(--text-display); font-weight: 600; letter-spacing: -.032em; line-height: 1.05;
+}
+.answer .ahead { display: flex; align-items: center; gap: var(--s3); }
+.answer .aline { font-size: var(--text-headline); color: var(--text-secondary); margin: var(--s3) 0 0; max-width: 60ch; line-height: 1.4; font-weight: 400; }
+.answer.yes .aword { color: var(--success); }
+.answer.at-risk .aword { color: var(--warning); }
+.answer.no .aword { color: var(--danger); }
+/* ⚪ takes the ordinary ink colour. It is not an alarm and must not read as one. */
+.answer.cant-say .aword { color: var(--text-primary); }
+
+/* --- inline metric --------------------------------------------------------- */
+.metric { display: flex; flex-direction: column; gap: var(--s1); }
+.metric .mvalue {
+  font-size: var(--text-display); font-weight: 600; letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums; line-height: 1.05;
+}
+.metric .mlabel { font-size: var(--text-meta); color: var(--text-muted); }
+.metric-strip { display: flex; flex-wrap: wrap; gap: var(--s8); align-items: flex-start; }
+
+/* --- controls: precise, native-feeling, comfortable to touch ---------------- */
+input[type="text"], input[type="date"], input[type="number"], input[type="search"], select {
+  height: var(--control-height);
+  padding: 0 var(--s3);
+  font-size: var(--text-body);
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+  -webkit-appearance: none; appearance: none;
+}
+select {
+  /* A chevron drawn in the border colour, so the control reads as native
+     without importing an icon set. */
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: var(--s8);
+  color: var(--text-primary);
+}
+input:focus-visible, select:focus-visible {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 22%, transparent);
+}
+input::placeholder { color: var(--text-muted); }
+
+.btn { height: var(--control-height); border-radius: 8px; padding-inline: var(--s5); }
+.btn:active { transform: scale(.985); }
+.btn { transition: background var(--fast) var(--ease), transform var(--fast) var(--ease), border-color var(--fast) var(--ease); }
+
+/* --- the ask: one calm row of controls ------------------------------------- */
+.ask {
+  display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.1fr) auto;
+  gap: var(--s4); align-items: end;
+}
+.ask > label { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.ask > label > span { font-size: var(--text-meta); color: var(--text-secondary); font-weight: 500; }
+.ask input, .ask select { width: 100%; }
+.ask button { height: var(--control-height); }
+
+/* --- a stacked form, where the ask is a decision rather than a query -------- */
+textarea {
+  padding: var(--s3);
+  font: inherit;
+  font-size: var(--text-body);
+  line-height: 1.5;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+  resize: vertical;
+  transition: border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+}
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 22%, transparent);
+}
+
+.form { display: grid; gap: var(--s4); max-width: 42rem; }
+.form label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.form label > span { font-size: var(--text-meta); color: var(--text-secondary); font-weight: 500; }
+.form input, .form textarea { width: 100%; }
+.form .check { flex-direction: row; align-items: flex-start; gap: var(--s3); }
+.form .check input { width: auto; height: auto; margin-top: 4px; flex: none; }
+.form .actions { display: flex; gap: var(--s3); flex-wrap: wrap; }
+
+/* --- confirmation: quiet, specific, and it does not need dismissing -------- */
+.saved {
+  margin: 0 0 var(--s4);
+  padding: var(--s3) var(--s4);
+  border-left: 2px solid var(--ok);
+  background: color-mix(in srgb, var(--ok) 7%, transparent);
+  border-radius: 0 6px 6px 0;
+  font-size: var(--text-meta);
+  color: var(--text-secondary);
+}
+
+/* The row that was just saved, marked briefly so the eye can find where it
+   landed. It settles rather than pulsing — a confirmation that keeps blinking
+   is an alarm. */
+.row.flash { animation: settle 1.6s var(--ease) 1; }
+@keyframes settle {
+  0%   { background: color-mix(in srgb, var(--ok) 16%, transparent); }
+  100% { background: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .row.flash { animation: none; }
+}
+
+/* A small edit-in-place control living in a row's trailing slot. */
+.inline-field { display: flex; flex-direction: column; gap: 4px; }
+.inline-field > span { font-size: var(--text-caption); color: var(--text-muted); font-weight: 500; }
+.inline-field input { width: 6.5rem; text-align: right; }
+.row > form.rtrail { display: flex; gap: var(--s3); align-items: flex-end; justify-content: flex-end; }
+@media (max-width: 620px) {
+  .row > form.rtrail { justify-content: flex-start; }
+}
+
+/* --- disclosure ------------------------------------------------------------ */
+details.disclose { margin-top: var(--s5); }
+details.disclose > summary {
+  cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--text-secondary-size); font-weight: 500; color: var(--primary);
+  padding: var(--s2) 0; min-height: 36px;
+}
+details.disclose > summary::-webkit-details-marker { display: none; }
+details.disclose > summary::before {
+  content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); margin-right: 2px;
+  transition: transform var(--normal) var(--ease);
+}
+details.disclose[open] > summary::before { transform: rotate(45deg); }
+details.disclose > .disclose-body { padding-top: var(--s2); animation: reveal var(--normal) var(--ease); }
+@keyframes reveal { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+
+/* --- navigation: a native destination bar, not website links ---------------- */
+nav.top .inner { gap: var(--s2); }
+.nav-primary { gap: 2px; }
+.nav-primary a {
+  position: relative; font-size: var(--text-secondary-size); font-weight: 500;
+  color: var(--text-secondary); padding: var(--s2) var(--s3); border-radius: 7px;
+}
+.nav-primary a[aria-current="page"] { color: var(--text-primary); font-weight: 600; background: transparent; }
+/* A hairline indicator rather than a pill: obvious, and quiet. */
+.nav-primary a[aria-current="page"]::after {
+  content: ""; position: absolute; left: var(--s3); right: var(--s3); bottom: -1px;
+  height: 2px; background: var(--primary); border-radius: 2px 2px 0 0;
+}
+nav.top .inner { min-height: var(--nav-height); }
+
+/* --- mobile tab bar: the native pattern for five destinations --------------- */
+.tabbar { display: none; }
+@media (max-width: 620px) {
+  nav.top .nav-primary { display: none; }
+  nav.top .inner { justify-content: space-between; }
+  .wrap { padding-bottom: calc(var(--tabbar-height) + var(--s8)); }
+
+  .tabbar {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(18px);
+    -webkit-backdrop-filter: saturate(180%) blur(18px);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tabbar a {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; min-height: var(--tabbar-height); font-size: var(--text-micro); font-weight: 500;
+    color: var(--text-muted); text-decoration: none;
+  }
+  .tabbar a[aria-current="page"] { color: var(--primary); font-weight: 600; }
+  .tabbar a .tdot { width: 5px; height: 5px; border-radius: 50%; background: transparent; }
+  .tabbar a[aria-current="page"] .tdot { background: var(--primary); }
+}
+
+/* --- responsive refinement -------------------------------------------------- */
+@media (max-width: 900px) {
+  .ask { grid-template-columns: 1fr 1fr; }
+  .ask > label:first-child { grid-column: 1 / -1; }
+  .ask button { grid-column: 1 / -1; }
+  .metric-strip { gap: var(--s6); }
+}
+@media (max-width: 620px) {
+  :root { --text-display: 32px; --text-title: 23px; --text-headline: 17px; }
+  .ask { grid-template-columns: 1fr; }
+  .row { grid-template-columns: 20px 1fr; }
+  .row .rtrail { grid-column: 2; text-align: left; margin-top: 2px; }
+  /* ⚠ A marker-less row keeps a two-column grid unless told otherwise, which
+     squeezed a material's name into a third of the width and left it wrapping
+     over three lines beside its own input. On a phone the trailing content
+     belongs UNDER the title, not beside it. */
+  .row.nomark { grid-template-columns: 1fr; }
+  .row.nomark .rtrail { grid-column: 1; text-align: left; margin-top: var(--s2); }
+  .metric-strip { flex-direction: column; gap: var(--s5); }
+  .answer .amark { font-size: 26px; }
 }

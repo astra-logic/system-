@@ -1,75 +1,148 @@
 /**
- * INVENTORY — quantity truth.
+ * STOCK — "What do I have, and what should I worry about?"
  *
- * F3: every stock number states WHICH quantity it is. An unlabelled figure is a
- * defect. `Reserved` is shown as zero rather than hidden (D-050) — removing it
- * would make the vocabulary incomplete and invite a later redefinition.
+ * Before Block 14 this was a correct, disciplined quantity ledger that was
+ * SILENT on risk: eight rows sorted alphabetically by item code, with a
+ * `Reserved` column reading 0.000 eight times.
+ *
+ * Now it leads with what needs attention and orders by urgency. Every state is
+ * derived from two OBSERVED numbers — how fast the material is used, and how
+ * long it takes to arrive. No minimum-stock level is invented, because `A-18`
+ * is an open factory policy the system may not choose.
+ *
+ * ⚪ carries its own remedy. With one of eight materials currently judgeable,
+ * a grey row that only shrugs would make the product look broken; a grey row
+ * that names its missing input and what supplying it unlocks is onboarding.
  */
-import { sql } from "../../lib/db/client";
-import { positionAt } from "../../lib/ledger/post";
+import { firstSiteId } from "../../lib/engine/run";
+import { byUrgency, cantSayCopy, stockLines, type StockLine } from "../../lib/views/stock";
+import { qty as fmtQty, approx as fmtApprox, date as fmtDate, cover as fmtCover } from "../../lib/ui/format";
 import { DemoBanner } from "../demo-banner";
+import { sql } from "../../lib/db/client";
 
 export const dynamic = "force-dynamic";
 const AS_OF = new Date("2027-01-01T00:00:00Z");
 
-export default async function Inventory() {
-  const items = await sql<{ id: string; code: string; name: string; stock_uom: string; catch_weight: boolean; nominal_uom: string | null; lead_time_days: number | null }[]>`
-    SELECT id, code, name, stock_uom, catch_weight, nominal_uom, lead_time_days FROM items ORDER BY code`;
+const MARK = { no: "🔴", "at-risk": "🟡", yes: "🟢", "cant-say": "⚪" } as const;
+
+export default async function Stock() {
+  const siteId = await firstSiteId();
   const [demo] = await sql<{ any_demo: boolean }[]>`SELECT COALESCE(bool_or(is_demo), false) AS any_demo FROM import_batches`;
 
-  const rows = await Promise.all(items.map(async (i) => ({ item: i, pos: await positionAt(i.id, AS_OF) })));
+  if (!siteId) {
+    return (
+      <>
+        <h1>Stock</h1>
+        <div className="state">
+          <p className="state-title">No materials yet</p>
+          <p className="state-body">Import your item list and stock movements and they will appear here.</p>
+          <a className="btn btn-secondary" href="/import">Import your data</a>
+        </div>
+      </>
+    );
+  }
+
+  const lines = (await stockLines(siteId, AS_OF)).sort(byUrgency);
+  const needsAttention = lines.filter((l) => l.state === "no" || l.state === "at-risk");
+  const unknown = lines.filter((l) => l.state === "cant-say");
+  const healthy = lines.filter((l) => l.state === "yes");
 
   return (
     <>
       <DemoBanner isDemo={demo?.any_demo ?? false} />
-      <h1>Inventory</h1>
+      <h1>Stock</h1>
       <p className="sub">
-        Balances at {AS_OF.toISOString().slice(0, 10)}, reconstructed from the movement ledger rather
-        than read from a stored total. Every column says which quantity it is.
+        {/* ⚠ "Nothing is running short" would be a lie by omission while most of
+            the shelf is unjudgeable. The claim is scoped to what we can watch. */}
+        {needsAttention.length > 0
+          ? `${needsAttention.length} ${needsAttention.length === 1 ? "material needs" : "materials need"} attention.`
+          : unknown.length > 0
+            ? "Nothing we can watch is running short."
+            : "Nothing is running short."}
+        {" "}Balances as at {fmtDate(AS_OF)}.
       </p>
 
-      <div className="card scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Item</th><th>Type</th>
-              <th className="num">On hand</th><th className="num">Reserved</th>
-              <th className="num">Quality hold</th><th className="num">Available</th>
-              <th className="num">Master lead time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(({ item, pos }) => (
-              <tr key={item.id}>
-                <td>
-                  <strong>{item.code}</strong>
-                  <div className="note" style={{ margin: 0 }}>{item.name}</div>
-                </td>
-                <td>
-                  {item.catch_weight ? (
-                    <span className="badge warn">catch-weight · {item.nominal_uom} → {item.stock_uom}</span>
-                  ) : (
-                    <span className="badge">{item.stock_uom}</span>
-                  )}
-                </td>
-                <td className="num">{pos.onHand.toFixed(3)}</td>
-                <td className="num">
-                  {pos.reserved.toFixed(3)}
-                  <div className="note" style={{ margin: 0, fontSize: 11 }}>no source of commitment</div>
-                </td>
-                <td className="num">{pos.qualityHold.toFixed(3)}</td>
-                <td className="num"><strong>{pos.available.toFixed(3)}</strong></td>
-                <td className="num">{item.lead_time_days ?? <span className="badge warn">not maintained</span>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {needsAttention.length > 0 && (
+        <section className="section">
+          <h2>Needs attention</h2>
+          <div className="rows">{needsAttention.map((l) => <Row key={l.itemId} l={l} />)}</div>
+        </section>
+      )}
+
+      {unknown.length > 0 && (
+        <section className="section">
+          <h2>We can&apos;t judge these yet</h2>
+          <p className="section-note">
+            We can watch {lines.length - unknown.length} of your {lines.length} materials properly.
+            For the rest we can show what you have, but we can&apos;t warn you before you run out
+            until we know both how fast you use it and how long it takes to arrive.
+          </p>
+          <div className="rows">{unknown.map((l) => <Row key={l.itemId} l={l} />)}</div>
+        </section>
+      )}
+
+      {healthy.length > 0 && (
+        <section className="section">
+          <h2>Healthy</h2>
+          <div className="rows tight">{healthy.map((l) => <Row key={l.itemId} l={l} />)}</div>
+        </section>
+      )}
+    </>
+  );
+}
+
+function Row({ l }: { l: StockLine }) {
+  const w = { whole: l.integerOnly };
+  const c = l.state === "cant-say" ? cantSayCopy(l) : null;
+
+  return (
+    <div className="row" id={l.code}>
+      <span className="rmark" aria-hidden="true">{MARK[l.state]}</span>
+      <div className="rmain">
+        <div className="rtitle">{l.name}<span className="rcode">{l.code}</span></div>
+        <div className="rsub">
+          {c ? c.why : (
+            <>
+              {l.coverDays !== null && <>{fmtCover(l.coverDays)} of cover</>}
+              {l.leadTimeDays !== null && <>, and it takes {l.leadTimeDays} days to arrive</>}
+              {l.qualityHold.greaterThan(0) && <> · {fmtQty(l.qualityHold, l.stockUom, w)} waiting on inspection</>}
+            </>
+          )}
+        </div>
+      </div>
+      <div className="rtrail strong">
+        {fmtQty(l.available, l.stockUom, w)}
+        {l.onOrder.greaterThan(0) && (
+          <span className="rtrail-sub">
+            {fmtQty(l.onOrder, l.stockUom, w)} on the way
+            {l.nextArrival && ` · ${fmtDate(l.nextArrival)}`}
+          </span>
+        )}
       </div>
 
-      <p className="note">
-        Catch-weight items balance on <strong>actual weight</strong>, not on the units ordered. A
-        movement awaiting weighing does not post — it is never posted with an estimated weight.
-      </p>
-    </>
+      {/* What to do — only where an action is genuinely known. */}
+      {l.state === "no" && (
+        <div className="rdo">
+          <a href="/orders">Order more now</a> — you will run out before a replacement could arrive.
+        </div>
+      )}
+      {l.state === "at-risk" && (
+        <div className="rdo">
+          <a href="/orders">Order before you run out</a> — cover is shorter than the usual delivery time.
+        </div>
+      )}
+      {c?.fix && (
+        <div className="rdo"><a href={c.fix}>Add a delivery time</a> — {c.then.toLowerCase()}</div>
+      )}
+      {c && !c.fix && <div className="rnote">{c.then}</div>}
+
+      {/* Layer 3/4 — the observation the state rests on, and its window. */}
+      {l.dailyUse !== null && (
+        <div className="rnote">
+          Used about {fmtApprox(l.dailyUse.times(30), l.stockUom)} a month, based on{" "}
+          {l.historyDays} days of recorded use.
+        </div>
+      )}
+    </div>
   );
 }

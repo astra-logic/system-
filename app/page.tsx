@@ -1,22 +1,35 @@
 /**
- * TODAY — "what needs my attention?"
+ * TODAY — "What needs my attention?"
  *
- * Core mission §10's hierarchy: DECISION → EXPLANATION → EVIDENCE → DETAIL.
- * The headline figure appears with its caveats attached, never as a bare number,
- * because D-012 and D-041 both require the number to carry what is wrong with it.
+ * A warehouse command centre, not an analytics dashboard. Per the first-release
+ * scope the executive experience is deliberately deferred, so this page answers
+ * one question for the person running the floor.
+ *
+ * What it shows, in order:
+ *   1  the state of the factory, in one line
+ *   2  what needs doing — grouped by kind, ranked within kind
+ *   3  the money, as ONE figure with its evidence one interaction away
+ *   4  the last question asked, in the past tense
+ *
+ * ⚠ AT MOST THREE ATTENTION GROUPS ARE SHOWN AS PRIMARY. Three is the count of
+ * distinct questions a manager arrives with — will anything stop production,
+ * what must I order, where am I losing money. A fourth card competes with three
+ * that matter and answers no question anyone asked.
+ *
+ * ⚠ Kinds are grouped and NOT interleaved (O-02). Ranking a stock risk against
+ * an order risk would need a comparability rule nobody has established.
  */
 import { sql } from "../lib/db/client";
 import { firstSiteId } from "../lib/engine/run";
-import { currentEvidenceGaps, currentOpportunities } from "../lib/engine/persist";
-import { evaluateContradictions } from "../lib/engine/contradiction-service";
 import { potentialAnnualSaving } from "../lib/engine/aggregate";
 import { rehydrate } from "../lib/engine/rehydrate";
-import { money, moneyExact } from "../lib/ui/format";
+import { stockLines, byUrgency as stockByUrgency, cantSayCopy } from "../lib/views/stock";
+import { orderLines, byUrgency as ordersByUrgency, whyLate } from "../lib/views/orders";
+import { money, qty as fmtQty, date as fmtDate, days as fmtDays, cover as fmtCover } from "../lib/ui/format";
+import { answerById, recentAnswers } from "../lib/feasibility/audit";
 import { DemoBanner } from "./demo-banner";
 
 export const dynamic = "force-dynamic";
-
-/** The as-of instant is explicit so a run is reproducible (U-16's rule). */
 const AS_OF = new Date("2027-01-01T00:00:00Z");
 
 export default async function Today() {
@@ -24,165 +37,227 @@ export default async function Today() {
   if (!siteId) {
     return (
       <>
-        <h1>No data yet</h1>
-        <p className="sub">Run <code>npm run db:seed</code> to load the demo fixtures, or import factory data.</p>
+        <h1>Today</h1>
+        <div className="state">
+          <p className="state-title">Nothing is set up yet</p>
+          <p className="state-body">Add your materials, stock and orders and this page will tell you what needs attention.</p>
+          <a className="btn btn-secondary" href="/import">Import your data</a>
+        </div>
       </>
     );
   }
 
-  // Read what was RECORDED, not a fresh in-memory computation. The headline a
-  // manager sees is the one that was persisted, and it survives a restart.
-  const stored = await currentOpportunities(siteId);
-  const gaps = await currentEvidenceGaps(siteId);
-  const contradictions = await evaluateContradictions(siteId);
-  const h = potentialAnnualSaving({ findings: stored.map(rehydrate), currency: "EGP", asOf: AS_OF });
-  const r = {
-    opportunities: stored,
-    evidenceGaps: gaps,
-    contradictions: contradictions.contradictions,
-    isDemo: stored.some((o) => o.isDemo),
-  };
+  const [stock, orders, findings, demo] = await Promise.all([
+    stockLines(siteId, AS_OF),
+    orderLines(siteId, AS_OF),
+    sql<{ id: string; title: string; net_impact: Record<string, unknown> | null; item_code: string | null; lifecycle: string; is_demo: boolean; ladder: string; evidence_strength: string | null; net_excludes_unvalued_risk: boolean; recurring_impact: unknown; one_time_impact: unknown; incremental_cost: unknown }[]>`
+      SELECT o.id, o.title, o.net_impact, o.lifecycle, o.is_demo, o.ladder,
+             o.evidence_strength, o.net_excludes_unvalued_risk,
+             o.recurring_impact, o.one_time_impact, o.incremental_cost,
+             i.code AS item_code
+      FROM opportunities o LEFT JOIN items i ON i.id = o.subject_item_id
+      WHERE o.site_id = ${siteId}::uuid AND o.superseded_at IS NULL`,
+    sql<{ any_demo: boolean }[]>`SELECT COALESCE(bool_or(is_demo), false) AS any_demo FROM import_batches`,
+  ]);
+  const anyDemo = demo[0]?.any_demo ?? false;
 
-  const [counts] = await sql<{ items: number; movements: number; open_orders: number; gaps: number }[]>`
-    SELECT (SELECT COUNT(*)::int FROM items WHERE site_id = ${siteId}::uuid) AS items,
-           (SELECT COUNT(*)::int FROM movements WHERE site_id = ${siteId}::uuid) AS movements,
-           (SELECT COUNT(*)::int FROM purchase_orders WHERE site_id = ${siteId}::uuid AND status = 'SENT') AS open_orders,
-           0 AS gaps`;
+  /* The last question asked — D-059: past tense, attributed, verbatim, never a
+     plan the system is tracking.
 
-  /* Law 9: the ONE formatting boundary. These were inline .toFixed() calls.
-     The range is kept intact — D-044's evidence partition is unchanged — but it
-     is now rendered at the precision a person reads rather than at cash
-     precision on a seven-figure number. */
-  const range =
-    h.basis === "INSUFFICIENT_DATA"
-      ? "Not yet calculable"
-      : h.lower.equals(h.upper)
-        ? money(h.lower, "")
-        : `${money(h.lower, "")} – ${money(h.upper, "")}`;
+     ⚠ Read through `audit.ts`, NOT with a query of our own. D-055 makes that
+     module the single door to the answers table, and the structural test that
+     enforces it caught this page reaching around it. The rule is what keeps a
+     stored answer from quietly becoming an input to a calculation. */
+  const [recent] = await recentAnswers(1);
+  const stored = recent ? await answerById(recent.id) : null;
+  const [askedItem] = recent
+    ? await sql<{ code: string; name: string }[]>`
+        SELECT code, name FROM items WHERE id = ${recent.productItemId}::uuid`
+    : [];
+  const lastAsk = recent && stored && askedItem
+    ? { askedAt: recent.askedAt, requestedQty: recent.requestedQty, headline: stored.answer.headline, name: askedItem.name }
+    : null;
+
+  const blocking = stock.filter((s) => s.state === "no").sort(stockByUrgency);
+  const lateOrders = orders.filter((o) => o.isOpen && (o.state === "no" || o.state === "at-risk")).sort(ordersByUrgency);
+  const atRisk = stock.filter((s) => s.state === "at-risk").sort(stockByUrgency);
+  const unknowable = stock.filter((s) => s.state === "cant-say");
+
+  const head = potentialAnnualSaving({
+    findings: findings.map((f) => rehydrate(f as never)),
+    currency: "EGP",
+    asOf: AS_OF,
+  });
+
+  const attentionCount = blocking.length + lateOrders.length + atRisk.length;
+  const openFindings = findings.filter((f) => f.lifecycle === "POTENTIAL").length;
 
   return (
     <>
-      <DemoBanner isDemo={r.isDemo} />
+      <DemoBanner isDemo={anyDemo} />
       <h1>Today</h1>
-      <p className="sub">
-        As of {AS_OF.toISOString().slice(0, 10)}. Every figure below traces to recorded movements and
-        documents, and every refusal names what was missing.
+
+      {/* ---------------------------------------------------------- LAYER 1 */}
+      <p className="sub" style={{ fontSize: "var(--text-headline)", color: "var(--text-primary)", maxWidth: "58ch" }}>
+        {attentionCount === 0
+          ? "Nothing needs your attention today."
+          : `${attentionCount} ${attentionCount === 1 ? "thing needs" : "things need"} your attention.`}
       </p>
 
-      <div className="card">
-        <div className="badge">Potential Annual Saving · recurring only</div>
-        <div className="figure">
-          {range}
-          {h.basis !== "INSUFFICIENT_DATA" && <span className="cur">{h.currency}</span>}
-          {h.isLowerBound && <span className="cur">lower bound</span>}
-        </div>
-        <div className="note">
-          basis <strong>{h.basis}</strong> · realised {h.realisedVersusIdentified.realised} of{" "}
-          {h.realisedVersusIdentified.identified} identified
-        </div>
-        <ul className="reasons">
-          {h.statements.map((s, i) => (
-            <li key={i}>{s}</li>
-          ))}
-        </ul>
-      </div>
-
-      {h.excluded.length > 0 && (
-        <div className="card">
-          <h3 style={{ marginTop: 0 }}>Identified but excluded from the figure</h3>
-          <p className="note">
-            These are real findings whose money cannot yet be defensibly claimed. They are shown
-            rather than dropped — the total above omits them, and the omission is favourable.
-          </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Finding</th>
-                <th>Why it is excluded</th>
-                <th className="num">Observed magnitude</th>
-              </tr>
-            </thead>
-            <tbody>
-              {h.excluded.map((e) => (
-                <tr key={e.opportunityId}>
-                  <td>
-                    <a href={`/opportunities#${encodeURIComponent(e.opportunityId)}`}>{e.title}</a>
-                  </td>
-                  <td className="note" style={{ margin: 0 }}>{e.reason}</td>
-                  <td className="num">
-                    {e.observedMagnitude ? moneyExact(e.observedMagnitude, h.currency) : "—"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {attentionCount === 0 && (
+        <p className="note" style={{ marginTop: "calc(var(--s5) * -1)" }}>
+          Checked {stock.length} materials and {orders.filter((o) => o.isOpen).length} incoming orders,
+          using stock recorded up to {fmtDate(AS_OF)}.
+        </p>
       )}
 
-      <h2>What needs attention</h2>
-      <div className="card">
-        <dl className="kv">
-          <dt>Opportunities detected</dt>
-          <dd>
-            {r.opportunities.length} · <a href="/opportunities">review</a>
-          </dd>
-          <dt>Evidence gaps</dt>
-          <dd>
-            {r.evidenceGaps.length} — data the factory does not record, blocking claims we could
-            otherwise make
-          </dd>
-          <dt>Contradictions</dt>
-          <dd>
-            {r.contradictions.length}
-            {r.contradictions.length === 0 && (
-              <span className="note"> — no two recommendations oppose each other</span>
-            )}
-          </dd>
-          <dt>Open orders in flight</dt>
-          <dd>
-            {counts?.open_orders ?? 0} · <a href="/orders">track</a>
-          </dd>
-          <dt>Items · movements recorded</dt>
-          <dd>
-            {counts?.items ?? 0} · {counts?.movements ?? 0}
-          </dd>
-        </dl>
-      </div>
-
-      {r.evidenceGaps.length > 0 && (
-        <>
-          <h2>Evidence gaps</h2>
-          <p className="sub">
-            Prioritised by <strong>observed spend</strong> — a fact we can see — never by suspected
-            opportunity, which we cannot.
-          </p>
-          <div className="card">
-            <table>
-              <thead>
-                <tr>
-                  <th>Ref</th>
-                  <th>What is missing</th>
-                  <th className="num">Observed spend</th>
-                </tr>
-              </thead>
-              <tbody>
-                {r.evidenceGaps.map((g) => {
-                  const spend = g.observed_spend as Record<string, unknown> | null;
-                  return (
-                    <tr key={g.id}>
-                      <td><span className="badge">{g.factory_data_ref}</span></td>
-                      <td>
-                        {g.missing_evidence}
-                        <div className="note">{g.blocks}</div>
-                      </td>
-                      <td className="num">{spend?.["value"] ? `${spend["value"]} ${spend["unit"]}` : "—"}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      {/* ---------------------------------------------------------- LAYER 2 */}
+      {blocking.length > 0 && (
+        <section className="section">
+          <h2>Production may stop</h2>
+          <div className="rows">
+            {blocking.map((s) => (
+              <div className="row" key={s.itemId}>
+                <span className="rmark" aria-hidden="true">🔴</span>
+                <div className="rmain">
+                  <div className="rtitle">{s.name}<span className="rcode">{s.code}</span></div>
+                  <div className="rsub">
+                    {fmtQty(s.available, s.stockUom, { whole: s.integerOnly })} left
+                    {s.coverDays !== null && ` — ${fmtCover(s.coverDays)} of cover`}
+                    {s.leadTimeDays !== null && `, and it takes ${s.leadTimeDays} days to arrive`}
+                  </div>
+                </div>
+                <div className="rtrail">
+                  {s.nextArrival ? <>due {fmtDate(s.nextArrival)}</> : <span className="note" style={{ margin: 0 }}>nothing on order</span>}
+                </div>
+                <div className="rdo">
+                  <a href={`/inventory#${s.code}`}>Order more {s.name.toLowerCase()}</a>
+                  {" — "}you will run out before a replacement could arrive.
+                </div>
+              </div>
+            ))}
           </div>
-        </>
+        </section>
+      )}
+
+      {lateOrders.length > 0 && (
+        <section className="section">
+          <h2>Deliveries that need chasing</h2>
+          <div className="rows">
+            {lateOrders.map((o) => {
+              const why = whyLate(o);
+              return (
+                <div className="row" key={o.poLineId}>
+                  <span className="rmark" aria-hidden="true">{o.state === "no" ? "🔴" : "🟡"}</span>
+                  <div className="rmain">
+                    <div className="rtitle">{o.itemName}<span className="rcode">{o.number} · {o.supplier}</span></div>
+                    <div className="rsub">
+                      {fmtQty(o.openQty, o.uom)} still to come
+                      {o.daysLate !== null ? `, ${fmtDays(o.daysLate)}` : o.expectedDate ? `, expected ${fmtDate(o.expectedDate)}` : ""}
+                    </div>
+                    {why && <div className="rnote">{why}</div>}
+                  </div>
+                  <div className="rtrail">
+                    {o.expectedDate ? fmtDate(o.expectedDate) : <span className="note" style={{ margin: 0 }}>no date</span>}
+                  </div>
+                  <div className="rdo"><a href={`/orders#${o.number}`}>Chase {o.supplier}</a></div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {atRisk.length > 0 && (
+        <section className="section">
+          <h2>Running low</h2>
+          <div className="rows">
+            {atRisk.map((s) => (
+              <div className="row" key={s.itemId}>
+                <span className="rmark" aria-hidden="true">🟡</span>
+                <div className="rmain">
+                  <div className="rtitle">{s.name}<span className="rcode">{s.code}</span></div>
+                  <div className="rsub">
+                    {s.coverDays !== null && `${fmtCover(s.coverDays)} of cover`}
+                    {s.leadTimeDays !== null && `, and it takes ${s.leadTimeDays} days to arrive`}
+                  </div>
+                </div>
+                <div className="rtrail">{fmtQty(s.available, s.stockUom, { whole: s.integerOnly })}</div>
+                <div className="rdo"><a href={`/inventory#${s.code}`}>Order before you run out</a></div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ---------------------------------------------------------- LAYER 3 */}
+      <section className="section">
+        <h2>Money</h2>
+        <div className="metric-strip">
+          <div className="metric">
+            <span className="mvalue">
+              {head.basis === "INSUFFICIENT_DATA" ? "Not yet" : money(head.upper, "EGP")}
+            </span>
+            <span className="mlabel">
+              You could save this each year
+              {openFindings > 0 && ` · ${openFindings} ${openFindings === 1 ? "saving needs" : "savings need"} your decision`}
+            </span>
+          </div>
+        </div>
+        {head.basis !== "INSUFFICIENT_DATA" && (
+          <p className="note" style={{ maxWidth: "62ch" }}>
+            {head.lower.isZero()
+              ? "None of this is proven yet — it rests on figures entered by hand rather than measured. "
+              : `${money(head.lower, "EGP")} of it rests on measured records. `}
+            <a href="/opportunities">See what it rests on</a>
+          </p>
+        )}
+      </section>
+
+      {/* What we cannot yet judge — stated, and made useful. */}
+      {unknowable.length > 0 && (
+        <section className="section">
+          <h2>What we can&apos;t judge yet</h2>
+          <p className="section-note">
+            We can watch {stock.length - unknowable.length} of your {stock.length} materials properly.
+            For the rest we can show what you have, but we can&apos;t warn you before you run out.
+          </p>
+          <div className="rows tight">
+            {unknowable.slice(0, 4).map((s) => {
+              const c = cantSayCopy(s);
+              return (
+                <div className="row" key={s.itemId}>
+                  <span className="rmark" aria-hidden="true">⚪</span>
+                  <div className="rmain">
+                    <div className="rtitle">{s.name}<span className="rcode">{s.code}</span></div>
+                    <div className="rsub">{c.why}</div>
+                  </div>
+                  <div className="rtrail">{fmtQty(s.available, s.stockUom, { whole: s.integerOnly })}</div>
+                  {c.fix && <div className="rdo"><a href={c.fix}>Add a delivery time</a> — {c.then.toLowerCase()}</div>}
+                </div>
+              );
+            })}
+          </div>
+          {unknowable.length > 4 && (
+            <p className="note"><a href="/inventory">See all {unknowable.length} in Stock</a></p>
+          )}
+        </section>
+      )}
+
+      {/* ------------------------------------------------------------ D-059 */}
+      {lastAsk && (
+        <section className="section">
+          <h2>The last thing you checked</h2>
+          <p style={{ margin: 0, maxWidth: "64ch" }}>
+            On {fmtDate(lastAsk.askedAt)} you asked whether you could make{" "}
+            {fmtQty(lastAsk.requestedQty, "", { whole: true }).trim()} of {lastAsk.name}.{" "}
+            {lastAsk.headline}
+          </p>
+          <p className="note">
+            This is what we told you then, not a plan we are tracking.{" "}
+            <a href="/produce">Ask again</a> to check against today&apos;s stock.
+          </p>
+        </section>
       )}
     </>
   );

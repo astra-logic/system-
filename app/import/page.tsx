@@ -1,5 +1,5 @@
 /**
- * IMPORT — the front door.
+ * BRING IN YOUR DATA — the front door.
  *
  * UPLOAD → PARSE → VALIDATE → SHOW ERRORS → ACCEPT VALID → WRITE TO LEDGER → RESULT
  *
@@ -14,6 +14,7 @@ import { firstSiteId } from "../../lib/engine/run";
 import { parseFile, readSheet, recordBatch } from "../../lib/import/ingest";
 import { ITEM_SPEC, MOVEMENT_SPEC, STRUCTURE_SPEC } from "../../lib/import/specs";
 import { applyItems, applyMovements, applyStructures, recordOutcomes, type ApplyReport } from "../../lib/import/apply";
+import { date as fmtDate } from "../../lib/ui/format";
 import { DemoBanner } from "../demo-banner";
 
 export const dynamic = "force-dynamic";
@@ -78,6 +79,33 @@ async function handleUpload(formData: FormData): Promise<void> {
   revalidatePath("/data-health");
 }
 
+
+/** What a file was said to contain, in the words the user chose it by. */
+const KIND: Record<string, string> = {
+  MOVEMENTS: "Stock movements",
+  ITEMS: "Item list",
+  STRUCTURES: "Product recipes",
+  /* The demo corpus is written directly rather than uploaded, so it carries no
+     rows. It is still a batch, and hiding it would break the promise that
+     everything the system holds can be traced to where it came from. */
+  SEED: "Made-up starter data",
+};
+
+/**
+ * ⚠ A batch with no rows is not a failed batch. The starter data went in
+ * without passing through a spreadsheet, so counting its rows and painting it
+ * red would report a fault that did not happen.
+ */
+const batchMark = (accepted: number, rejected: number, total: number): string =>
+  total === 0 ? "⚪" : rejected === 0 && accepted > 0 ? "🟢" : accepted > 0 ? "🟡" : "🔴";
+
+/** Why a row didn't go in. Never a code — the user has to act on this. */
+const OUTCOME: Record<string, string> = {
+  DUPLICATE: "Already recorded",
+  REJECTED: "Couldn't be read",
+  FAILED: "Couldn't be read",
+};
+
 export default async function ImportPage() {
   const siteId = await firstSiteId();
   const batches = siteId
@@ -100,177 +128,187 @@ export default async function ImportPage() {
   return (
     <>
       <DemoBanner isDemo={anyDemo?.d ?? false} />
-      <h1>Import factory data</h1>
+      <p className="note" style={{ marginTop: 0 }}><a href="/settings">← Settings</a></p>
+      <h1>Bring in your data</h1>
       <p className="sub">
-        A spreadsheet enters through the same ledger rules as everything else. Nothing is repaired,
-        defaulted or guessed — a row the system cannot understand is refused with the reason, and the
-        original is kept exactly as you sent it.
+        A spreadsheet goes through exactly the same rules as anything else you enter. Nothing is
+        repaired, filled in or guessed — a row we can&apos;t understand is turned away with the
+        reason, and kept exactly as you sent it.
       </p>
 
-      <div className="card">
+      {/* ------------------------------------------------------------ UPLOAD */}
+      <section className="section">
         <form action={handleUpload}>
-          <div style={{ display: "grid", gap: 14, maxWidth: 560 }}>
+          <div className="form">
             <label>
-              <div className="note" style={{ margin: "0 0 4px" }}>What is in this file?</div>
-              <select name="kind" defaultValue="MOVEMENTS" style={selectStyle}>
+              <span>What is in this file?</span>
+              <select name="kind" defaultValue="MOVEMENTS">
                 <option value="MOVEMENTS">Stock movements</option>
-                <option value="ITEMS">Item master</option>
+                <option value="ITEMS">Item list</option>
                 <option value="STRUCTURES">Product recipes</option>
               </select>
             </label>
 
             <label>
-              <div className="note" style={{ margin: "0 0 4px" }}>Spreadsheet (.xlsx or .csv)</div>
-              <input type="file" name="file" accept=".xlsx,.xls,.csv" required style={{ fontSize: 14 }} />
+              <span>Your spreadsheet — .xlsx or .csv</span>
+              <input type="file" name="file" accept=".xlsx,.xls,.csv" required />
             </label>
 
-            <label style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-              <input type="checkbox" name="isDemo" defaultChecked style={{ marginTop: 3 }} />
+            <label className="check">
+              <input type="checkbox" name="isDemo" defaultChecked />
               <span className="note" style={{ margin: 0 }}>
-                <strong>This is demo or test data.</strong> Leave ticked unless the file contains real
-                factory transactions. Everything derived from a demo batch stays marked as demo, so a
-                generated number can never be presented as a real factory saving.
+                <strong>This is made-up or test data.</strong> Leave this ticked unless the file
+                holds real transactions from your factory. Anything worked out from made-up data
+                stays marked as such, so a generated number can never be shown to you as a real
+                saving.
               </span>
             </label>
 
-            <div>
-              <button type="submit" style={buttonStyle}>Upload and validate</button>
+            <div className="actions">
+              <button className="btn btn-primary" type="submit">Upload and check</button>
             </div>
           </div>
         </form>
 
-        <details style={{ marginTop: 18 }}>
-          <summary className="note" style={{ cursor: "pointer" }}>Required columns</summary>
-          <div className="note" style={{ marginTop: 8 }}>
-            <p style={{ margin: "6px 0" }}>
-              <strong>Stock movements:</strong> <code>natural_key · item_code · from_location ·
-              to_location · quantity · uom · effective_date · reason_code</code>. Optional:{" "}
-              <code>actual_quantity · actual_uom · document_type · document_id · cost_centre</code>.
+        <details className="disclose">
+          <summary>What each file needs to contain</summary>
+          <div className="disclose-body">
+            <h3>Stock movements</h3>
+            <p>
+              One row per movement, with columns for a reference of your own, the item code, where
+              it came from, where it went, how much, the unit, the date, and why it moved.
             </p>
-            <p style={{ margin: "6px 0" }}>
-              <strong>Item master:</strong> <code>code · name · kind · stock_uom</code>. Optional:{" "}
-              <code>catch_weight · nominal_uom · lead_time_days</code>.
+            <h3>Item list</h3>
+            <p>
+              A code, a name, what kind of thing it is, and the unit you keep it in. You can also
+              give a delivery time here, which is what lets us warn you before something runs out.
             </p>
-            <p style={{ margin: "6px 0" }}>
-              <strong>Product recipes:</strong> <code>parent_code · component_code · quantity_per ·
-              uom · effective_from</code>. One row per material in a product, and{" "}
-              <code>quantity_per</code> is for <strong>one</strong> finished unit. Import your items
-              first — a recipe line pointing at an item that does not exist is refused rather than
-              skipped, because a silently missing material would make every answer wrong.
+            <h3>Product recipes</h3>
+            <p>
+              One row per material in a product: the product code, the material code, how much goes
+              into <strong>one</strong> finished unit, the unit, and the date it started applying.
+              Import your item list first — a recipe pointing at an item we don&apos;t have is
+              turned away rather than skipped, because a silently missing material would make every
+              answer about that product wrong.
             </p>
-            <p style={{ margin: "6px 0" }}>
-              To change a quantity, add a row with a later <code>effective_from</code>. The old one
-              stays as history, so an answer given last month can still be explained.
+            <p className="note">
+              To change a quantity later, add a row with a later start date. The old one stays as
+              history, so an answer we gave you last month can still be explained.
             </p>
-            <p style={{ margin: "6px 0" }}>
-              <strong>Dates must be ISO — <code>YYYY-MM-DD</code>.</strong> A date like{" "}
-              <code>03/04/2026</code> is refused rather than guessed: it could be either day/month or
-              month/day, and a month's error changes which period the transaction falls in and the FX
-              rate applied to it.
+            <h3>Dates</h3>
+            <p>
+              Write dates as year-month-day, for example 2026-04-03. We turn away something like
+              03/04/2026 rather than guessing: it could be the third of April or the fourth of
+              March, and a month&apos;s error moves the transaction into a different period with a
+              different exchange rate.
             </p>
           </div>
         </details>
-      </div>
+      </section>
 
+      {/* ------------------------------------------------------- LAST RESULT */}
       {latest && (
-        <>
-          <h2>Last import</h2>
-          <div className="card">
-            <dl className="kv">
-              <dt>Batch</dt>
-              <dd><code>{latest.id}</code></dd>
-              <dt>File</dt>
-              <dd>{latest.filename} · {latest.kind}</dd>
-              <dt>Origin</dt>
-              <dd>{latest.is_demo ? <span className="badge warn">DEMO</span> : <span className="badge ok">factory</span>}</dd>
-              <dt>Result</dt>
-              <dd>
-                <span className={`badge ${latest.status === "ACCEPTED" ? "ok" : latest.status === "PARTIAL" ? "warn" : "bad"}`}>
-                  {latest.status}
-                </span>
-              </dd>
-              <dt>Rows accepted</dt>
-              <dd><strong>{latest.rows_accepted}</strong> of {latest.rows_total}</dd>
-              <dt>Rows rejected</dt>
-              <dd>{latest.rows_rejected}</dd>
-            </dl>
+        <section className="section">
+          <h2>What happened last time</h2>
+          <div className="rows">
+            <div className="row">
+              <span className="rmark" aria-hidden="true">
+                {batchMark(latest.rows_accepted, latest.rows_rejected, latest.rows_total)}
+              </span>
+              <div className="rmain">
+                <div className="rtitle">
+                  {latest.filename}
+                  <span className="rcode">{KIND[latest.kind] ?? latest.kind}</span>
+                </div>
+                <div className="rsub">
+                  {latest.rows_total === 0 ? (
+                    <>Not brought in from a spreadsheet, so there are no rows to report on.</>
+                  ) : (
+                    <>
+                      {latest.rows_accepted} of {latest.rows_total} {latest.rows_total === 1 ? "row" : "rows"} went in
+                      {latest.rows_rejected > 0 && <>, and {latest.rows_rejected} {latest.rows_rejected === 1 ? "was" : "were"} turned away</>}
+                    </>
+                  )}
+                  {" "}· {latest.is_demo ? "made-up data" : "your data"} · {fmtDate(latest.uploaded_at)}
+                </div>
+              </div>
+              <div className="rtrail strong">{latest.rows_total === 0 ? "—" : latest.rows_accepted}</div>
+            </div>
           </div>
 
           {failedRows.length > 0 && (
-            <div className="card">
-              <h3 style={{ marginTop: 0 }}>Rows that did not enter the ledger</h3>
-              <p className="note">
-                Each is preserved exactly as submitted. Fix the source and upload again — re-uploading
-                an unchanged row is safe, because a movement already recorded is refused rather than
-                posted twice.
+            <>
+              <h3>The rows we couldn&apos;t take</h3>
+              <p className="section-note">
+                Each is kept exactly as you sent it. Fix the source and upload again — sending an
+                unchanged row a second time is safe, because a movement already recorded is turned
+                away rather than counted twice.
               </p>
-              <div className="scroll">
-                <table>
-                  <thead>
-                    <tr><th>Row</th><th>Outcome</th><th>Why</th><th>As submitted</th></tr>
-                  </thead>
-                  <tbody>
-                    {failedRows.map((r) => (
-                      <tr key={r.row_number}>
-                        <td>{r.row_number}</td>
-                        <td>
-                          <span className={`badge ${r.outcome === "DUPLICATE" ? "warn" : "bad"}`}>{r.outcome}</span>
-                        </td>
-                        <td className="note" style={{ margin: 0 }}>{describeErrors(r.errors)}</td>
-                        <td className="note" style={{ margin: 0, fontFamily: "ui-monospace, monospace", fontSize: 12 }}>
-                          {JSON.stringify(r.raw).slice(0, 220)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="rows tight">
+                {failedRows.map((r) => (
+                  <div className="row nomark" key={r.row_number}>
+                    <div className="rmain">
+                      <div className="rtitle">
+                        Row {r.row_number}
+                        <span className="rcode">{OUTCOME[r.outcome] ?? "Couldn't be read"}</span>
+                      </div>
+                      <div className="rsub">{describeErrors(r.errors)}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            </>
           )}
-        </>
+        </section>
       )}
 
-      <h2>Import history</h2>
-      <div className="card scroll">
-        <table>
-          <thead>
-            <tr><th>When</th><th>File</th><th>Kind</th><th>Status</th><th className="num">Accepted</th><th className="num">Rejected</th><th>Origin</th></tr>
-          </thead>
-          <tbody>
+      {/* ----------------------------------------------------------- HISTORY */}
+      {batches.length > 1 && (
+        <section className="section">
+          <h2>Everything you&apos;ve brought in</h2>
+          <div className="rows tight">
             {batches.map((b) => (
-              <tr key={b.id}>
-                <td>{b.uploaded_at.slice(0, 16).replace("T", " ")}</td>
-                <td>{b.filename}</td>
-                <td>{b.kind}</td>
-                <td><span className={`badge ${b.status === "ACCEPTED" ? "ok" : b.status === "PARTIAL" ? "warn" : "bad"}`}>{b.status}</span></td>
-                <td className="num">{b.rows_accepted}</td>
-                <td className="num">{b.rows_rejected}</td>
-                <td>{b.is_demo ? <span className="badge warn">DEMO</span> : <span className="badge ok">factory</span>}</td>
-              </tr>
+              <div className="row nomark" key={b.id}>
+                <div className="rmain">
+                  <div className="rtitle">
+                    {b.filename}
+                    <span className="rcode">{KIND[b.kind] ?? b.kind}</span>
+                  </div>
+                  <div className="rsub">
+                    {b.rows_total === 0
+                      ? "Not brought in from a spreadsheet"
+                      : <>{b.rows_accepted} of {b.rows_total} went in{b.rows_rejected > 0 && <>, {b.rows_rejected} turned away</>}</>}
+                    {" "}· {b.is_demo ? "made-up data" : "your data"}
+                  </div>
+                </div>
+                <div className="rtrail">{fmtDate(b.uploaded_at)}</div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </div>
+          <p className="note">
+            <a href="/data-health">Check whether it all adds up</a>
+          </p>
+        </section>
+      )}
     </>
   );
 }
 
+/**
+ * Why a row was turned away, in a sentence the user can act on.
+ *
+ * The engine records the column, what it found, what was required and what the
+ * consequence would have been. All four are useful; the punctuation between
+ * them is what makes it a sentence rather than a dump.
+ */
 function describeErrors(errors: unknown): string {
-  if (!errors) return "—";
+  if (!errors) return "No reason was recorded.";
   const arr = Array.isArray(errors) ? errors : [errors];
   return arr
     .map((e: Record<string, unknown>) =>
-      e["detail"] ? String(e["detail"]) : `${e["column"] ?? ""}: found "${e["found"] ?? ""}", required ${e["required"] ?? ""}. ${e["consequence"] ?? ""}`,
+      e["detail"]
+        ? String(e["detail"])
+        : `${e["column"] ?? "A column"}: found "${e["found"] ?? ""}", but it needs ${e["required"] ?? "a valid value"}. ${e["consequence"] ?? ""}`.trim(),
     )
     .join(" ");
 }
-
-const selectStyle = {
-  padding: "8px 10px", borderRadius: 8, border: "1px solid var(--line)",
-  background: "var(--surface)", color: "var(--ink)", fontSize: 14, width: "100%",
-} as const;
-
-const buttonStyle = {
-  padding: "9px 18px", borderRadius: 8, border: "1px solid var(--accent)",
-  background: "var(--accent)", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer",
-} as const;

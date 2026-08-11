@@ -17,25 +17,51 @@ import { scan, visibleText } from "../lib/ui/vocabulary";
 
 const BASE = process.env.BASE ?? "http://localhost:3100";
 
-const ROUTES = [
+interface Route { readonly path: string; readonly name: string; readonly expect?: number }
+
+const ROUTES: Route[] = [
   { path: "/", name: "Today" },
   { path: "/inventory", name: "Stock" },
   { path: "/orders", name: "Orders" },
   { path: "/produce", name: "Make" },
   { path: "/opportunities", name: "Savings" },
+  { path: "/settings", name: "Settings" },
   { path: "/data-health", name: "Data health" },
   { path: "/import", name: "Import" },
+  /* The 404 is a route a user reaches, so it is scanned like any other. A
+     framework default leaking a stack trace would never be caught otherwise. */
+  { path: "/no-such-page", name: "Not found", expect: 404 },
 ];
+
+/**
+ * The saving detail page is scanned too, and its URL is discovered rather than
+ * hard-coded — it is the densest page in the product and the one where engine
+ * prose reaches the user most directly, so leaving it out would exempt exactly
+ * the page that most needs the check.
+ */
+async function withDetailRoute(): Promise<Route[]> {
+  try {
+    const res = await fetch(`${BASE}/opportunities`);
+    const id = (await res.text()).match(/opportunities\/([0-9a-f-]{36})/)?.[1];
+    return id ? [...ROUTES, { path: `/opportunities/${id}`, name: "One saving" }] : ROUTES;
+  } catch {
+    return ROUTES;
+  }
+}
 
 async function main() {
   let total = 0;
   const rows: { route: string; count: number; terms: string[] }[] = [];
 
-  for (const r of ROUTES) {
+  for (const r of await withDetailRoute()) {
     let html: string;
     try {
       const res = await fetch(`${BASE}${r.path}`);
-      if (!res.ok) { console.error(`  ${r.path} → HTTP ${res.status}, skipped`); continue; }
+      const wanted = r.expect ?? 200;
+      if (res.status !== wanted) {
+        console.error(`  ${r.path} → HTTP ${res.status}, expected ${wanted}, skipped`);
+        continue;
+      }
       html = await res.text();
     } catch {
       console.error(`\nCannot reach ${BASE}. Start the app first:  npx next start -p 3100\n`);

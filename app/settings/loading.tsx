@@ -2,5 +2,5 @@ import { LoadingState } from "../_ui/states";
 
 /** Shown while the page's real database work runs. Never a blank screen. */
 export default function Loading() {
-  return <LoadingState title="Bring in your data" rows={3} />;
+  return <LoadingState title="Settings" rows={4} />;
 }

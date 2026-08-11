@@ -46,6 +46,18 @@ describe("formatting boundary", () => {
     expect(fmt.qty("4500.3", "EA", { whole: true })).toBe("4,500 EA");
   });
 
+  it("strips false precision from a figure the copy already hedges", () => {
+    // The exact defect: "Used about 323.166 kg a month" — a sentence that
+    // hedges and then contradicts the hedge to three decimal places.
+    expect(fmt.approx("323.16599999", "kg")).toBe("323 kg");
+    expect(fmt.approx("12.51", "kg")).toBe("13 kg");
+    expect(fmt.approx("9694.98", "kg")).toBe("9,690 kg");
+    expect(fmt.approx("4.27", "kg")).toBe("4.3 kg");
+    expect(fmt.approx("0.4213", "kg")).toBe("0.4 kg");
+    expect(fmt.approx("0", "kg")).toBe("0 kg");
+    expect(fmt.approx(null, "kg")).toBe("—");
+  });
+
   it("distinguishes absent from zero", () => {
     expect(fmt.money(null)).toBe("—");
     expect(fmt.qty(undefined, "kg")).toBe("—");
